@@ -1,11 +1,14 @@
 package me.rubataga.manhunt.models;
-
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
 public class Hunter {
     private Player player;
     private Player hunting;
+
+    public Hunter(Player player){
+        this.player = player;
+        this.hunting = null;
+    }
 
     public Player getPlayer() {
         return player;

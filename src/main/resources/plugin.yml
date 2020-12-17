@@ -1,5 +1,5 @@
-name: GodMode
+name: Manhunt
 version: ${project.version}
-main: me.rubataga.godmode.GodMode
+main: me.rubataga.manhunt.Manhunt
 api-version: 1.16
 author: rubataga
