@@ -1,0 +1,5 @@
+name: GodMode
+version: ${project.version}
+main: me.rubataga.godmode.GodMode
+api-version: 1.16
+author: rubataga
