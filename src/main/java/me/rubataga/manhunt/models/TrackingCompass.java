@@ -2,7 +2,6 @@ package me.rubataga.manhunt.models;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class TrackingCompass {

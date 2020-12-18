@@ -14,10 +14,9 @@ import java.util.stream.Collectors;
 
 public final class Manhunt extends JavaPlugin {
 
-    public static ArrayList<Player> runners = new ArrayList<>();
+    public static List<Player> runners = new LinkedList<>();
     public static HashMap<Player, Hunter> hunters = new HashMap<>();
-    public static HashMap<Player, Location> runnerLocations = new HashMap<>();
-
+    //public static HashMap<Player, Location> runnerLocations = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -48,7 +47,7 @@ public final class Manhunt extends JavaPlugin {
     }
 
     public static boolean isHunter(Player hunter){
-        if(getHunters().contains(hunter)){
+        if(hunters.keySet().contains(hunter)){
             return true;
         }
         return false;
@@ -61,6 +60,13 @@ public final class Manhunt extends JavaPlugin {
             }
         }
         return false;
+    }
+
+    public static Hunter getHunter(Player player){
+        if(hunters.containsKey(player)){
+            return hunters.get(player);
+        }
+        return null;
     }
 
     public static Collection<Hunter> getHunters(){

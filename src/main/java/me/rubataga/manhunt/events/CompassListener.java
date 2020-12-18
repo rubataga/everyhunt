@@ -25,7 +25,10 @@ public class CompassListener implements Listener {
 
     @EventHandler
     public void hunterUseTrackingCompass(PlayerInteractEvent e){
-        if(Manhunt.runners.size()==0 || !Manhunt.isHunter(e.getPlayer()) || !Manhunt.isTrackerCompass(e.getItem())){ // if there are no runners or player is not a hunter or item is not a Tracker Compass
+        if(e.getItem()==null){
+            return;
+        }
+        if(!Manhunt.isHunter(e.getPlayer()) || !Manhunt.isTrackerCompass(e.getItem()) || Manhunt.runners.size()==0){ // if there are no runners or player is not a hunter or item is not a Tracker Compass
             return;
         }
         Hunter hunter = Manhunt.hunters.get(e.getPlayer()); // Hunter hunter = the hunter using the compass
