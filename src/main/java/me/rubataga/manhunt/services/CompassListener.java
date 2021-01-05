@@ -13,27 +13,17 @@ import org.bukkit.inventory.EquipmentSlot;
 
 public class CompassListener implements Listener {
 
+    public CompassListener(){}
+
     @EventHandler
     public void hunterUseTrackingCompass(PlayerInteractEvent e){
         if(e.getHand().equals(EquipmentSlot.OFF_HAND) || //if listening for OFF_HAND
                 e.getItem()==null || //if no item is being held
                 !TargetManager.isHunter(e.getPlayer()) || // if the event player is not a hunter
                 !TrackingCompassUtils.isTrackingCompass(e.getItem())){// if the event player is not holding a Tracking Compass
-                 // if the event player is clicking an entity
             return;
         }
         Player hunter = e.getPlayer();
-//        RayTraceResult rayTracedEntities = e.getPlayer().getWorld().rayTraceEntities(e.getPlayer().getLocation(), e.getPlayer().getLocation().getDirection(),2.99D);
-//        if(rayTracedEntities == null){
-//            hunter.sendMessage("No entities!");
-//            return;
-//        } else {
-//            if(rayTracedEntities.getHitEntity() == null){
-//                hunter.sendMessage("No entities!");
-//                return;
-//            }
-//        }
-        //hunter.sendMessage("Entity detected!");
         if(TargetManager.isTrackingDeath(hunter)){ // if hunter is tracking death and target is null
             TargetManager.removeHunterTrackingDeath(hunter);
             if(TargetManager.getHunterTarget(hunter)!=null){
@@ -48,29 +38,21 @@ public class CompassListener implements Listener {
             TargetManager.setTarget(hunter,null);
             hunter.sendMessage("Tracker reset");
         }
-//        if(TargetManager.isTrackingDeath(hunter) && TargetManager.getHunterTarget(hunter)!=null){ //if hunter is tracking death and hunter has target
-//            Entity target = TargetManager.getHunterTarget(hunter);
-//            TargetManager.removeHunterTrackingDeath(hunter);
-//            if(!(target instanceof Player) || target.isDead()){ // if target isn't player or target is dead
-//                //if(TargetManager.isRunner((Player) TargetManager.getHunterTarget(hunter))){
-//                TargetManager.setTarget(hunter, null); // reset target to null
-//                hunter.sendMessage("Tracker reset");
-//                return;
-//            }
-//            hunter.sendMessage("Now tracking " + ((Player) target).getDisplayName());
-//            return;
-//        }
-        if(TargetManager.getRunners().size()==0) { // if there are no runners
+        if(TargetManager.getRunners().size()==0 || // if there are no runners
+                !(TargetManager.getTargets().get(hunter) instanceof Player)) { // if target isn't a player
             return;
         }
-        int runnerIndex;  // initialize runnerIndex
-        if(TargetManager.getRunners().size()==1 ||
-                TargetManager.getTargets().get(hunter)==null ||
-                !(TargetManager.getTargets().get(hunter) instanceof Player)){ // if there's only one runner or the hunter has no target or the target is not a player
-            runnerIndex = 0; // set the runnerIndex to 0;
+        int runnerIndex = 0;  // initialize runnerIndex
+        if(TargetManager.getRunners().size()==1){  // if there's only one runner
+            if(TargetManager.getRunners().get(0)==hunter){ // if the single runner is also the hunter
+                return;
+            }
         } else {
             runnerIndex = TargetManager.getRunners().indexOf(TargetManager.getTargets().get(hunter)) + 1; // cycle to the next runner in the ArrayList
-            if (runnerIndex == TargetManager.getRunners().size()) { // if the runnerIndex gets greater than the # of runners
+            if(TargetManager.getRunners().get(runnerIndex)==hunter){ // if the hunter is that next runner, keep going;
+                runnerIndex++;
+            }
+            if (runnerIndex >= TargetManager.getRunners().size()) { // if the runnerIndex gets greater than the # of runners
                 runnerIndex = 0; // set the runnerIndex back to 0
             }
         }
@@ -113,20 +95,8 @@ public class CompassListener implements Listener {
             for(Player hunter : TargetManager.getHuntersWithTarget(e.getEntity())){ // for each hunter targeting the dead entity
                 TargetManager.addHunterTrackingDeath(hunter); // hunter is now targeting death location and compass is not updated
                 hunter.sendMessage(TargetManager.getHunterTarget(hunter) + " has died. Now tracking " + TargetManager.getHunterTarget(hunter) + "'s death location.");
-                //TargetManager.setTarget(hunter,null);
             }
         }
 
     }
 }
-
-
-//    @EventHandler
-//    public void onRunnerMove(PlayerMoveEvent e){
-//        if(Manhunt.isRunner(e.getPlayer())){ // if runner moves
-//            Player runner = e.getPlayer(); // Player runner = the event's player
-//            for(Hunter hunter : Manhunt.huntersTargeting(runner)){ // for each hunter targeting the runner
-//                hunter.compassTrackRunner(runner); //update their compasses to point at targetHunters
-//            }
-//        }
-//    }

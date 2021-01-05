@@ -1,6 +1,6 @@
-package me.rubataga.manhunt.models;
+package me.rubataga.manhunt.services;
 
-import me.rubataga.manhunt.services.TargetManager;
+import me.rubataga.manhunt.models.TrackingCompassUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 public class CompassRepeatingTask {
+
+    private CompassRepeatingTask(){}
 
     public static Runnable compassRepeatingTask = ()-> {
         for (Map.Entry<Player, Entity> playerEntityEntry : TargetManager.getTargets().entrySet()) {
@@ -36,13 +38,12 @@ public class CompassRepeatingTask {
                     }
                 } else {
                     meta.setDisplayName("§cTracking Compass - " + target.getName());
-                    compassLore.add("Target: " + target.getName());
                     if (target.getWorld().equals(hunter.getWorld())) {
+                        compassLore.add("Target: " + target.getName());
                         hunter.setCompassTarget(target.getLocation());
                     } else {
                         compassLore.add("Target is in a different world");
-                        compassLore.add("Target: last world location.");
-
+                        compassLore.add("Target: " + target.getName() + "'s last world location.");
                     }
                 }
 

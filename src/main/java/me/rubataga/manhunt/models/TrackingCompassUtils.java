@@ -9,7 +9,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class TrackingCompassUtils {
@@ -40,18 +39,18 @@ public class TrackingCompassUtils {
         return false;
     }
 
-    public static boolean hasTrackingCompass(Player player){
-        PlayerInventory inventory = player.getInventory();
-        if(inventory.contains(Material.COMPASS)){
-            ItemStack[] compasses = Arrays.stream(inventory.getContents()).filter(item -> item.getType() == Material.COMPASS).toArray(ItemStack[]::new);
-            for (ItemStack compass : compasses) {
-                if(compass.getItemMeta().getDisplayName().contains("Tracking Compass")){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+//    public static boolean hasTrackingCompass(Player player){
+//        PlayerInventory inventory = player.getInventory();
+//        if(inventory.contains(Material.COMPASS)){
+//            ItemStack[] compasses = Arrays.stream(inventory.getContents()).filter(item -> item.getType() == Material.COMPASS).toArray(ItemStack[]::new);
+//            for (ItemStack compass : compasses) {
+//                if(compass.getItemMeta().getDisplayName().contains("Tracking Compass")){
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
 
     public static ItemStack getTrackingCompass(Player player){
         PlayerInventory inventory = player.getInventory();
@@ -62,9 +61,6 @@ public class TrackingCompassUtils {
                 if(isTrackingCompass(item)){
                     trackingCompasses.add(item);
                 }
-//                if (item.getType() == Material.COMPASS && item.getItemMeta().getDisplayName().contains("Tracking Compass")) {
-//                    trackingCompasses.add(item);
-//                }
             }
         }
         if(trackingCompasses.size()!=1){
@@ -79,9 +75,6 @@ public class TrackingCompassUtils {
             return trackingCompass.getBoolean("isTrackingCompass");
         }
         return false;
-//            return !compass.getItemMeta().getDisplayName().contains("Tracking Compass");
-//        }
-//        return true;
     }
 //
 //    public static boolean giveCompass(Player hunter){
