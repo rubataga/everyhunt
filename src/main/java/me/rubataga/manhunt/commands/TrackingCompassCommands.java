@@ -5,15 +5,26 @@ import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.PlayerArgument;
 import me.rubataga.manhunt.models.TrackingCompassUtils;
 import me.rubataga.manhunt.services.TargetManager;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
+
+/**
+ * Class containing commands relating to {@link TrackingCompassUtils}
+ */
 
 public class TrackingCompassCommands {
 
-    public TrackingCompassCommands() {}
+    private TrackingCompassCommands() {}
+
+    /**
+     * Command to give a player a {@link TrackingCompassUtils#trackingCompass()}
+     *
+     * @return CommandAPICommand
+     */
 
     public static CommandAPICommand compass(){
         return new CommandAPICommand("compass")
@@ -28,6 +39,12 @@ public class TrackingCompassCommands {
                 });
     }
 
+    /**
+     * Command to give self a {@link TrackingCompassUtils#trackingCompass()}
+     *
+     * @return CommandAPICommand
+     */
+
     public static CommandAPICommand compassSelf(){
         return new CommandAPICommand("compass")
                 .executesPlayer((sender, args) -> {
@@ -39,10 +56,20 @@ public class TrackingCompassCommands {
                 });
     }
 
+    /**
+     * Command given by player to track a runner
+     *
+     * @return CommandAPICommand
+     */
+
     public static CommandAPICommand trackRunner(){
         return new CommandAPICommand("track")
                 .withArguments(new PlayerArgument("runner"))
                 .executesPlayer((sender, args) -> {
+                    if(sender == args[0]){
+                        sender.sendMessage("You can't track yourself!");
+                        return;
+                    }
                     if(TargetManager.isHunter(sender)){
                         if(TargetManager.isRunner((Player) args[0])){
                             TargetManager.setTarget(sender, (Player) args[0]);
@@ -57,37 +84,66 @@ public class TrackingCompassCommands {
                 });
     }
 
+    /**
+     * Command given by player to track an entity / multiple entities
+     *
+     * @return CommandAPICommand
+     */
+
+    @SuppressWarnings("unchecked")
     public static CommandAPICommand trackEntity(){
         return new CommandAPICommand("track")
                 .withArguments(new EntitySelectorArgument("entity", EntitySelectorArgument.EntitySelector.MANY_ENTITIES))
                 .executesPlayer((sender,args) -> {
+                    Bukkit.getLogger().warning("blah");
+                    Bukkit.getLogger().warning(args[0].getClass().getName());
+
+                    Collection<Entity> entityList = new ArrayList<>();
+                    Entity target = null;
+
+                    if(args[0] instanceof Collection){
+                        entityList = (Collection<Entity>)args[0];
+                    }
                     if(!TargetManager.isHunter(sender)){
                         sender.sendMessage("You are not a hunter!");
                         return;
                     }
-                    List<Entity> entityList = (LinkedList)args[0];
-                    if(entityList.size()==0){
-                        sender.sendMessage("No targets found!");
-                        return;
-                    }
-                    Entity target = entityList.get(0);
-                    if(entityList.size()>1){
-                        sender.sendMessage("Multiple targets found! Tracking closest target.");
-                        double min = sender.getLocation().distanceSquared(entityList.get(0).getLocation());
+                    //delete yourself from entityList
+                    entityList.remove(sender);
+
+                    if(entityList.size()>0){
+                        if(entityList.size()>1){
+                            sender.sendMessage("Multiple targets found! Tracking closest target.");
+                        }
+                        Double min = null;
+                        //find closest target
                         for(Entity entity : entityList){
                             double dist = sender.getLocation().distanceSquared(entity.getLocation());
-                            if(dist<min){
+                            if(target==null){
+                                target = entity;
+                                min = dist;
+                            }
+                            else if(dist<min){
                                 target=entity;
                                 min=dist;
                             }
                         }
                     }
-                    if(TargetManager.isHunter(sender)){
+                    if(target!=null){
                         TargetManager.setTarget(sender, target);
                         sender.sendMessage("Now tracking " + target.getName());
+                    } else {
+                        sender.sendMessage("No targets found!");
                     }
                 });
     }
+
+
+    /**
+     * Command to reset a player's compass location
+     *
+     * @return CommandAPICommand
+     */
 
     public static CommandAPICommand recalibrate(){
         return new CommandAPICommand("recalibrate")

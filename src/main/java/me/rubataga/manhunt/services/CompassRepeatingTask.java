@@ -10,34 +10,51 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class containing the task that updates a {@link TrackingCompassUtils#trackingCompass()}
+ */
+
 public class CompassRepeatingTask {
 
     private CompassRepeatingTask(){}
 
+    /**
+     * Task that updates the compass location of a hunter with a {@link TrackingCompassUtils#trackingCompass()}
+     */
+
     public static Runnable compassRepeatingTask = ()-> {
-        for (Map.Entry<Player, Entity> playerEntityEntry : TargetManager.getTargets().entrySet()) {
-            Player hunter = (Player) ((Map.Entry) playerEntityEntry).getKey();
-            Entity target = (Entity) ((Map.Entry) playerEntityEntry).getValue();
+        // for each entrySet of Player, Entity in hunterTargetMap
+        for (Map.Entry<Player, Entity> playerEntityEntry : TargetManager.getHunterTargetMap().entrySet()) {
+            Player hunter = playerEntityEntry.getKey();
+            Entity target = playerEntityEntry.getValue();
+            // if the hunter exists
             if (hunter != null) {
+                // set trackingCompass to the hunter's trackingCompass
                 ItemStack trackingCompass = TrackingCompassUtils.getTrackingCompass(hunter);
                 if(trackingCompass==null){
                     break;
                 }
                 ItemMeta meta = trackingCompass.getItemMeta();
                 List<String> compassLore = new LinkedList<>();
+                // if the hunter is tracking a death location
                 if (TargetManager.isTrackingDeath(hunter)) {
                     meta.setDisplayName("§cTracking Compass - " + target.getName() + "'s death location");
+                // if hunter has no target
                 } else if (target == null) {
                     meta.setDisplayName("§cTracking Compass");
-                    try{
+                    // track hunter's bed
+                    if(hunter.getBedSpawnLocation()!=null){
                         hunter.setCompassTarget(hunter.getBedSpawnLocation());
                         compassLore.add("Target: bed spawn.");
-                    } catch (Exception e){
+                    // if no bed, track world spawn
+                    } else {
                         hunter.setCompassTarget(hunter.getWorld().getSpawnLocation());
                         compassLore.add("Target: world spawn.");
                     }
+                // if hunter has a target and isn't tracking a death location
                 } else {
                     meta.setDisplayName("§cTracking Compass - " + target.getName());
+                    // if target is in the same world world
                     if (target.getWorld().equals(hunter.getWorld())) {
                         compassLore.add("Target: " + target.getName());
                         hunter.setCompassTarget(target.getLocation());
@@ -46,7 +63,7 @@ public class CompassRepeatingTask {
                         compassLore.add("Target: " + target.getName() + "'s last world location.");
                     }
                 }
-
+                // update the trackingCompass' lore and meta
                 meta.setLore(compassLore);
                 trackingCompass.setItemMeta(meta);
             }
