@@ -1,83 +1,200 @@
 package me.rubataga.manhunt.services;
 
-import me.rubataga.manhunt.models.*;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 import java.util.*;
 
+/**
+ * Static class that stores and manages hunter/target pairs.
+ */
+
+// AP CSA: Accessor/Mutator methods (get/set)
+
 public class TargetManager {
 
-    private static final Map<UUID, Hunter> hunters = new HashMap<>();
-    private static final Map<UUID, Target> targets = new HashMap<>();
-    private static final Map<UUID, Runner> runners = new HashMap<>();
-    private static final List<Runner> runnerList = new LinkedList<>();
+    private TargetManager(){}
 
-//    public static GameEntity getGameEntity(UUID id, RoleEnum role){
-//        if(role==RoleEnum.HUNTER){
-//            return hunters.get(id);
-//        } else if (role==RoleEnum.TARGET){
-//            return targets.get(id);
-//        } else if (role==RoleEnum.RUNNER){
-//            return runners.get(id);
-//        }
-//        return null;
-//    }
+    // AP CSA: static variables
+    private static final HashMap<Player, Entity> hunterTargetMap = new HashMap<>();
+    private static final List<Player> runners = new LinkedList<>();
+    private static final List<Player> huntersTrackingDeath = new LinkedList<>();
 
-    public static boolean hasRole(UUID id, RoleEnum role){ // is this implementation worth it???
-        if(role.equals(RoleEnum.HUNTER)){
-            return hunters.containsKey(id);
-        } else if (role.equals(RoleEnum.TARGET)){
-            return targets.containsKey(id);
-        } else if (role.equals(RoleEnum.RUNNER)){
-            return runners.containsKey(id);
+    /**
+     * Returns a list of all hunters of tracking an entity
+     *
+     * @param entity Entity to find hunters for.
+     * @return a list containing players tracking the entity
+     */
+
+    // AP CSA: static methods
+
+    public static List<Player> getHuntersWithTarget(Entity entity){
+        List<Player> huntersTargetingRunner = new LinkedList<>();
+        // AP CSA: For each loops
+        for (Map.Entry<Player, Entity> playerEntityEntry : hunterTargetMap.entrySet()) {
+            // AP CSA: Comparing objects with .equals()
+            if (playerEntityEntry.getValue().equals(entity)) {
+                huntersTargetingRunner.add(playerEntityEntry.getKey());
+            }
         }
-        return false;
+        return huntersTargetingRunner;
     }
 
-    public static boolean hasRole(Entity entity, RoleEnum role){
-        return hasRole(entity.getUniqueId(),role);
+    /**
+     * Returns a hunter's target entity
+     *
+     * @param hunter player to find target for
+     * @return the entity being tracked by hunter
+     */
+
+    public static Entity getHunterTarget(Player hunter){
+        return hunterTargetMap.get(hunter);
     }
 
-    public static void addHunter(Hunter hunter){
-        hunters.put(hunter.getEntity().getUniqueId(), hunter);
+    /**
+     * Removes a player as a hunter
+     *
+     * @param hunter - player to remove
+     */
+
+    public static void removeHunter(Player hunter){
+        hunterTargetMap.remove(hunter);
     }
 
-    public static void removeHunter(UUID id){
-        hunters.remove(id);
+    /**
+     * Checks if a player is a hunter
+     *
+     * @param hunter player to check if hunter
+     * @return true if player is a hunter, key in hunterTargetMap
+     */
+
+    public static boolean isHunter(Player hunter){
+        return hunterTargetMap.containsKey(hunter);
     }
 
-    public static void addTarget(Target target){
-        targets.put(target.getEntity().getUniqueId(), target);
+    /**
+     * Returns the map containing all hunters and targets
+     *
+     * @return a map containing all hunters (keys) and their targets (values)
+     */
+
+    public static HashMap<Player, Entity> getHunterTargetMap() {
+        return hunterTargetMap;
     }
 
-    public static void removeTarget(UUID id){
-        targets.remove(id);
+    /**
+     * Sets a player's target
+     *
+     * @param hunter player to add as hunter or set target for
+     * @param target hunter's new target
+     */
+
+    public static void setTarget(Player hunter, Entity target){
+        if(hunterTargetMap.replace(hunter,target)==null){
+            hunterTargetMap.put(hunter,target);
+        }
+        if(target instanceof Player){
+            if(!runners.contains(target)){
+                runners.add((Player)target);
+            }
+        }
+
     }
 
-    public static void addRunner(Runner runner){
-        runners.put(runner.getEntity().getUniqueId(), runner);
-        runnerList.add(runner);
+    /**
+     * Removes an entity as a target
+     *
+     * @param target entity to remove from hunterTargetMap
+     */
+
+    public static void removeTarget(Entity target){
+        if(hunterTargetMap.containsValue(target)){
+            for (Map.Entry<Player, Entity> playerEntityEntry : hunterTargetMap.entrySet()) {
+                if ((playerEntityEntry).getValue().equals(target)) {
+                    (playerEntityEntry).setValue(null);
+                }
+            }
+        }
     }
 
-    public static void removeRunner(UUID id){
-        runners.remove(id);
-        runnerList.remove(runners.get(id));
+    /**
+     * Checks if an entity is a target
+     *
+     * @param target entity to check
+     * @return true if target is target, value in hunterTargetMap
+     */
+
+    public static boolean isTarget(Entity target){
+        return hunterTargetMap.containsValue(target);
     }
 
-    public static Map<UUID, Hunter> getHunters() {
-        return hunters;
+    /**
+     * Returns a list of runners
+     *
+     * @return a list containing players who are runners
+     */
+
+    public static List<Player> getRunners() { return runners; }
+
+    /**
+     * Adds a player as a runner
+     *
+     * @param runner player to add as runner
+     */
+
+    public static void addRunner(Player runner) { runners.add(runner); }
+
+    /**
+     * Removes a player as a runner
+     *
+     * @param runner player to remove as runner
+     */
+
+    public static void removeRunner(Player runner){
+        runners.remove(runner);
     }
 
-    public static Map<UUID, Target> getTargets() {
-        return targets;
+    /**
+     * Checks if a player is a runner
+     *
+     * @param runner player to check if runner
+     * @return true if player is a runner, value contained in runners
+     */
+
+    public static boolean isRunner(Player runner){
+        return runners.contains(runner);
     }
 
-    public static Map<UUID, Runner> getRunners() {
-        return runners;
+    //public static List<Player> getHuntersTrackingDeath() { return huntersTrackingDeath; }
+
+    /**
+     * Adds a player to tracking the location of its target's death
+     *
+     * @param hunter hunter to add to huntersTrackingDeath
+     */
+
+    public static void addHunterTrackingDeath(Player hunter){
+        huntersTrackingDeath.add(hunter);
     }
 
-    public static List<Runner> getRunnerList() {
-        return runnerList;
+    /**
+     * Removes a player from tracking the location of its target's death
+     *
+     * @param hunter hunter to remove from huntersTrackingDeath
+     */
+
+    public static void removeHunterTrackingDeath(Player hunter){
+        huntersTrackingDeath.remove(hunter);
     }
+
+    /**
+     * Checks if a player is tracking the location of its target's death
+     *
+     * @param hunter hunter tracking a death location
+     * @return true if player player is tracking a death location, value contained in huntersTrackingDeath
+     */
+
+    public static boolean isTrackingDeath(Player hunter) { return huntersTrackingDeath.contains(hunter); }
 
 }

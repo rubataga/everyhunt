@@ -4,11 +4,15 @@ import dev.jorel.commandapi.CommandAPICommand;
 /**
  * Class containing all of the plugin's commands
  */
-public class CommandConfiguration {
+
+public class CommandManager {
+
+    private CommandManager() {}
 
     /**
      * Registers all of the plugin's commands
      */
+
     public static void register() {
         new CommandAPICommand("mh")
 
