@@ -1,7 +1,8 @@
 package me.rubataga.manhunt.utils;
 
-import de.tr7zw.changeme.nbtapi.NBTItem;
 import me.rubataga.manhunt.models.Hunter;
+import de.tr7zw.changeme.nbtapi.NBTItem;
+
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -65,8 +66,9 @@ public class TrackingCompassUtils {
         PlayerInventory inventory = player.getInventory();
         List<ItemStack> trackingCompasses = new ArrayList<>();
         for(ItemStack item : inventory.getContents()){
+            // empty inventory slots are null, so skip them
             if(item!=null) {
-                if(isTrackingCompass(item)){
+                if (isTrackingCompass(item)) {
                     trackingCompasses.add(item);
                 }
             }
@@ -75,6 +77,30 @@ public class TrackingCompassUtils {
             return null;
         }
         return trackingCompasses.get(0);
+    }
+
+    public static void assignTrackingCompass(Hunter hunter){
+        // if inventory has no compass
+        if(!hunter.inventoryHasCompass()){
+//            System.out.println("§bdoesn't have compass!");
+//            // if hunter has assigned compass, give them that compass
+//            if(hunter.getCompass()!=null){
+//                System.out.println("§badding assigned");
+//                ItemStack tempCompass = hunter.getCompass();
+//                System.out.println("temp compass null?" + (tempCompass==null));
+//                hunter.setCompass(tempCompass,true);
+//                // else give hunter new compass
+//            } else {
+//                System.out.println("§bmaking new compass!");
+                hunter.setCompass(trackingCompass(),true);
+//            }
+        // if hunter has compass in inventory, set their compass to this compass
+        } else {
+//            System.out.println("§bhas compass!");
+            hunter.setCompass(TrackingCompassUtils.getTrackingCompass(hunter.getEntity()),false);
+        }
+//        System.out.println("compass null?" + (hunter.getCompass()==null));
+        hunter.updateCompass();
     }
 
     public static boolean hasTrackingCompass(Player player){
@@ -87,32 +113,37 @@ public class TrackingCompassUtils {
         //hunter.getEntity().sendMessage("updating compass!");
         ItemStack compass = hunter.getCompass();
         StringBuilder displayName = new StringBuilder("§cTracking Compass");
+        // if hunter has no target
         if(hunter.getTarget()==null){
             if(hunter.getEntity().getBedSpawnLocation()!=null){
-                displayName.append(" - ").append(" Bed Spawn");
+                displayName.append(" - Bed Spawn");
                 hunter.getEntity().setCompassTarget(hunter.getEntity().getBedSpawnLocation());
             } else {
-                displayName.append(" - ").append(" World Spawn");
+                displayName.append(" - World Spawn");
                 hunter.getEntity().setCompassTarget(hunter.getEntity().getWorld().getSpawnLocation());
             }
-        } else if (hunter.isTrackingDeath()){
-            displayName.append(" - ").append(hunter.getTargetEntity().getName()).append("'s death location");
-        } else if (hunter.isTrackingPortal()){
-            displayName.append(" - ").append(hunter.getTargetEntity().getName()).append("'s portal");
+        // if hunter has target
         } else {
             displayName.append(" - ").append(hunter.getTargetEntity().getName());
+            if (hunter.isTrackingDeath()) {
+                displayName.append("'s death location");
+            } else if (hunter.isTrackingPortal()) {
+                displayName.append("'s portal");
+            }
         }
         ItemMeta meta = compass.getItemMeta();
         meta.setDisplayName(displayName.toString());
         compass.setItemMeta(meta);
+        if(TrackingCompassUtils.hasTrackingCompass(hunter.getEntity())){
+            TrackingCompassUtils.getTrackingCompass(hunter.getEntity()).setItemMeta(meta);
+        }
         hunter.getEntity().updateInventory();
+
 
         //System.out.println("§bBUGCHECK: updated compass displayname: " + hunter.getCompass().getItemMeta().getDisplayName());
         //System.out.println("§bBUGCHECK: " + hunter.getEntity().getName() + "'s compass displayname: " + hunter.getCompass().getItemMeta().getDisplayName());
         //System.out.println("§bBUGCHECK: UtilGetCompass displayname: " + getTrackingCompass(hunter.getEntity()).getItemMeta().getDisplayName());
     }
-
-
 
 //
 //    public static void compassUpdateTrackingDeath(Player hunter){

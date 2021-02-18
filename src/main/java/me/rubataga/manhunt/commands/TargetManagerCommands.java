@@ -1,11 +1,11 @@
 package me.rubataga.manhunt.commands;
 
+import me.rubataga.manhunt.services.TargetService;
+import me.rubataga.manhunt.services.TargetManager;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.PlayerArgument;
 
-import me.rubataga.manhunt.services.TargetService;
-import me.rubataga.manhunt.services.TargetManager;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -17,19 +17,20 @@ import java.util.Collections;
  */
 public class TargetManagerCommands {
 
-    private TargetManagerCommands() {}
+    private TargetManagerCommands() {
+    }
 
     /**
      * Command to add player as runner
      *
      * @return CommandAPICommand
      */
-    public static CommandAPICommand addRunner(){
+    public static CommandAPICommand addRunner() {
         return new CommandAPICommand("addrunner")
                 .withArguments(new PlayerArgument("player"))
                 .executes((sender, args) -> {
                     Collection<Entity> player = Collections.singletonList((Player) args[0]);
-                    TargetService.addRunner(sender,player);
+                    TargetService.addRunner(sender, player);
                 });
     }
 
@@ -51,12 +52,12 @@ public class TargetManagerCommands {
      *
      * @return CommandAPICommand
      */
-    public static CommandAPICommand addRunnerMultiple(){
+    public static CommandAPICommand addRunnerMultiple() {
         return new CommandAPICommand("addrunner")
                 .withArguments(new EntitySelectorArgument("players", EntitySelectorArgument.EntitySelector.MANY_ENTITIES))
                 .executes((sender, args) -> {
                     // AP CSA : Casting
-                    TargetService.addRunner(sender,(Collection)args[0]);
+                    TargetService.addRunner(sender, (Collection) args[0]);
                 });
     }
 
@@ -65,12 +66,12 @@ public class TargetManagerCommands {
      *
      * @return CommandAPICommand
      */
-    public static CommandAPICommand addHunter(){
+    public static CommandAPICommand addHunter() {
         return new CommandAPICommand("addhunter")
                 .withArguments(new PlayerArgument("player"))
                 .executes((sender, args) -> {
                     Collection<Entity> player = Collections.singletonList((Player) args[0]);
-                    TargetService.addHunter(sender,player);
+                    TargetService.addHunter(sender, player);
                 });
     }
 
@@ -79,11 +80,11 @@ public class TargetManagerCommands {
      *
      * @return CommandAPICommand
      */
-    public static CommandAPICommand addHunterMultiple(){
+    public static CommandAPICommand addHunterMultiple() {
         return new CommandAPICommand("addhunter")
                 .withArguments(new EntitySelectorArgument("players", EntitySelectorArgument.EntitySelector.MANY_ENTITIES))
                 .executes((sender, args) -> {
-                    TargetService.addRunner(sender,(Collection)args[0]);
+                    TargetService.addRunner(sender, (Collection) args[0]);
                 });
     }
 
@@ -92,7 +93,7 @@ public class TargetManagerCommands {
      *
      * @return CommandAPICommand
      */
-    public static CommandAPICommand addHunterSelf(){
+    public static CommandAPICommand addHunterSelf() {
         return new CommandAPICommand("addhunter")
                 .executesPlayer((sender, args) -> {
                     Collection<Entity> players = Collections.singletonList(sender);
@@ -105,7 +106,7 @@ public class TargetManagerCommands {
      *
      * @return CommandAPICommand
      */
-    public static CommandAPICommand removePlayer(){
+    public static CommandAPICommand removePlayer() {
         return new CommandAPICommand("remove")
                 .withArguments(new PlayerArgument("player"))
                 .executes((sender, args) -> {
@@ -119,12 +120,12 @@ public class TargetManagerCommands {
      *
      * @return CommandAPICommand
      */
-    public static CommandAPICommand removeEntity(){
+    public static CommandAPICommand removeEntity() {
         return new CommandAPICommand("remove")
                 .withArguments(new EntitySelectorArgument("entity", EntitySelectorArgument.EntitySelector.MANY_ENTITIES))
                 .executes((sender, args) -> {
-                    Collection<Entity> entities = (Collection)args[0];
-                    TargetService.removeEntity(sender,entities);
+                    Collection<Entity> entities = (Collection) args[0];
+                    TargetService.removeEntity(sender, entities);
                 });
     }
 
@@ -133,11 +134,11 @@ public class TargetManagerCommands {
      *
      * @return CommandAPICommand
      */
-    public static CommandAPICommand removeSelf(){
+    public static CommandAPICommand removeSelf() {
         return new CommandAPICommand("remove")
                 .executesPlayer((sender, args) -> {
                     Collection<Entity> player = Collections.singletonList(sender);
-                    TargetService.removeEntity(sender,player);
+                    TargetService.removeEntity(sender, player);
                 });
     }
 
@@ -146,10 +147,27 @@ public class TargetManagerCommands {
      *
      * @return CommandAPICommand
      */
-    public static CommandAPICommand teams(){
+    public static CommandAPICommand teams() {
         return new CommandAPICommand("teams")
-                .executes((sender,args) -> {
+                .executes((sender, args) -> {
                     TargetService.teams(sender);
+                });
+    }
+
+    public static CommandAPICommand sumSelf() {
+        return new CommandAPICommand("sum")
+                .executesPlayer((sender, args) -> {
+                    Collection<Entity> player = Collections.singletonList(sender);
+                    TargetService.sum(sender, player);
+                });
+    }
+
+    public static CommandAPICommand sum() {
+        return new CommandAPICommand("sum")
+                .withArguments(new EntitySelectorArgument("entity", EntitySelectorArgument.EntitySelector.MANY_ENTITIES))
+                .executes((sender, args) -> {
+                    Collection<Entity> entities = (Collection) args[0];
+                    TargetService.sum(sender, entities);
                 });
     }
 

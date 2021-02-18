@@ -3,3 +3,4 @@ version: ${project.version}
 main: me.rubataga.manhunt.Manhunt
 api-version: 1.16
 author: rubataga
+#depend: [CommandPanels]

@@ -1,10 +1,12 @@
 package me.rubataga.manhunt.commands;
 
+import me.rubataga.manhunt.services.CompassService;
+import me.rubataga.manhunt.services.TargetManager;
+import me.rubataga.manhunt.utils.TrackingCompassUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.PlayerArgument;
-import me.rubataga.manhunt.services.CompassService;
-import me.rubataga.manhunt.utils.TrackingCompassUtils;
+
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -88,4 +90,14 @@ public class TrackingCompassCommands {
                 });
     }
 
+    public static CommandAPICommand gui(){
+        return new CommandAPICommand("gui")
+                .executesPlayer((sender, args) -> {
+                    if(TargetManager.getHunters().containsKey(sender)){
+                        TargetManager.getHunters().get(sender).getGUI().show();
+                    } else {
+                        sender.sendMessage("Only hunters can do this!");
+                    }
+                });
+    }
 }

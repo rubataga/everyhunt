@@ -1,78 +1,74 @@
 package me.rubataga.manhunt.services;
 
-import me.rubataga.manhunt.models.*;
+import me.rubataga.manhunt.models.Hunter;
+import me.rubataga.manhunt.models.RoleEnum;
+import me.rubataga.manhunt.models.Runner;
+import me.rubataga.manhunt.models.Target;
+
 import org.bukkit.entity.Entity;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class TargetManager {
 
-    private static final Map<UUID, Hunter> hunters = new HashMap<>();
-    private static final Map<UUID, Target> targets = new HashMap<>();
-    private static final Map<UUID, Runner> runners = new HashMap<>();
+    private static final Map<Entity, Hunter> hunters = new HashMap<>();
+    private static final Map<Entity, Target> targets = new HashMap<>();
+    private static final Map<Entity, Runner> runners = new HashMap<>();
     private static final List<Runner> runnerList = new LinkedList<>();
 
-//    public static GameEntity getGameEntity(UUID id, RoleEnum role){
-//        if(role==RoleEnum.HUNTER){
-//            return hunters.get(id);
-//        } else if (role==RoleEnum.TARGET){
-//            return targets.get(id);
-//        } else if (role==RoleEnum.RUNNER){
-//            return runners.get(id);
-//        }
-//        return null;
-//    }
-
-    public static boolean hasRole(UUID id, RoleEnum role){ // is this implementation worth it???
+    public static boolean hasRole(Entity entity, RoleEnum role){ // is this implementation worth it???
         if(role.equals(RoleEnum.HUNTER)){
-            return hunters.containsKey(id);
+            return hunters.containsKey(entity);
         } else if (role.equals(RoleEnum.TARGET)){
-            return targets.containsKey(id);
+            return targets.containsKey(entity);
         } else if (role.equals(RoleEnum.RUNNER)){
-            return runners.containsKey(id);
+            return runners.containsKey(entity);
         }
         return false;
     }
 
-    public static boolean hasRole(Entity entity, RoleEnum role){
-        return hasRole(entity.getUniqueId(),role);
-    }
+//    public static boolean hasRole(Entity entity, RoleEnum role){
+//        return hasRole(entity,role);
+//    }
 
     public static void addHunter(Hunter hunter){
-        hunters.put(hunter.getEntity().getUniqueId(), hunter);
+        hunters.put(hunter.getEntity(), hunter);
     }
 
-    public static void removeHunter(UUID id){
-        hunters.remove(id);
+    public static void removeHunter(Entity hunter){
+        hunters.remove(hunter);
     }
 
     public static void addTarget(Target target){
-        targets.put(target.getEntity().getUniqueId(), target);
+        targets.put(target.getEntity(), target);
     }
 
-    public static void removeTarget(UUID id){
-        targets.remove(id);
+    public static void removeTarget(Entity target){
+        targets.remove(target);
     }
 
     public static void addRunner(Runner runner){
-        runners.put(runner.getEntity().getUniqueId(), runner);
+        runners.put(runner.getEntity(), runner);
         runnerList.add(runner);
     }
 
-    public static void removeRunner(UUID id){
-        runners.remove(id);
-        runnerList.remove(runners.get(id));
+    public static void removeRunner(Entity runner){
+        runners.remove(runner);
+        runnerList.remove(runners.get(runner));
     }
 
-    public static Map<UUID, Hunter> getHunters() {
+    public static Map<Entity, Hunter> getHunters() {
         return hunters;
     }
 
-    public static Map<UUID, Target> getTargets() {
+    public static Map<Entity, Target> getTargets() {
         return targets;
     }
 
-    public static Map<UUID, Runner> getRunners() {
+    public static Map<Entity, Runner> getRunners() {
         return runners;
     }
 

@@ -49,6 +49,10 @@
                                     <pattern>de.tr7zw.changeme.nbtapi</pattern>
                                     <shadedPattern>me.rubataga.manhunt.nbtapi</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>de.themoep</pattern>
+                                    <shadedPattern>me.rubataga.manhunt.inventorygui</shadedPattern>
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>
@@ -81,13 +85,17 @@
             <id>commandapi</id>
             <url>https://raw.githubusercontent.com/JorelAli/CommandAPI/mvn-repo/</url>
         </repository>
+        <repository>
+            <id>minebench-repo</id>
+            <url>https://repo.minebench.de/</url>
+        </repository>
     </repositories>
 
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.16.4-R0.1-SNAPSHOT</version>
+            <version>1.16.5-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -106,5 +114,16 @@
             <artifactId>item-nbt-api</artifactId>
             <version>2.7.1</version>
         </dependency>
+        <dependency>
+            <groupId>de.themoep</groupId>
+            <artifactId>inventorygui</artifactId>
+            <version>1.4.3-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <!--        <dependency>-->
+<!--            <groupId>me.rockyhawk</groupId>-->
+<!--            <artifactId>commandpanels</artifactId>-->
+<!--            <version>3.15.2.4</version>-->
+<!--        </dependency>-->
     </dependencies>
 </project>

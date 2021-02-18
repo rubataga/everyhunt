@@ -1,17 +1,22 @@
 package me.rubataga.manhunt.models;
 
 import me.rubataga.manhunt.utils.TrackingCompassUtils;
+
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class Hunter extends GameEntity{
+public class Hunter extends ManhuntEntity {
 
-    //private UUID targetID;
     private Target target;
+    private ItemStack compass;
+    private Location lastTracked;
+
     private boolean trackingDeath = false;
     private boolean trackingPortal = false;
-    private ItemStack compass;
+    private boolean locked = false;
+    private final HunterGui gui = new HunterGui(this);
 
     public Hunter(Player player){
         super(player);
@@ -21,15 +26,43 @@ public class Hunter extends GameEntity{
         return compass;
     }
 
-    public void setCompass(ItemStack trackingCompass){
-        int slot = getEntity().getInventory().firstEmpty();
-        //System.out.println("BUGCHECK: setCompass: slot - " + slot + ", compass name: " + trackingCompass.getItemMeta().getDisplayName());
-        getEntity().getInventory().setItem(slot,trackingCompass.clone());
-        this.compass = getEntity().getInventory().getItem(slot);
+    // set the hunter's assigned compass, add it to inventory if addCompassToInventory is true
+    public void setCompass(ItemStack trackingCompass, boolean addCompassToInventory){
+        if(addCompassToInventory) {
+            int slot = getEntity().getInventory().firstEmpty();
+            getEntity().getInventory().setItem(slot, trackingCompass.clone());
+            this.compass = getEntity().getInventory().getItem(slot);
+        } else {
+            this.compass = trackingCompass;
+        }
+    }
+
+    public boolean inventoryHasCompass() {
+        return TrackingCompassUtils.hasTrackingCompass(getEntity());
     }
 
     public Player getEntity(){
         return (Player) super.getEntity();
+    }
+
+    public void setLastTracked(Location location){
+        this.lastTracked = location;
+    }
+
+    public Location getLastTracked(){
+        return lastTracked;
+    }
+
+    public HunterGui getGUI() {
+        return gui;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked){
+        this.locked = locked;
     }
 
     public boolean isTrackingDeath() {
@@ -62,7 +95,10 @@ public class Hunter extends GameEntity{
     }
 
     public Entity getTargetEntity(){
-        return this.target.getEntity();
+        if(target==null){
+            return null;
+        }
+        return target.getEntity();
     }
 
     public Target getTarget(){

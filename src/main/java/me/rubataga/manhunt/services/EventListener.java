@@ -4,15 +4,17 @@ import me.rubataga.manhunt.models.Hunter;
 import me.rubataga.manhunt.models.RoleEnum;
 import me.rubataga.manhunt.models.Runner;
 import me.rubataga.manhunt.models.Target;
-
 import me.rubataga.manhunt.utils.TrackingCompassUtils;
+
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
+import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -21,7 +23,7 @@ import org.bukkit.inventory.EquipmentSlot;
 /**
  * Listener for events relating to {@link TrackingCompassUtils}
  */
-public class CompassListener implements Listener {
+public class EventListener implements Listener {
 
     /**
      * EventHandler for a hunter right-clicking while holding a {@link TrackingCompassUtils#trackingCompass()}
@@ -30,14 +32,27 @@ public class CompassListener implements Listener {
      */
     @EventHandler
     public void hunterUseTrackingCompass(PlayerInteractEvent e){
+
+        if(e.getAction()==Action.LEFT_CLICK_AIR || e.getAction()==Action.LEFT_CLICK_BLOCK || e.getAction()==Action.PHYSICAL){
+            return;
+        }
         if(e.getHand().equals(EquipmentSlot.OFF_HAND) || //if listening for OFF_HAND
                 e.getItem()==null || //if no item is being held
                 !TargetManager.hasRole(e.getPlayer(),RoleEnum.HUNTER) || // if the event player is not a hunter
                 !(TrackingCompassUtils.isTrackingCompass(e.getItem()))){// if the event player is not holding a Tracking Compass
             return;
         }
-        Hunter hunter = TargetManager.getHunters().get(e.getPlayer().getUniqueId());
+        // cancel the normal interact event
+        e.setCancelled(true);
+        Hunter hunter = TargetManager.getHunters().get(e.getPlayer());
         Player player = e.getPlayer();
+        if(hunter.getEntity().isSneaking()){
+            hunter.getGUI().show();
+            return;
+        }
+        if(hunter.isLocked()){
+            return;
+        }
         // if hunter is tracking death
         if(hunter.isTrackingDeath()){
             hunter.setTrackingDeath(false);
@@ -60,7 +75,6 @@ public class CompassListener implements Listener {
                 !(hunter.getTargetEntity() instanceof Player)) { // if target isn't a player
             return;
         }
-
         int runnerIndex = 0;
         // if there's only one runner
         if(TargetManager.getRunnerList().size()==1){
@@ -71,7 +85,7 @@ public class CompassListener implements Listener {
         // if there are multiple runners, cycle to and select the next runner
         } else {
             if(TargetManager.hasRole(hunter.getTargetEntity(),RoleEnum.RUNNER)){
-                runnerIndex = TargetManager.getRunnerList().indexOf(hunter.getTarget()) + 1; // cycle to the next runner in the ArrayList
+                runnerIndex = TargetManager.getRunnerList().indexOf(TargetManager.getRunners().get(hunter.getTargetEntity())) + 1; // cycle to the next runner in the ArrayList
             }
             if(TargetManager.getRunnerList().get(runnerIndex).getEntity()==player){ // if the hunter is that next runner, keep going;
                 runnerIndex++;
@@ -103,12 +117,19 @@ public class CompassListener implements Listener {
             return;
         // if player is not a hunter
         }
+        e.setCancelled(true);
         if(!TargetManager.hasRole(e.getPlayer(),RoleEnum.HUNTER)){
             e.getPlayer().sendMessage("You are not a hunter!");
             return;
         }
         // set the player's target to the clicked entity
-        Hunter hunter = TargetManager.getHunters().get(e.getPlayer().getUniqueId());
+        Hunter hunter = TargetManager.getHunters().get(e.getPlayer());
+        if(hunter.getEntity().isSneaking()){
+            return;
+        }
+        if(hunter.isLocked()){
+            return;
+        }
         // if hunter is already tracking the clicked entity
         if(hunter.getTargetEntity()==e.getRightClicked()){
             return;
@@ -116,7 +137,7 @@ public class CompassListener implements Listener {
         Target target;
         // if clicked entity is a target, set target to the clicked entity
         if(TargetManager.hasRole(e.getRightClicked(),RoleEnum.TARGET)){
-            target = TargetManager.getTargets().get(e.getRightClicked().getUniqueId());
+            target = TargetManager.getTargets().get(e.getRightClicked());
         // create a new target
         } else {
             target = new Target(e.getRightClicked());
@@ -138,22 +159,17 @@ public class CompassListener implements Listener {
         // if respawning player is hunter, give trackingCompass
         if(TargetManager.hasRole(e.getPlayer(),RoleEnum.HUNTER)){
             // initialize the hunter object
-            Hunter hunter = TargetManager.getHunters().get(e.getPlayer().getUniqueId());
-            // if hunter has no compass, give them a new tracking compass
-            if(!TrackingCompassUtils.hasTrackingCompass(hunter.getEntity())){
-                if(hunter.getCompass()!=null){
-                    hunter.setCompass(TrackingCompassUtils.trackingCompass());
-                    // if hunter DOES have a compass, but its not in their invenotry, give them the same compass
-                } else {
-                    hunter.getEntity().getInventory().addItem(hunter.getCompass());
-                }
+            Hunter hunter = TargetManager.getHunters().get(e.getPlayer());
+            // assign a compass to the hunter
+            TrackingCompassUtils.assignTrackingCompass(hunter);
+            if(hunter.isTrackingPortal() || hunter.isTrackingDeath()){
+                hunter.getEntity().setCompassTarget(hunter.getLastTracked());
             }
             hunter.updateCompass();
-            return;
         }
         // if respawning player is runner, notify the hunter
         if(TargetManager.hasRole(e.getPlayer(),RoleEnum.RUNNER)){
-            Runner runner = TargetManager.getRunners().get(e.getPlayer().getUniqueId());
+            Runner runner = TargetManager.getRunners().get(e.getPlayer());
             for(Hunter hunter : runner.getHunters()){
                 hunter.getEntity().sendMessage(e.getPlayer().getDisplayName() + " has respawned."); // is using Bukkit faster than my map?
             }
@@ -162,19 +178,24 @@ public class CompassListener implements Listener {
 
     @EventHandler
     public void onTrackingCompassPickup(EntityPickupItemEvent e){
-        // if item isn't TrackingCompass, ignore
+        // if item isn't TrackingCompass, return
         if(!TrackingCompassUtils.isTrackingCompass(e.getItem().getItemStack())){
             return;
         }
-        e.setCancelled(true);
-        // if hunter has compass or player isn't hunter, cancel
-        if(TargetManager.hasRole(e.getEntity().getUniqueId(), RoleEnum.HUNTER)) {
-            Hunter hunter = TargetManager.getHunters().get(e.getEntity().getUniqueId());
-            //if player inventory doesn't have a tracking compass, give one
-            if(!TrackingCompassUtils.hasTrackingCompass((Player)e.getEntity())) {
-                hunter.setCompass(TrackingCompassUtils.trackingCompass());
-            }
+        // if not a hunter, cancel and return
+        if(!TargetManager.hasRole(e.getEntity(), RoleEnum.HUNTER)){
+            e.setCancelled(true);
+            return;
         }
+        Hunter hunter = TargetManager.getHunters().get(e.getEntity());
+        //if player inventory has tracking compass in inventory, cancel
+        if (!hunter.inventoryHasCompass()) {
+            // give hunter new compass and destroy event's item
+            TrackingCompassUtils.assignTrackingCompass(hunter);
+            e.getItem().remove();
+            hunter.updateCompass();
+        }
+        e.setCancelled(true);
     }
 
     /**
@@ -188,11 +209,13 @@ public class CompassListener implements Listener {
         //if a target dies, notify the player and set their target to the target's death location
         if(TargetManager.hasRole(e.getEntity(),RoleEnum.TARGET)){ // if dead entity is target
             //System.out.println("role works");
-            for(Hunter hunter: TargetManager.getTargets().get(e.getEntity().getUniqueId()).getHunters()){ // for each hunter targeting the dead entity
+            for(Hunter hunter: TargetManager.getTargets().get(e.getEntity()).getHunters()){ // for each hunter targeting the dead entity
                 //System.out.println("Hunter found: " + hunter.getEntity().getName());
                 hunter.setTrackingDeath(true); // hunter is now targeting death location and compass is not updated
                 hunter.getEntity().sendMessage(hunter.getTargetEntity().getName() + " has died. Now tracking " + hunter.getTargetEntity().getName() + "'s death location.");
+                hunter.setLastTracked(e.getEntity().getLocation());
                 hunter.updateCompass();
+                hunter.getGUI().draw();
             }
         }
     }
@@ -200,13 +223,24 @@ public class CompassListener implements Listener {
     @EventHandler
     public void onTargetPortal(EntityPortalEnterEvent e){
         if(TargetManager.hasRole(e.getEntity(),RoleEnum.TARGET)) { // if teleporting entity is target
-            for(Hunter hunter : TargetManager.getTargets().get(e.getEntity().getUniqueId()).getHunters()){
+            for(Hunter hunter : TargetManager.getTargets().get(e.getEntity()).getHunters()){
                 hunter.setTrackingPortal(hunter.getEntity().getWorld().equals(e.getEntity().getWorld())); // hunter is now targeting portal location and compass is not updated
+                hunter.setLastTracked(e.getEntity().getLocation());
                 hunter.updateCompass();
+                hunter.getGUI().draw();
             }
         }
     }
 
-
+    // when player gets into a bed and their target is null, update their compass
+    @EventHandler
+    public void onRespawnSetBed(PlayerBedLeaveEvent e){
+        if(TargetManager.hasRole(e.getPlayer(),RoleEnum.HUNTER)){
+            Hunter hunter = TargetManager.getHunters().get(e.getPlayer());
+            if(hunter.getTarget()==null){
+                hunter.updateCompass();
+            }
+        }
+    }
 
 }

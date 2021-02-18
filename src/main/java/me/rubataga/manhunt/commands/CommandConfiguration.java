@@ -1,4 +1,5 @@
 package me.rubataga.manhunt.commands;
+
 import dev.jorel.commandapi.CommandAPICommand;
 
 /**
@@ -23,6 +24,8 @@ public class CommandConfiguration {
                 .withSubcommand(TargetManagerCommands.removeEntity())
                 .withSubcommand(TargetManagerCommands.removeSelf())
                 .withSubcommand(TargetManagerCommands.teams())
+                .withSubcommand(TargetManagerCommands.sum())
+                .withSubcommand(TargetManagerCommands.sumSelf())
 
                 //TrackingCompassCommands
                 .withSubcommand(TrackingCompassCommands.compass())
@@ -30,6 +33,7 @@ public class CommandConfiguration {
                 .withSubcommand(TrackingCompassCommands.trackRunner())
                 .withSubcommand(TrackingCompassCommands.trackEntity())
                 .withSubcommand(TrackingCompassCommands.recalibrate())
+                .withSubcommand(TrackingCompassCommands.gui())
 
                 .register();
 

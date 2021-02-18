@@ -1,6 +1,8 @@
 package me.rubataga.manhunt.services;
 
 import me.rubataga.manhunt.models.*;
+import me.rubataga.manhunt.utils.TrackingCompassUtils;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -44,6 +46,7 @@ public class TargetService {
                     Hunter hunter = new Hunter(player);
                     TargetManager.addHunter(hunter);
                     hunter.setTarget(null);
+                    TrackingCompassUtils.assignTrackingCompass(hunter);
                     player.sendMessage("You are now a hunter!");
                     if (!senderIsPlayer) {
                         sender.sendMessage(player.getName() + " is now a hunter!");
@@ -66,7 +69,7 @@ public class TargetService {
             boolean senderIsEntity = sender == entity;
 
             if (isTarget) {
-                TargetManager.removeTarget(entity.getUniqueId());
+                TargetManager.removeTarget(entity);
                 if(isPlayer){
                     entity.sendMessage("You are no longer a target!");
                 }
@@ -79,7 +82,7 @@ public class TargetService {
                 boolean isRunner = TargetManager.hasRole(player,RoleEnum.RUNNER);
                 boolean isHunter = TargetManager.hasRole(player,RoleEnum.HUNTER);
                 if (isRunner) {
-                    TargetManager.removeRunner(player.getUniqueId());
+                    TargetManager.removeRunner(player);
                     if (senderIsEntity) {
                         player.sendMessage("You are no longer a runner!");
                     } else {
@@ -87,7 +90,7 @@ public class TargetService {
                     }
                 }
                 if (isHunter) {
-                    TargetManager.removeHunter(player.getUniqueId());
+                    TargetManager.removeHunter(player);
                     if (senderIsEntity) {
                         player.sendMessage("You are no longer a hunter!");
                     } else {
@@ -138,7 +141,7 @@ public class TargetService {
         sender.sendMessage(runnersString.toString());
     }
 
-    private static void buildTeamString(StringBuilder s, GameEntity[] entities){
+    private static void buildTeamString(StringBuilder s, ManhuntEntity[] entities){
         for (int i = 0; i<entities.length; i++) {
             if(i>0){
                 s.append(", ");
@@ -146,6 +149,28 @@ public class TargetService {
             s.append(entities[i].getEntity().getName());
         }
         s.append(".");
+    }
+
+    public static void sum(CommandSender sender, Collection<Entity> entities){
+        for(Entity entity : entities){
+            if(TargetManager.getHunters().containsKey(entity)){
+                Hunter hunter = TargetManager.getHunters().get(entity);
+                sender.sendMessage("§b" + entity.getName());
+                sender.sendMessage("Compass is null?: " + (hunter.getCompass()==null));
+                sender.sendMessage("Tracked location: " + hunter.getEntity().getCompassTarget());
+                if(hunter.getTarget()!=null){
+                    sender.sendMessage("Target: " + hunter.getTargetEntity().getName());
+                }
+                sender.sendMessage("Tracking death: " + hunter.isTrackingDeath());
+                sender.sendMessage("Tracking portal: " + hunter.isTrackingPortal());
+
+            }
+//            if(!TargetManager.getHunters().containsKey(entity) ||
+//                    !TargetManager.getTargets().containsKey(entity) ||
+//                    !TargetManager.getRunners().containsKey(entity)){
+//                sender.sendMessage(entity.getName() + " had no roles.");
+//            }
+        }
     }
 
 
