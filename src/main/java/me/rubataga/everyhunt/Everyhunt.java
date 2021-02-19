@@ -1,14 +1,14 @@
-package me.rubataga.manhunt;
+package me.rubataga.everyhunt;
 
-import me.rubataga.manhunt.commands.CommandConfiguration;
-import me.rubataga.manhunt.listeners.CompassListener;
-import me.rubataga.manhunt.listeners.DeathListener;
-import me.rubataga.manhunt.roles.Hunter;
-import me.rubataga.manhunt.roles.Target;
-import me.rubataga.manhunt.listeners.PortalListener;
+import me.rubataga.everyhunt.commands.CommandConfiguration;
+import me.rubataga.everyhunt.listeners.CompassListener;
+import me.rubataga.everyhunt.listeners.DeathListener;
+import me.rubataga.everyhunt.roles.Hunter;
+import me.rubataga.everyhunt.roles.Target;
+import me.rubataga.everyhunt.listeners.PortalListener;
 import dev.jorel.commandapi.CommandAPI;
-import me.rubataga.manhunt.services.TargetManager;
-import me.rubataga.manhunt.utils.TrackingCompassUtils;
+import me.rubataga.everyhunt.services.TargetManager;
+import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.plugin.java.JavaPlugin;
