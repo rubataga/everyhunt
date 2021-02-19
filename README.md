@@ -29,15 +29,15 @@ rubataga's Manhunt Plugin
     - The Nether does not currently work for this plugin
 
 **commands:**
-/mh addhunter [player] - makes a player into a hunter
-/mh addrunner [player] - makes a player into a runner
-/mh remove [player] - removes all of a player's roles
-/mh track [player] - lets a hunter track another player
+- /mh addhunter [player] - makes a player into a hunter
+- /mh addrunner [player] - makes a player into a runner
+- /mh remove [player] - removes all of a player's roles
+- /mh track [player] - lets a hunter track another player
     - /mh track @p tracks the closest player
-/mh compass [player] - gives a hunter a new tracking compass
-/mh teams - view all current hunters and runners
-/mh recal - recalibrates the compass to world spawn (only hunters should use this, any other players using this causes errors ATM)
-/mh gui - pulls up the gui
+- /mh compass [player] - gives a hunter a new tracking compass
+- /mh teams - view all current hunters and runners
+- /mh recal - recalibrates the compass to world spawn (only hunters should use this, any other players using this causes errors ATM)
+- /mh gui - pulls up the gui
 
 Any [player] can be a specific player, or a target selector (@a). If @a is used, then all players are affected.
 Players can use commands on themselves without including [player], or OPs/console can direct commands at players using [player].
