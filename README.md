@@ -1,4 +1,4 @@
-rubataga's Manhunt Plugin
+rubataga's Everyhunt Plugin
 
 **Hunters**
 - Hunters are able to use the Tracking Compass.
