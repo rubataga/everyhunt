@@ -1,7 +1,7 @@
-package me.rubataga.manhunt.services;
+package me.rubataga.everyhunt.services;
 
-import me.rubataga.manhunt.roles.*;
-import me.rubataga.manhunt.utils.TrackingCompassUtils;
+import me.rubataga.everyhunt.roles.*;
+import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -141,7 +141,7 @@ public class TargetService {
         sender.sendMessage(runnersString.toString());
     }
 
-    private static void buildTeamString(StringBuilder s, ManhuntEntity[] entities){
+    private static void buildTeamString(StringBuilder s, EveryhuntEntity[] entities){
         for (int i = 0; i<entities.length; i++) {
             if(i>0){
                 s.append(", ");

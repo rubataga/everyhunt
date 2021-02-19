@@ -16,11 +16,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 /**
  * Plugin class
  */
-public final class Manhunt extends JavaPlugin {
+public final class Everyhunt extends JavaPlugin {
 
-    private static Manhunt pluginInstance;
+    private static Everyhunt pluginInstance;
 
-    public static Manhunt getInstance(){
+    public static Everyhunt getInstance(){
         return pluginInstance;
     }
 
@@ -33,7 +33,7 @@ public final class Manhunt extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new CompassListener(), this);
         getServer().getPluginManager().registerEvents(new DeathListener(), this);
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, compassRepeatingTask,0L,10L);
-        System.out.println("§bRubataga's Manhunt plugin enabled!");
+        System.out.println("§bRubataga's Everyhunt plugin enabled!");
     }
 
     @Override
@@ -43,7 +43,7 @@ public final class Manhunt extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        System.out.println("§bRubataga's Manhunt plugin disabled!");
+        System.out.println("§bRubataga's Everyhunt plugin disabled!");
     }
 
     /**

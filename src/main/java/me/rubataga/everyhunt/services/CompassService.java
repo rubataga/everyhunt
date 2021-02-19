@@ -1,9 +1,9 @@
-package me.rubataga.manhunt.services;
+package me.rubataga.everyhunt.services;
 
-import me.rubataga.manhunt.roles.Hunter;
-import me.rubataga.manhunt.roles.RoleEnum;
-import me.rubataga.manhunt.roles.Target;
-import me.rubataga.manhunt.utils.TrackingCompassUtils;
+import me.rubataga.everyhunt.roles.Hunter;
+import me.rubataga.everyhunt.roles.RoleEnum;
+import me.rubataga.everyhunt.roles.Target;
+import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;

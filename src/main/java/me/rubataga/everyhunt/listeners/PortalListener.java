@@ -1,10 +1,10 @@
-package me.rubataga.manhunt.listeners;
+package me.rubataga.everyhunt.listeners;
 
-import me.rubataga.manhunt.roles.Hunter;
-import me.rubataga.manhunt.roles.RoleEnum;
-import me.rubataga.manhunt.roles.Target;
-import me.rubataga.manhunt.services.TargetManager;
-import me.rubataga.manhunt.utils.TrackingCompassUtils;
+import me.rubataga.everyhunt.roles.Hunter;
+import me.rubataga.everyhunt.roles.RoleEnum;
+import me.rubataga.everyhunt.roles.Target;
+import me.rubataga.everyhunt.services.TargetManager;
+import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;

@@ -2,11 +2,11 @@ package me.rubataga.everyhunt.roles;
 
 import org.bukkit.entity.Entity;
 
-public class ManhuntEntity {
+public class EveryhuntEntity {
 
     private final Entity entity;
 
-    public ManhuntEntity(Entity entity){
+    public EveryhuntEntity(Entity entity){
         this.entity = entity;
     }
 

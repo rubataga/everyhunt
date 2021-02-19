@@ -1,4 +1,4 @@
-package me.rubataga.manhunt.commands;
+package me.rubataga.everyhunt.commands;
 
 import dev.jorel.commandapi.CommandAPICommand;
 

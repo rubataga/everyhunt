@@ -1,6 +1,6 @@
-package me.rubataga.manhunt.utils;
+package me.rubataga.everyhunt.utils;
 
-import me.rubataga.manhunt.roles.Hunter;
+import me.rubataga.everyhunt.roles.Hunter;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 
 import org.bukkit.Material;

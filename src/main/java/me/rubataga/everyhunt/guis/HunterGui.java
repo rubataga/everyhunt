@@ -1,12 +1,12 @@
-package me.rubataga.manhunt.guis;
+package me.rubataga.everyhunt.guis;
 
 import de.themoep.inventorygui.DynamicGuiElement;
 import de.themoep.inventorygui.GuiStateElement;
 import de.themoep.inventorygui.InventoryGui;
 import de.themoep.inventorygui.StaticGuiElement;
-import me.rubataga.manhunt.Manhunt;
-import me.rubataga.manhunt.roles.Hunter;
-import me.rubataga.manhunt.utils.TrackingCompassUtils;
+import me.rubataga.everyhunt.Everyhunt;
+import me.rubataga.everyhunt.roles.Hunter;
+import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -17,7 +17,7 @@ public class HunterGui extends InventoryGui {
     private final Hunter hunter;
 
     public HunterGui(Hunter hunter) {
-        super(Manhunt.getInstance(),hunter.getEntity(),"Rubataga's Manhunt v1.0", new String[]{
+        super(Everyhunt.getInstance(),hunter.getEntity(),"Rubataga's Everyhunt v1.0", new String[]{
                 " l ",
                 "tcb",
                 " p "

@@ -1,8 +1,8 @@
-package me.rubataga.manhunt.services;
+package me.rubataga.everyhunt.services;
 
-import me.rubataga.manhunt.roles.Hunter;
-import me.rubataga.manhunt.roles.RoleEnum;
-import me.rubataga.manhunt.roles.Target;
+import me.rubataga.everyhunt.roles.Hunter;
+import me.rubataga.everyhunt.roles.RoleEnum;
+import me.rubataga.everyhunt.roles.Target;
 
 import org.bukkit.entity.Entity;
 

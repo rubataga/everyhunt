@@ -12,18 +12,18 @@ rubataga's Everyhunt Plugin
 - A player can be a hunter AND runner at the same time.
 
 **Tracking Compass**
-- The tracking compass is used by hunters to, well, track their target.
+- Hunters use tracking compass to, track their target.
 - Right-clicking an entity tracks them.
     - If a hunter doesn't want to lose their target, it is recommended that they lock their compass using the GUI (see below)
     - Any entities can be tracked, so mobs and players. Again, locking the compass will prevent hunters from accidentally tracking something else.
-- Right-clicking the air cycles through targetting runners.
-- Right-clicking the air after your target dies resets the comapss.
+- Right-clicking the air cycles through targeting runners.
+- Right-clicking the air after your target dies resets the compass.
 - Sneaking+Right-clicking opens up the GUI
     - The compass in the center gives information about the target. Get a new compass by clicking the compass
     - The dirt/bedrock block on the top locks/unlocks your compass. Bedrock = locked, Dirt = unlocked. Using /mh track still works with a locked compass.
     - None of the other buttons do anything yet
 - If a hunter's target dies, their compass will continue to track the location of the death until it is reset via a right-click, a new target, or /mh recal
-    - Lock the compass in order to not lose track of death location.
+    - Lock the compass in order to keep track of death location.
 - If a hunter's target enters a portal, their compass will continue to track the location of the portal they last entered.
     - The compass does NOT work in the Nether
     - The Nether does not currently work for this plugin

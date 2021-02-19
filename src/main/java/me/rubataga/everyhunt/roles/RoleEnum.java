@@ -1,4 +1,4 @@
-package me.rubataga.manhunt.roles;
+package me.rubataga.everyhunt.roles;
 
 public enum RoleEnum {
     HUNTER,

@@ -1,7 +1,7 @@
-package me.rubataga.manhunt.roles;
+package me.rubataga.everyhunt.roles;
 
-import me.rubataga.manhunt.guis.HunterGui;
-import me.rubataga.manhunt.utils.TrackingCompassUtils;
+import me.rubataga.everyhunt.guis.HunterGui;
+import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
 
-public class Hunter extends ManhuntEntity {
+public class Hunter extends EveryhuntEntity {
 
     private Target target;
     private ItemStack compass;

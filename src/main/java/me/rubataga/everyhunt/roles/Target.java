@@ -1,6 +1,6 @@
-package me.rubataga.manhunt.roles;
+package me.rubataga.everyhunt.roles;
 
-import me.rubataga.manhunt.services.TargetManager;
+import me.rubataga.everyhunt.services.TargetManager;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-public class Target extends ManhuntEntity {
+public class Target extends EveryhuntEntity {
 
     Collection<Hunter> hunters = new LinkedList<>();
     Map<World.Environment,Location> lastLocations = new HashMap<>();

@@ -1,8 +1,8 @@
-package me.rubataga.manhunt.commands;
+package me.rubataga.everyhunt.commands;
 
-import me.rubataga.manhunt.services.CompassService;
-import me.rubataga.manhunt.services.TargetManager;
-import me.rubataga.manhunt.utils.TrackingCompassUtils;
+import me.rubataga.everyhunt.services.CompassService;
+import me.rubataga.everyhunt.services.TargetManager;
+import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.PlayerArgument;
