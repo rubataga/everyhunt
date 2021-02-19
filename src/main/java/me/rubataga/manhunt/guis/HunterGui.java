@@ -1,10 +1,11 @@
-package me.rubataga.manhunt.models;
+package me.rubataga.manhunt.guis;
 
 import de.themoep.inventorygui.DynamicGuiElement;
 import de.themoep.inventorygui.GuiStateElement;
 import de.themoep.inventorygui.InventoryGui;
 import de.themoep.inventorygui.StaticGuiElement;
 import me.rubataga.manhunt.Manhunt;
+import me.rubataga.manhunt.roles.Hunter;
 import me.rubataga.manhunt.utils.TrackingCompassUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
@@ -16,7 +17,7 @@ public class HunterGui extends InventoryGui {
     private final Hunter hunter;
 
     public HunterGui(Hunter hunter) {
-        super(Manhunt.getInstance(),hunter.getEntity(),"Manhunt", new String[]{
+        super(Manhunt.getInstance(),hunter.getEntity(),"Rubataga's Manhunt v1.0", new String[]{
                 " l ",
                 "tcb",
                 " p "
@@ -40,8 +41,14 @@ public class HunterGui extends InventoryGui {
 
     private DynamicGuiElement guiCompassElement(){
         return new DynamicGuiElement('c', (viewer) -> {
+            ItemStack trackingCompass;
+            if(hunter.isLodestoneTracking()){
+                trackingCompass = hunter.getCompass();
+            } else {
+                trackingCompass = new ItemStack(Material.COMPASS);
+            }
             StaticGuiElement compass = new StaticGuiElement('c',
-                    new ItemStack(Material.COMPASS),
+                    trackingCompass,
                     click -> {
                         TrackingCompassUtils.assignTrackingCompass(hunter);
                         return true;

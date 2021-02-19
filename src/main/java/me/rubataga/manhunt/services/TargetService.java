@@ -1,6 +1,6 @@
 package me.rubataga.manhunt.services;
 
-import me.rubataga.manhunt.models.*;
+import me.rubataga.manhunt.roles.*;
 import me.rubataga.manhunt.utils.TrackingCompassUtils;
 
 import org.bukkit.command.CommandSender;
@@ -19,7 +19,7 @@ public class TargetService {
                 Player player = (Player) entity;
                 boolean senderIsPlayer = sender == player;
                 if (!TargetManager.hasRole(player,RoleEnum.RUNNER)) {
-                    TargetManager.addRunner(new Runner(player));
+                    TargetManager.addRunner(new Target(player));
                     player.sendMessage("You are now a runner!");
                     if (!senderIsPlayer) {
                         sender.sendMessage(player.getName() + " is now a runner!");
@@ -116,7 +116,7 @@ public class TargetService {
     public static void teams(CommandSender sender){
         Hunter[] hunters = TargetManager.getHunters().values().toArray(new Hunter[]{});
         Target[] targets = TargetManager.getTargets().values().toArray(new Target[]{});
-        Runner[] runners = TargetManager.getRunners().values().toArray(new Runner[]{});
+        Target[] runners = TargetManager.getRunners().values().toArray(new Target[]{});
         StringBuilder huntersString = new StringBuilder("§aHunters (" + hunters.length + "): ");
         StringBuilder targetsString = new StringBuilder("§aTargets (" + targets.length + "): ");
         StringBuilder runnersString = new StringBuilder("§aRunners (" + runners.length + "): ");
@@ -163,6 +163,7 @@ public class TargetService {
                 }
                 sender.sendMessage("Tracking death: " + hunter.isTrackingDeath());
                 sender.sendMessage("Tracking portal: " + hunter.isTrackingPortal());
+                sender.sendMessage("Lodestone tracking: " + hunter.isLodestoneTracking());
 
             }
 //            if(!TargetManager.getHunters().containsKey(entity) ||

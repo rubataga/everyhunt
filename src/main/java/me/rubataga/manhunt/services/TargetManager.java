@@ -1,9 +1,8 @@
 package me.rubataga.manhunt.services;
 
-import me.rubataga.manhunt.models.Hunter;
-import me.rubataga.manhunt.models.RoleEnum;
-import me.rubataga.manhunt.models.Runner;
-import me.rubataga.manhunt.models.Target;
+import me.rubataga.manhunt.roles.Hunter;
+import me.rubataga.manhunt.roles.RoleEnum;
+import me.rubataga.manhunt.roles.Target;
 
 import org.bukkit.entity.Entity;
 
@@ -16,10 +15,10 @@ public class TargetManager {
 
     private static final Map<Entity, Hunter> hunters = new HashMap<>();
     private static final Map<Entity, Target> targets = new HashMap<>();
-    private static final Map<Entity, Runner> runners = new HashMap<>();
-    private static final List<Runner> runnerList = new LinkedList<>();
+    private static final Map<Entity, Target> runners = new HashMap<>();
+    private static final List<Target> runnerList = new LinkedList<>();
 
-    public static boolean hasRole(Entity entity, RoleEnum role){ // is this implementation worth it???
+    public static boolean hasRole(Entity entity, RoleEnum role){
         if(role.equals(RoleEnum.HUNTER)){
             return hunters.containsKey(entity);
         } else if (role.equals(RoleEnum.TARGET)){
@@ -29,10 +28,6 @@ public class TargetManager {
         }
         return false;
     }
-
-//    public static boolean hasRole(Entity entity, RoleEnum role){
-//        return hasRole(entity,role);
-//    }
 
     public static void addHunter(Hunter hunter){
         hunters.put(hunter.getEntity(), hunter);
@@ -50,7 +45,7 @@ public class TargetManager {
         targets.remove(target);
     }
 
-    public static void addRunner(Runner runner){
+    public static void addRunner(Target runner){
         runners.put(runner.getEntity(), runner);
         runnerList.add(runner);
     }
@@ -68,11 +63,11 @@ public class TargetManager {
         return targets;
     }
 
-    public static Map<Entity, Runner> getRunners() {
+    public static Map<Entity, Target> getRunners() {
         return runners;
     }
 
-    public static List<Runner> getRunnerList() {
+    public static List<Target> getRunnerList() {
         return runnerList;
     }
 

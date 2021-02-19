@@ -1,4 +1,4 @@
-package me.rubataga.manhunt.models;
+package me.rubataga.manhunt.roles;
 
 import org.bukkit.entity.Entity;
 
