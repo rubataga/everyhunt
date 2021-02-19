@@ -1,12 +1,13 @@
 package me.rubataga.manhunt.utils;
 
-import me.rubataga.manhunt.models.Hunter;
+import me.rubataga.manhunt.roles.Hunter;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
@@ -26,8 +27,9 @@ public class TrackingCompassUtils {
      */
     public static ItemStack vanillaTrackingCompass(){
         ItemStack trackingCompass = new ItemStack(Material.COMPASS);
-        ItemMeta meta = trackingCompass.getItemMeta();
+        CompassMeta meta = (CompassMeta)trackingCompass.getItemMeta();
         meta.setDisplayName("§cTracking Compass");
+        meta.setLodestoneTracked(false);
         trackingCompass.setItemMeta(meta);
         return trackingCompass;
     }
@@ -109,25 +111,30 @@ public class TrackingCompassUtils {
 
 
     public static void compassUpdater(Hunter hunter){
-        //System.out.println("updating compass for " + hunter.getEntity().getName());
-        //hunter.getEntity().sendMessage("updating compass!");
+        //System.out.println("§bupdating compass for " + hunter.getEntity().getName());
         ItemStack compass = hunter.getCompass();
         StringBuilder displayName = new StringBuilder("§cTracking Compass");
         // if hunter has no target
         if(hunter.getTarget()==null){
+            //System.out.println("§cBUGCHECK1");
             if(hunter.getEntity().getBedSpawnLocation()!=null){
+                //System.out.println("§cBUGCHECK2");
                 displayName.append(" - Bed Spawn");
                 hunter.getEntity().setCompassTarget(hunter.getEntity().getBedSpawnLocation());
             } else {
+                //System.out.println("§cBUGCHECK3");
                 displayName.append(" - World Spawn");
                 hunter.getEntity().setCompassTarget(hunter.getEntity().getWorld().getSpawnLocation());
             }
         // if hunter has target
         } else {
+            //System.out.println("§cBUGCHECK4");
             displayName.append(" - ").append(hunter.getTargetEntity().getName());
             if (hunter.isTrackingDeath()) {
+                //System.out.println("§cBUGCHECK5");
                 displayName.append("'s death location");
             } else if (hunter.isTrackingPortal()) {
+                //System.out.println("§cBUGCHECK6");
                 displayName.append("'s portal");
             }
         }
@@ -135,14 +142,14 @@ public class TrackingCompassUtils {
         meta.setDisplayName(displayName.toString());
         compass.setItemMeta(meta);
         if(TrackingCompassUtils.hasTrackingCompass(hunter.getEntity())){
+            //System.out.println("§cBUGCHECK7");
             TrackingCompassUtils.getTrackingCompass(hunter.getEntity()).setItemMeta(meta);
         }
-        hunter.getEntity().updateInventory();
+        //hunter.getEntity().updateInventory();
 
-
-        //System.out.println("§bBUGCHECK: updated compass displayname: " + hunter.getCompass().getItemMeta().getDisplayName());
-        //System.out.println("§bBUGCHECK: " + hunter.getEntity().getName() + "'s compass displayname: " + hunter.getCompass().getItemMeta().getDisplayName());
-        //System.out.println("§bBUGCHECK: UtilGetCompass displayname: " + getTrackingCompass(hunter.getEntity()).getItemMeta().getDisplayName());
+        //System.out.println("§bBUGCHECK: hunter's updated compass displayname: " + hunter.getCompass().getItemMeta().getDisplayName());
+        //System.out.println("§bBUGCHECK: meta displayname: " + meta.getDisplayName());
+        //System.println("§bBUGCHECK: UtilGetCompass displayname: " + getTrackingCompass(hunter.getEntity()).getItemMeta().getDisplayName());
     }
 
 //

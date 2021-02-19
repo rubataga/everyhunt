@@ -1,8 +1,8 @@
 package me.rubataga.manhunt.services;
 
-import me.rubataga.manhunt.models.Hunter;
-import me.rubataga.manhunt.models.RoleEnum;
-import me.rubataga.manhunt.models.Target;
+import me.rubataga.manhunt.roles.Hunter;
+import me.rubataga.manhunt.roles.RoleEnum;
+import me.rubataga.manhunt.roles.Target;
 import me.rubataga.manhunt.utils.TrackingCompassUtils;
 
 import org.bukkit.command.CommandSender;
@@ -101,7 +101,12 @@ public class CompassService {
 
     public static void recalibrate(CommandSender sender){
         Player player = (Player) sender;
-        Hunter hunter = TargetManager.getHunters().get(player);
+        Hunter hunter;
+        if(!TargetManager.hasRole(player,RoleEnum.HUNTER)){
+            player.sendMessage("You are not a hunter!");
+            return;
+        }
+        hunter = TargetManager.getHunters().get(player);
         hunter.setTarget(null);
         hunter.updateCompass();
         player.sendMessage("Compass reset!");

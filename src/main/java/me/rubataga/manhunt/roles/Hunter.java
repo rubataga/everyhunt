@@ -1,25 +1,30 @@
-package me.rubataga.manhunt.models;
+package me.rubataga.manhunt.roles;
 
+import me.rubataga.manhunt.guis.HunterGui;
 import me.rubataga.manhunt.utils.TrackingCompassUtils;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.CompassMeta;
 
 public class Hunter extends ManhuntEntity {
 
     private Target target;
     private ItemStack compass;
     private Location lastTracked;
+    private final HunterGui gui;
 
-    private boolean trackingDeath = false;
-    private boolean trackingPortal = false;
-    private boolean locked = false;
-    private final HunterGui gui = new HunterGui(this);
+    private boolean trackingDeath;
+    private boolean trackingPortal;
+    private boolean lodestoneTracking;
+    private boolean locked;
 
     public Hunter(Player player){
         super(player);
+        this.gui = new HunterGui(this);
     }
 
     public ItemStack getCompass(){
@@ -77,21 +82,34 @@ public class Hunter extends ManhuntEntity {
         return trackingPortal;
     }
 
-    public void setTrackingPortal(boolean trackingPortal) {
-        this.trackingPortal = trackingPortal;
+    public void setTrackingPortal() {
+        this.lodestoneTracking = getEntity().getWorld().getEnvironment()!= World.Environment.NORMAL;
+        this.trackingPortal = getEntity().getWorld()!=getTargetEntity().getWorld();
+        // if player is in overworld, un"lode" compass
+        if(!lodestoneTracking){
+            CompassMeta meta = (CompassMeta)(compass.getItemMeta());
+            meta.setLodestone(null);
+            compass.setItemMeta(meta);
+        }
+        updateCompass();
     }
 
+    public boolean isLodestoneTracking(){
+        return lodestoneTracking;
+    }
 
     public void setTarget(Target target){
         if(this.target!=null){
+            //System.out.println("BUGCHECK removed this hunter from target");
             this.target.removeHunter(this);
         }
-        if(target!=null){
-            target.addHunter(this);
-        }
         this.target = target;
-        this.trackingDeath = false;
-        this.trackingPortal = false;
+        if(target!=null){
+            //System.out.println("BUGCHECK added this hunter to target");
+            target.addHunter(this);
+            this.trackingDeath = target.getEntity().isDead();
+            setTrackingPortal();
+        }
     }
 
     public Entity getTargetEntity(){
@@ -107,6 +125,7 @@ public class Hunter extends ManhuntEntity {
 
     public void updateCompass(){
         TrackingCompassUtils.compassUpdater(this);
+        gui.draw();
     }
 
 
