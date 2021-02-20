@@ -32,18 +32,17 @@ public class CompassService {
             } else {
                 Hunter hunter = TargetManager.getHunters().get(player);
                 // if hunter has a tracking compass in their inventory
-                if(hunter.inventoryHasCompass()) {
+                if(TrackingCompassUtils.assignTrackingCompass(hunter)){
                     if (senderIsPlayer) {
                         sender.sendMessage("You already have a Tracking Compass!");
                     } else {
                         sender.sendMessage(player.getName() + " already has a Tracking Compass!");
                     }
                 } else {
-                    TrackingCompassUtils.assignTrackingCompass(hunter);
                     if (!senderIsPlayer) {
                         sender.sendMessage(player.getName() + " was given a Tracking Compass!");
                     }
-                    hunter.updateCompass();
+                    hunter.updateCompassMeta();
                 }
             }
         }
@@ -69,7 +68,9 @@ public class CompassService {
             //find closest target
             for(Entity entity : targetsInit){
                 //if entity is a player and the player isn't a runner, continue
-                if(entity instanceof Player && !TargetManager.getRunners().containsKey(entity) || !(entity instanceof LivingEntity)){
+                if(entity instanceof Player && !TargetManager.getRunners().containsKey(entity)
+                        || !(entity instanceof LivingEntity)
+                        || player.getWorld() != entity.getWorld()){
                     continue;
                 }
                 double dist = player.getLocation().distanceSquared(entity.getLocation());
@@ -92,7 +93,7 @@ public class CompassService {
             }
             hunter.setTarget(target);
             player.sendMessage("Now tracking " + targetEntity.getName());
-            hunter.updateCompass();
+            hunter.updateCompassMeta();
 
         } else {
             player.sendMessage("No targets found!");
@@ -108,7 +109,7 @@ public class CompassService {
         }
         hunter = TargetManager.getHunters().get(player);
         hunter.setTarget(null);
-        hunter.updateCompass();
+        hunter.updateCompassMeta();
         player.sendMessage("Compass reset!");
     }
 }

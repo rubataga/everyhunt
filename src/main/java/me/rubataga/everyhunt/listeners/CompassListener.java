@@ -24,18 +24,19 @@ public class CompassListener implements Listener {
      */
     @EventHandler
     public void hunterUseTrackingCompass(PlayerInteractEvent e){
-
-        if(e.getAction()== Action.LEFT_CLICK_AIR || e.getAction()==Action.LEFT_CLICK_BLOCK || e.getAction()==Action.PHYSICAL){
+        //System.out.println("Interact listener is go...");
+        if(e.getAction()==Action.LEFT_CLICK_AIR || e.getAction()==Action.LEFT_CLICK_BLOCK || e.getAction()==Action.PHYSICAL){
             return;
         }
         if(e.getHand().equals(EquipmentSlot.OFF_HAND) || //if listening for OFF_HAND
                 e.getItem()==null || //if no item is being held
                 !TargetManager.hasRole(e.getPlayer(), RoleEnum.HUNTER) || // if the event player is not a hunter
                 !(TrackingCompassUtils.isTrackingCompass(e.getItem()))){// if the event player is not holding a Tracking Compass
+//            System.out.println("e.getItem: " + e.getItem());
+//            System.out.println("Isn't a hunter " + !TargetManager.hasRole(e.getPlayer(), RoleEnum.HUNTER));
+//            System.out.println("Not a tc: " + !(TrackingCompassUtils.isTrackingCompass(e.getItem())));
             return;
         }
-        // cancel the normal interact event
-        e.setCancelled(true);
         Hunter hunter = TargetManager.getHunters().get(e.getPlayer());
         Player player = e.getPlayer();
         if(hunter.getEntity().isSneaking()){
@@ -45,6 +46,7 @@ public class CompassListener implements Listener {
         if(hunter.isLocked()){
             return;
         }
+        e.setCancelled(true);
         // if hunter is tracking dead runner, queue hunter to track runner when they revive
         if(hunter.isTrackingDeath()){
             if(hunter.getTarget()!=null) {
@@ -57,7 +59,7 @@ public class CompassListener implements Listener {
             hunter.setTrackingDeath(false);
             hunter.setTarget(null);
             player.sendMessage("Tracker reset.");
-            hunter.updateCompass();
+            hunter.updateCompassMeta();
             return;
         }
         if(TargetManager.getRunners().size()==0 || // if there are no runners
@@ -87,7 +89,7 @@ public class CompassListener implements Listener {
         Target runner = TargetManager.getRunnerList().get(runnerIndex); // Player runner = the runner with index runnerIndex
         hunter.setTarget(runner); // the hunter is set to be hunting runner
         player.sendMessage("Now tracking " + runner.getEntity().getName() + ".");
-        hunter.updateCompass();
+        hunter.updateCompassMeta();
     }
 
     /**
@@ -141,7 +143,7 @@ public class CompassListener implements Listener {
             TargetManager.addTarget(target);
         }
         hunter.setTarget(target);
-        hunter.updateCompass();
+        hunter.updateCompassMeta();
         hunter.getEntity().sendMessage("Now tracking " + target.getEntity().getName() + ".");
         //System.out.println("Hunter object name: " + hunter.getTargetEntity().getName());
     }
@@ -159,15 +161,12 @@ public class CompassListener implements Listener {
         }
         Hunter hunter = TargetManager.getHunters().get(e.getEntity());
         //if player inventory has tracking compass in inventory, cancel
-        if (!hunter.inventoryHasCompass()) {
-            // give hunter new compass and destroy event's item
-            TrackingCompassUtils.assignTrackingCompass(hunter);
+        if(!TrackingCompassUtils.assignTrackingCompass(hunter)) {
             e.getItem().remove();
-            hunter.updateCompass();
+            hunter.updateCompassMeta();
+            e.setCancelled(true);
         }
-        e.setCancelled(true);
     }
-
 
     // when player gets into a bed and their target is null, update their compass
     @EventHandler
@@ -175,7 +174,7 @@ public class CompassListener implements Listener {
         if(TargetManager.hasRole(e.getPlayer(),RoleEnum.HUNTER)){
             Hunter hunter = TargetManager.getHunters().get(e.getPlayer());
             if(hunter.getTarget()==null){
-                hunter.updateCompass();
+                hunter.updateCompassMeta();
             }
         }
     }

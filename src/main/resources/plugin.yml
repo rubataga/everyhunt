@@ -1,5 +1,5 @@
-name: Manhunt
+name: Everyhunt
 version: ${project.version}
-main: me.rubataga.manhunt.Manhunt
+main: me.rubataga.everyhunt.Everyhunt
 api-version: 1.16
 author: rubataga

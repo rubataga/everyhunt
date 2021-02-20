@@ -43,17 +43,30 @@ public class HunterGui extends InventoryGui {
         return new DynamicGuiElement('c', (viewer) -> {
             ItemStack trackingCompass;
             if(hunter.isLodestoneTracking()){
-                trackingCompass = hunter.getCompass();
+                //System.out.println("Hunter compass is null: " + (hunter.getCompass()==null));
+                if(hunter.inventoryHasCompass()){
+                    //System.out.println("Hunter inventory has compass");
+                    trackingCompass = hunter.getCompass();
+                } else {
+                    //System.out.println("Hunter inventory does not have compass");
+                    trackingCompass = hunter.getLodestoneCompass(); // issue!!! works fine when compass is in inventory
+                }
+                //System.out.println("tracking compass is null:" + (trackingCompass==null));
             } else {
-                trackingCompass = new ItemStack(Material.COMPASS);
+                //System.out.println("DEBUG 1");
+                trackingCompass = TrackingCompassUtils.trackingCompass(); // this works fine
             }
+            //System.out.println("DEBUG 2");
             StaticGuiElement compass = new StaticGuiElement('c',
                     trackingCompass,
+                    1,
                     click -> {
                         TrackingCompassUtils.assignTrackingCompass(hunter);
                         return true;
             });
+            //System.out.println("DEBUG 3");
             if(hunter.getTarget()!=null){
+                //System.out.println("DEBUG 4");
                 String alive = ChatColor.GREEN + "Alive!";
                 if(hunter.getTargetEntity().isDead()){
                     alive = ChatColor.RED + "Dead!";
@@ -71,12 +84,14 @@ public class HunterGui extends InventoryGui {
                 );
 
             } else {
+                //System.out.println("DEBUG 5");
                 String spawn = "World Spawn";
                 if(hunter.getEntity().getBedSpawnLocation()!=null){
                     spawn = "Bed Spawn";
                 }
                 compass.setText("No target!",spawn);
             }
+            //System.out.println("DEBUG 6");
             return compass;
         });
     }

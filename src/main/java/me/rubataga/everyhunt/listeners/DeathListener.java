@@ -32,7 +32,7 @@ public class DeathListener implements Listener {
                 hunter.setTrackingDeath(true); // hunter is now targeting death location and compass is not updated
                 hunter.getEntity().sendMessage(hunter.getTargetEntity().getName() + " has died. Now tracking " + hunter.getTargetEntity().getName() + "'s death location.");
                 hunter.setLastTracked(e.getEntity().getLocation());
-                hunter.updateCompass();
+                hunter.updateCompassMeta();
             }
         }
     }
@@ -53,15 +53,15 @@ public class DeathListener implements Listener {
             if(hunter.isTrackingPortal() || hunter.isTrackingDeath()){
                 hunter.getEntity().setCompassTarget(hunter.getLastTracked());
             }
-            hunter.updateCompass();
+            hunter.updateCompassMeta();
         }
         // if respawning player is runner, notify the hunter
         if(TargetManager.hasRole(e.getPlayer(),RoleEnum.RUNNER)){
             Target runner = TargetManager.getRunners().get(e.getPlayer());
             for(Hunter hunter : runner.getHunters()){
                 hunter.setTrackingDeath(false);
-                hunter.updateCompass();
                 hunter.getEntity().sendMessage(e.getPlayer().getDisplayName() + " has respawned.");
+                hunter.updateCompassMeta();
             }
         }
     }

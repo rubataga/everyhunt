@@ -14,6 +14,7 @@ public class Hunter extends EveryhuntEntity {
 
     private Target target;
     private ItemStack compass;
+    private final ItemStack lodestoneCompass;
     private Location lastTracked;
     private final HunterGui gui;
 
@@ -22,25 +23,80 @@ public class Hunter extends EveryhuntEntity {
     private boolean lodestoneTracking;
     private boolean locked;
 
+    /*
+    compasses
+    compass variable refers to the only compass a player has
+    -- upon receiving a new compass ino the inventory
+        -- generate compass name from variables
+        -- if lodestoneTracking, set compass as lodestone compass
+     */
+
     public Hunter(Player player){
         super(player);
         this.gui = new HunterGui(this);
+        this.lodestoneCompass = TrackingCompassUtils.lodestoneTrackingCompass();
     }
 
     public ItemStack getCompass(){
         return compass;
     }
 
-    // set the hunter's assigned compass, add it to inventory if addCompassToInventory is true
-    public void setCompass(ItemStack trackingCompass, boolean addCompassToInventory){
-        if(addCompassToInventory) {
-            int slot = getEntity().getInventory().firstEmpty();
-            getEntity().getInventory().setItem(slot, trackingCompass.clone());
+    public void setCompass(ItemStack trackingCompass){
+        setCompass(trackingCompass,false);
+    }
+
+    public void setCompass(ItemStack trackingCompass, boolean addToInv){
+        if(isLodestoneTracking()){
+            int slot;
+            if(addToInv){
+                slot = getEntity().getInventory().firstEmpty();
+            } else {
+                slot = TrackingCompassUtils.getTrackingCompassIndex(getEntity());
+            }
+            getEntity().getInventory().setItem(slot, lodestoneCompass);
             this.compass = getEntity().getInventory().getItem(slot);
         } else {
-            this.compass = trackingCompass;
+            if (addToInv) {
+                int slot = getEntity().getInventory().firstEmpty();
+                getEntity().getInventory().setItem(slot, trackingCompass);
+                this.compass = getEntity().getInventory().getItem(slot);
+            } else {
+                this.compass = trackingCompass;
+            }
         }
+        updateCompassMeta();
     }
+
+    public ItemStack getLodestoneCompass(){
+        return lodestoneCompass;
+    }
+
+//
+//
+//    public void setCompass(int slot){
+//        if(lodestoneTracking){
+//            this.compass = getEntity().getInventory().getItem(slot);
+//        }
+//    }
+//    // set the hunter's assigned compass, add it to inventory if addCompassToInventory is true
+//    public void setCompassComplicated(ItemStack trackingCompass){
+//        if(lodestoneTracking){
+//            TrackingCompassUtils.compassUpdater(this,trackingCompass);
+//            int slot = getEntity().getInventory().firstEmpty();
+//            getEntity().getInventory().setItem(slot, trackingCompass);
+//            this.compass = getEntity().getInventory().getItem(slot);
+//        }
+//    }
+//
+//    public void setCompass(ItemStack trackingCompass, boolean addCompassToInventory){
+//        if(addCompassToInventory) {
+//            int slot = getEntity().getInventory().firstEmpty();
+//            getEntity().getInventory().setItem(slot, trackingCompass.clone());
+//            this.compass = getEntity().getInventory().getItem(slot);
+//        } else {
+//            this.compass = trackingCompass;
+//        }
+//    }
 
     public boolean inventoryHasCompass() {
         return TrackingCompassUtils.hasTrackingCompass(getEntity());
@@ -86,12 +142,12 @@ public class Hunter extends EveryhuntEntity {
         this.lodestoneTracking = getEntity().getWorld().getEnvironment()!= World.Environment.NORMAL;
         this.trackingPortal = getEntity().getWorld()!=getTargetEntity().getWorld();
         // if player is in overworld, un"lode" compass
-        if(!lodestoneTracking){
+        if(!lodestoneTracking && inventoryHasCompass()){
             CompassMeta meta = (CompassMeta)(compass.getItemMeta());
             meta.setLodestone(null);
             compass.setItemMeta(meta);
         }
-        updateCompass();
+        updateCompassMeta();
     }
 
     public boolean isLodestoneTracking(){
@@ -123,8 +179,8 @@ public class Hunter extends EveryhuntEntity {
         return this.target;
     }
 
-    public void updateCompass(){
-        TrackingCompassUtils.compassUpdater(this);
+    public void updateCompassMeta(){
+        TrackingCompassUtils.compassUpdater(this, compass);
         gui.draw();
     }
 
