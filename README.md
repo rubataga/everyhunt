@@ -25,8 +25,7 @@ rubataga's Everyhunt Plugin
 - If a hunter's target dies, their compass will continue to track the location of the death until it is reset via a right-click, a new target, or /mh recal
     - Lock the compass in order to keep track of death location.
 - If a hunter's target enters a portal, their compass will continue to track the location of the portal they last entered.
-    - The compass does NOT work in the Nether
-    - The Nether does not currently work for this plugin
+    - [NEW] The compass works in the Nether! 
 
 **commands:**
 - /mh addhunter [player] - makes a player into a hunter
