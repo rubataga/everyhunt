@@ -3,6 +3,7 @@ package me.rubataga.everyhunt.services;
 import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
+import me.rubataga.everyhunt.utils.GameRules;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 
 import org.bukkit.command.CommandSender;
@@ -30,7 +31,7 @@ public class CompassService {
                     sender.sendMessage(player.getName() + " is not a hunter!");
                 }
             } else {
-                Hunter hunter = TargetManager.getHunters().get(player);
+                Hunter hunter = TargetManager.getHunter(player);
                 // if hunter has a tracking compass in their inventory
                 if(TrackingCompassUtils.assignTrackingCompass(hunter)){
                     if (senderIsPlayer) {
@@ -57,7 +58,7 @@ public class CompassService {
             player.sendMessage("You are not a hunter!");
             return;
         }
-        hunter = TargetManager.getHunters().get(player);
+        hunter = TargetManager.getHunter(player);
         //delete yourself from entityList
         targetsInit.remove(player);
         if(targetsInit.size()>0){
@@ -70,7 +71,8 @@ public class CompassService {
                 //if entity is a player and the player isn't a runner, continue
                 if(entity instanceof Player && !TargetManager.getRunners().containsKey(entity)
                         || !(entity instanceof LivingEntity)
-                        || player.getWorld() != entity.getWorld()){
+                        || player.getWorld() != entity.getWorld()
+                        || GameRules.isBlacklisted(entity)){
                     continue;
                 }
                 double dist = player.getLocation().distanceSquared(entity.getLocation());
@@ -107,7 +109,7 @@ public class CompassService {
             player.sendMessage("You are not a hunter!");
             return;
         }
-        hunter = TargetManager.getHunters().get(player);
+        hunter = TargetManager.getHunter(player);
         hunter.setTarget(null);
         hunter.updateCompassMeta();
         player.sendMessage("Compass reset!");

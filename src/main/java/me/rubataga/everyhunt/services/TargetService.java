@@ -5,6 +5,7 @@ import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
@@ -67,7 +68,6 @@ public class TargetService {
             boolean isPlayer = entity instanceof Player;
             boolean isTarget = TargetManager.hasRole(entity, RoleEnum.TARGET);
             boolean senderIsEntity = sender == entity;
-
             if (isTarget) {
                 TargetManager.removeTarget(entity);
                 if(isPlayer){
@@ -79,6 +79,7 @@ public class TargetService {
             }
             if(entity instanceof Player) {
                 Player player = (Player) entity;
+                String name = player.getName();
                 boolean isRunner = TargetManager.hasRole(player,RoleEnum.RUNNER);
                 boolean isHunter = TargetManager.hasRole(player,RoleEnum.HUNTER);
                 if (isRunner) {
@@ -86,22 +87,23 @@ public class TargetService {
                     if (senderIsEntity) {
                         player.sendMessage("You are no longer a runner!");
                     } else {
-                        sender.sendMessage(player.getName() + " is no longer a runner!");
+                        sender.sendMessage(name + " is no longer a runner!");
                     }
                 }
                 if (isHunter) {
                     TargetManager.removeHunter(player);
                     if (senderIsEntity) {
+                        TrackingCompassUtils.removeTrackingCompasses(player);
                         player.sendMessage("You are no longer a hunter!");
                     } else {
-                        sender.sendMessage(player.getName() + " is no longer a hunter!");
+                        sender.sendMessage(name + " is no longer a hunter!");
                     }
                 }
                 if (!isTarget && !isRunner && !isHunter) {
                     if (senderIsEntity) {
                         player.sendMessage("You are neither a hunter, runner, nor target!");
                     } else {
-                        sender.sendMessage(player.getName() + " is neither a hunter, runner, nor target!");
+                        sender.sendMessage(name + " is neither a hunter, runner, nor target!");
                     }
                 }
             } else if (!isTarget){
@@ -154,8 +156,11 @@ public class TargetService {
     public static void sum(CommandSender sender, Collection<Entity> entities){
         for(Entity entity : entities){
             if(TargetManager.getHunters().containsKey(entity)){
-                Hunter hunter = TargetManager.getHunters().get(entity);
+                Hunter hunter = TargetManager.getHunter(entity);
                 sender.sendMessage("§b" + entity.getName());
+                sender.sendMessage("Namepsace key: " + entity.getType().getKey().getKey());
+                sender.sendMessage("Type: " + entity.getType().name());
+                sender.sendMessage("EntityType: " + EntityType.valueOf(entity.getType().name()));
                 sender.sendMessage("Compass is null?: " + (hunter.getCompass()==null));
                 sender.sendMessage("Tracked location: " + hunter.getEntity().getCompassTarget());
                 if(hunter.getTarget()!=null){

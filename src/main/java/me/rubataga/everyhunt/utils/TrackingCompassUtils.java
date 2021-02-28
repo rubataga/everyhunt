@@ -1,9 +1,10 @@
 package me.rubataga.everyhunt.utils;
 
+import me.rubataga.everyhunt.Everyhunt;
 import me.rubataga.everyhunt.roles.Hunter;
-import de.tr7zw.changeme.nbtapi.NBTItem;
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -11,28 +12,46 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 /**
- * Class containing methods for {@link TrackingCompassUtils#trackingCompass()}
+ * Class containing methods for {@link TrackingCompassUtils#trackingCompass(Hunter)}
  */
 public class TrackingCompassUtils {
 
     private TrackingCompassUtils(){}
+
+    private static final Everyhunt plugin = Everyhunt.getInstance();
+    private static final NamespacedKey COMPASS_TIME_KEY = new NamespacedKey(plugin, "compassTime");
+    //private static final NamespacedKey COMPASS_PLAYER = new NamespacedKey(plugin, "compassPlayer");
+    //private static final NamespacedKey IS_TRACKING_COMPASS = new NamespacedKey(plugin, "isTrackingCompass");
+    private static final NamespacedKey TRACKING_COMPASS_KEY = new NamespacedKey(plugin, "trackingCompass");
+    private static final TrackingCompassTagType TRACKING_COMPASS_TAG_TYPE = new TrackingCompassTagType();
 
     /**
      * Returns a vanilla compass named "Tracking Compass"
      *
      * @return a compass with a display name "Tracking Compass"
      */
-    public static ItemStack vanillaTrackingCompass(){
+    public static ItemStack vanillaTrackingCompass(Hunter hunter){
         ItemStack trackingCompass = new ItemStack(Material.COMPASS);
         trackingCompass.addUnsafeEnchantment(Enchantment.LUCK,1);
         CompassMeta meta = (CompassMeta)trackingCompass.getItemMeta();
         meta.setDisplayName("§cTracking Compass");
         meta.setLodestoneTracked(false);
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+//        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+//        pdc.set(COMPASS_TIME, PersistentDataType.LONG,System.currentTimeMillis());
+//        if(hunter!=null) {
+//            pdc.set(COMPASS_PLAYER, PersistentDataType.STRING, hunter.getEntity().getUniqueId().toString());
+//        }
         trackingCompass.setItemMeta(meta);
         return trackingCompass;
+    }
+
+    public static ItemStack vanillaTrackingCompass(){
+        return vanillaTrackingCompass(null);
     }
 
     /**
@@ -40,14 +59,25 @@ public class TrackingCompassUtils {
      *
      * @return a compass with display name "Tracking Compass" and an NBT boolean tag "isTrackingCompass" = true
      */
-    public static ItemStack trackingCompass(){
-        NBTItem trackingCompass = new NBTItem(vanillaTrackingCompass());
-        trackingCompass.setBoolean("isTrackingCompass",true);
-        return trackingCompass.getItem();
+    public static ItemStack trackingCompass(Hunter hunter){
+        ItemStack tc = vanillaTrackingCompass(hunter);
+        ItemMeta meta = tc.getItemMeta();
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        pdc.set(COMPASS_TIME_KEY, PersistentDataType.LONG,System.currentTimeMillis());
+        if(hunter!=null) {
+            pdc.set(TRACKING_COMPASS_KEY, TRACKING_COMPASS_TAG_TYPE, hunter);
+        }
+        //pdc.set(IS_TRACKING_COMPASS, PersistentDataType.STRING,"isTrackingCompass");
+        tc.setItemMeta(meta);
+        return tc;
     }
 
-    public static ItemStack lodestoneTrackingCompass(){
-        ItemStack lc = trackingCompass();
+    public static ItemStack trackingCompass(){
+        return trackingCompass(null);
+    }
+
+    public static ItemStack lodestoneTrackingCompass(Hunter hunter){
+        ItemStack lc = trackingCompass(hunter);
         CompassMeta meta = (CompassMeta)lc.getItemMeta();
         meta.setLodestoneTracked(false);
         lc.setItemMeta(meta);
@@ -64,9 +94,17 @@ public class TrackingCompassUtils {
         if(compass == null){
             return false;
         }
+        ItemMeta meta = compass.getItemMeta();
+        if(meta == null){
+            return false;
+        }
+//        if(compass.getType()==Material.COMPASS){
+//            NBTItem trackingCompass = new NBTItem(compass);
+//            return trackingCompass.getBoolean("isTrackingCompass");
+//        }
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
         if(compass.getType()==Material.COMPASS){
-            NBTItem trackingCompass = new NBTItem(compass);
-            return trackingCompass.getBoolean("isTrackingCompass");
+            return pdc.has(TRACKING_COMPASS_KEY, new TrackingCompassTagType());
         }
         return false;
     }
@@ -98,22 +136,36 @@ public class TrackingCompassUtils {
         return trackingCompass;
     }
 
+    public static void removeTrackingCompasses(Player player){
+        PlayerInventory inventory = player.getInventory();
+        ItemStack trackingCompass = null;
+        //int index = 0;
+        for(int i = 0; i < inventory.getContents().length; i++){
+            ItemStack item = inventory.getItem(i);
+            if(item!=null){
+                if(isTrackingCompass(item)){
+                    inventory.setItem(i,null);
+                }
+            }
+        }
+    }
+
     public static ItemStack getTrackingCompass(Hunter hunter){
         return getTrackingCompass(hunter.getEntity());
     }
 
     public static int getTrackingCompassIndex(Player player){
         PlayerInventory inventory = player.getInventory();
-        boolean searching = true;
-        int index = 0;
+        int index = -1;
         for(int i = 0; i < inventory.getContents().length; i++){
             ItemStack item = inventory.getItem(i);
             if(item!=null){
                 if(isTrackingCompass(item)){
-                    if(searching) {
+                    if(index==-1) {
                         //System.out.println("compass found!");
-                        searching = false;
                         index = i;
+                    } else {
+                        inventory.setItem(i,null);
                     }
 //                    } else {
 //                        System.out.println("removed extra compass");
@@ -134,18 +186,17 @@ public class TrackingCompassUtils {
     }
 
     public static boolean assignTrackingCompass(Hunter hunter){
-        boolean compassFound = true;
+        boolean hasCompass = true;
         ItemStack tc = getTrackingCompass(hunter.getEntity());
         //hunter already has tracking compass
         if(tc==null) {
-
-            compassFound = false;
-            tc = trackingCompass();
+            hasCompass = false;
+            tc = trackingCompass(hunter);
         }
         compassUpdater(hunter,tc);
-        hunter.setCompass(tc,!compassFound);
+        hunter.setCompass(tc,!hasCompass);
         //System.out.println("tc null: " + (tc==null));
-        return compassFound;
+        return hasCompass;
     }
     // if inventory has no compass
     //if(!hunter.inventoryHasCompass()){

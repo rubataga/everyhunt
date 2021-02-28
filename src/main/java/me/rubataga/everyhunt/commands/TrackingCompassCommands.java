@@ -1,5 +1,6 @@
 package me.rubataga.everyhunt.commands;
 
+import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.services.CompassService;
 import me.rubataga.everyhunt.services.TargetManager;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
@@ -93,8 +94,9 @@ public class TrackingCompassCommands {
     public static CommandAPICommand gui(){
         return new CommandAPICommand("gui")
                 .executesPlayer((sender, args) -> {
-                    if(TargetManager.getHunters().containsKey(sender)){
-                        TargetManager.getHunters().get(sender).getGUI().show();
+                    Hunter hunter = TargetManager.getHunter(sender);
+                    if(hunter!=null){
+                        hunter.getGUI().show();
                     } else {
                         sender.sendMessage("Only hunters can do this!");
                     }

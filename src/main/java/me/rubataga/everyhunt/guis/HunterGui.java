@@ -10,11 +10,13 @@ import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class HunterGui extends InventoryGui {
 
     private final Hunter hunter;
+    private final Player player;
 
     public HunterGui(Hunter hunter) {
         super(Everyhunt.getInstance(),hunter.getEntity(),"Rubataga's Everyhunt v1.0", new String[]{
@@ -23,11 +25,12 @@ public class HunterGui extends InventoryGui {
                 " p "
         });
         this.hunter = hunter;
+        this.player = hunter.getEntity();
         initialize();
     }
 
     public void show(){
-        show(hunter.getEntity());
+        show(player);
     }
 
     private void initialize(){
@@ -54,13 +57,16 @@ public class HunterGui extends InventoryGui {
                 //System.out.println("tracking compass is null:" + (trackingCompass==null));
             } else {
                 //System.out.println("DEBUG 1");
-                trackingCompass = TrackingCompassUtils.trackingCompass(); // this works fine
+                trackingCompass = TrackingCompassUtils.trackingCompass(hunter); // this works fine
             }
             //System.out.println("DEBUG 2");
             StaticGuiElement compass = new StaticGuiElement('c',
                     trackingCompass,
                     1,
                     click -> {
+                        if(TrackingCompassUtils.isTrackingCompass(player.getItemOnCursor())){
+                            player.setItemOnCursor(null);
+                        }
                         TrackingCompassUtils.assignTrackingCompass(hunter);
                         return true;
             });
@@ -86,7 +92,7 @@ public class HunterGui extends InventoryGui {
             } else {
                 //System.out.println("DEBUG 5");
                 String spawn = "World Spawn";
-                if(hunter.getEntity().getBedSpawnLocation()!=null){
+                if(player.getBedSpawnLocation()!=null){
                     spawn = "Bed Spawn";
                 }
                 compass.setText("No target!",spawn);
@@ -100,8 +106,8 @@ public class HunterGui extends InventoryGui {
         GuiStateElement lock = new GuiStateElement('l',
                 new GuiStateElement.State(
                         change -> {
-                            hunter.setLocked(true);
-                            hunter.getEntity().sendMessage("Your compass is locked");
+                            hunter.setLockedOnTarget(true);
+                            player.sendMessage("Your compass is locked");
                         },
                         "compassLocked",
                         new ItemStack(Material.BEDROCK),
@@ -110,8 +116,8 @@ public class HunterGui extends InventoryGui {
                 ),
                 new GuiStateElement.State(
                         change -> {
-                            hunter.setLocked(false);
-                            hunter.getEntity().sendMessage("Your compass is unlocked");
+                            hunter.setLockedOnTarget(false);
+                            player.sendMessage("Your compass is unlocked");
                         },
                         "compassUnlocked",
                         new ItemStack(Material.DIRT),
@@ -119,7 +125,7 @@ public class HunterGui extends InventoryGui {
                         "Click here to lock your compass"
                 )
         );
-        if(hunter.isLocked()){
+        if(hunter.isLockedOnTarget()){
             lock.setState("compassLocked");
         } else {
             lock.setState("compassUnlocked");

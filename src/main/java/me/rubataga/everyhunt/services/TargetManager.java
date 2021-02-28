@@ -59,16 +59,32 @@ public class TargetManager {
         return hunters;
     }
 
+    public static Hunter getHunter(Entity entity){
+        return hunters.getOrDefault(entity,null);
+    }
+
     public static Map<Entity, Target> getTargets() {
         return targets;
+    }
+
+    public static Target getTarget(Entity entity){
+        return targets.getOrDefault(entity,null);
     }
 
     public static Map<Entity, Target> getRunners() {
         return runners;
     }
 
+    public static Target getRunner(Entity entity){
+        return runners.getOrDefault(entity,null);
+    }
+
     public static List<Target> getRunnerList() {
         return runnerList;
+    }
+
+    public static Target getRunnerIndex(int i){
+        return runnerList.get(i);
     }
 
 }

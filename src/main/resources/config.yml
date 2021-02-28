@@ -1,0 +1,19 @@
+debug: true
+
+gamemode: "classic"
+
+description:
+  ["A classic game of",
+  "Minecraft Manhunt!"]
+
+useBlacklist: false
+
+blacklistMessage: "Tracking this entity is not allowed!"
+
+compassWhitelist: ["player"]
+
+compassBlacklist: ["pig","sheep"]
+
+rightClickCyclesRunners: false
+
+rigthClickResetsDeadCompass

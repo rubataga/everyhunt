@@ -6,7 +6,9 @@ import me.rubataga.everyhunt.roles.Target;
 import me.rubataga.everyhunt.services.TargetManager;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
@@ -35,32 +37,35 @@ public class PortalListener implements Listener {
 
     private void portal(Entity entity){
         if(TargetManager.hasRole(entity,RoleEnum.TARGET)) { // if teleporting entity is target
-            Target target = TargetManager.getTargets().get(entity);
+            Target target = TargetManager.getTarget(entity);
             target.updateLastLocation();
-            for(Hunter hunter : TargetManager.getTargets().get(entity).getHunters()){
+            for(Hunter hunter : target.getHunters()){
+                Player player = hunter.getEntity();
+                World.Environment environment = player.getWorld().getEnvironment();
                 hunter.setTrackingPortal();
                 // hunter in overworld, target joins otherworld
                 if(hunter.isTrackingPortal() && !hunter.isLodestoneTracking()){
-                    hunter.getEntity().setCompassTarget(target.getLastLocationDimension(hunter.getEntity().getWorld().getEnvironment()));
+                    player.setCompassTarget(target.getLastLocationDimension(environment));
                 }
                 // hunter in otherworld, target joins overworld
                 if(hunter.isTrackingPortal() && hunter.isLodestoneTracking()){
-                    hunter.setLastTracked(target.getLastLocationDimension(hunter.getEntity().getWorld().getEnvironment()));
+                    hunter.setLastTracked(target.getLastLocationDimension(environment));
                 }
             }
         }
         if(TargetManager.hasRole(entity,RoleEnum.HUNTER)) {
-            Hunter hunter = TargetManager.getHunters().get(entity);
+            Hunter hunter = TargetManager.getHunter(entity);
             if(hunter.getTarget()!=null){
+                Player player = hunter.getEntity();
                 hunter.setTrackingPortal();
                 // hunter joins overworld, target in otherworld
                 if(hunter.isTrackingPortal() && !hunter.isLodestoneTracking()){
-                    hunter.getEntity().setCompassTarget(hunter.getEntity().getLocation());
+                    player.setCompassTarget(player.getLocation());
                 }
 
                 // hunter joins otherworld, target in overworld
                 if(hunter.isTrackingPortal() && hunter.isLodestoneTracking()){
-                    hunter.setLastTracked(hunter.getEntity().getLocation());
+                    hunter.setLastTracked(player.getLocation());
                 }
             }
         }

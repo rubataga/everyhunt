@@ -10,9 +10,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
 
-public class Hunter extends EveryhuntEntity {
+public class Hunter extends EveryhuntEntity{
 
     private Target target;
+    private boolean lockedOnTarget;
+
     private ItemStack compass;
     private final ItemStack lodestoneCompass;
     private Location lastTracked;
@@ -21,7 +23,6 @@ public class Hunter extends EveryhuntEntity {
     private boolean trackingDeath;
     private boolean trackingPortal;
     private boolean lodestoneTracking;
-    private boolean locked;
 
     /*
     compasses
@@ -34,7 +35,7 @@ public class Hunter extends EveryhuntEntity {
     public Hunter(Player player){
         super(player);
         this.gui = new HunterGui(this);
-        this.lodestoneCompass = TrackingCompassUtils.lodestoneTrackingCompass();
+        this.lodestoneCompass = TrackingCompassUtils.lodestoneTrackingCompass(this);
     }
 
     public ItemStack getCompass(){
@@ -42,22 +43,26 @@ public class Hunter extends EveryhuntEntity {
     }
 
     public void setCompass(ItemStack trackingCompass){
-        setCompass(trackingCompass,false);
+        setCompass(trackingCompass,false,-1);
     }
 
     public void setCompass(ItemStack trackingCompass, boolean addToInv){
-        if(isLodestoneTracking()){
-            int slot;
+        setCompass(trackingCompass, addToInv, -1);
+    }
+
+    public void setCompass(ItemStack trackingCompass, boolean addToInv, int slot){
+        if(slot==-1){
             if(addToInv){
                 slot = getEntity().getInventory().firstEmpty();
             } else {
                 slot = TrackingCompassUtils.getTrackingCompassIndex(getEntity());
             }
+        }
+        if(isLodestoneTracking()){
             getEntity().getInventory().setItem(slot, lodestoneCompass);
             this.compass = getEntity().getInventory().getItem(slot);
         } else {
             if (addToInv) {
-                int slot = getEntity().getInventory().firstEmpty();
                 getEntity().getInventory().setItem(slot, trackingCompass);
                 this.compass = getEntity().getInventory().getItem(slot);
             } else {
@@ -118,12 +123,12 @@ public class Hunter extends EveryhuntEntity {
         return gui;
     }
 
-    public boolean isLocked() {
-        return locked;
+    public boolean isLockedOnTarget() {
+        return lockedOnTarget;
     }
 
-    public void setLocked(boolean locked){
-        this.locked = locked;
+    public void setLockedOnTarget(boolean lockedOnTarget){
+        this.lockedOnTarget = lockedOnTarget;
     }
 
     public boolean isTrackingDeath() {
