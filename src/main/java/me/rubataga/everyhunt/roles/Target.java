@@ -12,8 +12,9 @@ import java.util.Map;
 
 public class Target extends EveryhuntEntity {
 
-    Collection<Hunter> hunters = new LinkedList<>();
-    Map<World.Environment,Location> lastLocations = new HashMap<>();
+    private final Collection<Hunter> hunters = new LinkedList<>();
+    private final Map<World.Environment,Location> lastLocations = new HashMap<>();
+    private World deathWorld = null;
 
     public Target(Entity target){
         super(target);
@@ -34,6 +35,10 @@ public class Target extends EveryhuntEntity {
         return hunters;
     }
 
+    public void updateDimensionLocation(World.Environment dimension, Location location){
+        lastLocations.put(dimension,location);
+    }
+
     public void updateLastLocation() {
         World.Environment dimension = getEntity().getWorld().getEnvironment();
         Location currentLocation = getEntity().getLocation();
@@ -42,9 +47,17 @@ public class Target extends EveryhuntEntity {
 
     public Location getLastLocationDimension(World.Environment dimension){
         if(lastLocations.containsKey(dimension)){
-            return lastLocations.get(dimension);
+            return lastLocations.getOrDefault(dimension,null);
         }
         return null;
+    }
+
+    public void updateDeathWorld(){
+        this.deathWorld = getEntity().getWorld();
+    }
+
+    public World getDeathWorld(){
+        return deathWorld;
     }
 
 }

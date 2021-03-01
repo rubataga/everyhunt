@@ -23,7 +23,6 @@ public class TrackingCompassTagType implements PersistentDataType<byte[], Hunter
 
     @Override
     public byte[] toPrimitive(Hunter complex, PersistentDataAdapterContext context) {
-        //return complex.getEntity().getUniqueId();
         ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
         UUID id = complex.getEntity().getUniqueId();
         bb.putLong(id.getMostSignificantBits());
@@ -38,6 +37,5 @@ public class TrackingCompassTagType implements PersistentDataType<byte[], Hunter
         long leastSigBits = bb.getLong();
         UUID id = new UUID(mostSigBits,leastSigBits);
         return TargetManager.getHunter(Bukkit.getPlayer(id));
-        //return TargetManager.getHunter(Bukkit.getPlayer(primitive));
     }
 }

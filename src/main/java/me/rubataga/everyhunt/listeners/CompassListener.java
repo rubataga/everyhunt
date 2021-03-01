@@ -28,19 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CompassListener implements Listener {
-//    private final List<InventoryAction> compassDropActions = new ArrayList<>();
-//    private final List<InventoryAction> compassPickupActions = new ArrayList<>();
+
     private final List<InventoryAction> illegalTrackingCompassActions = new ArrayList<>();
 
     public CompassListener(){
-//        compassDropActions.add(InventoryAction.DROP_ALL_CURSOR);
-//        compassDropActions.add(InventoryAction.DROP_ALL_SLOT);
-//        compassDropActions.add(InventoryAction.DROP_ONE_CURSOR);
-//        compassDropActions.add(InventoryAction.DROP_ONE_SLOT);
-//        compassPickupActions.add(InventoryAction.PICKUP_ONE);
-//        compassPickupActions.add(InventoryAction.PICKUP_SOME);
-//        compassPickupActions.add(InventoryAction.PICKUP_ALL);
-//        compassPickupActions.add(InventoryAction.PICKUP_HALF);
         illegalTrackingCompassActions.add(InventoryAction.PLACE_ONE);
         illegalTrackingCompassActions.add(InventoryAction.PLACE_SOME);
         illegalTrackingCompassActions.add(InventoryAction.PLACE_ALL);
@@ -54,7 +45,6 @@ public class CompassListener implements Listener {
      */
     @EventHandler
     public void hunterUseTrackingCompass(PlayerInteractEvent e){
-        //System.out.println("Interact listener is go...");
         Action action = e.getAction();
         if(action==Action.LEFT_CLICK_AIR || action==Action.LEFT_CLICK_BLOCK || action==Action.PHYSICAL){
             return;
@@ -63,9 +53,6 @@ public class CompassListener implements Listener {
         if(e.getHand().equals(EquipmentSlot.OFF_HAND) || //if listening for OFF_HAND
                 !TargetManager.hasRole(player, RoleEnum.HUNTER) || // if the event player is not a hunter
                 !(TrackingCompassUtils.isTrackingCompass(e.getItem()))){// if the event player is not holding a Tracking Compass
-//            System.out.println("e.getItem: " + e.getItem());
-//            System.out.println("Isn't a hunter " + !TargetManager.hasRole(e.getPlayer(), RoleEnum.HUNTER));
-//            System.out.println("Not a tc: " + !(TrackingCompassUtils.isTrackingCompass(e.getItem())));
             return;
         }
         Hunter hunter = TargetManager.getHunter(player);
@@ -117,9 +104,8 @@ public class CompassListener implements Listener {
                 }
             }
         }
-        // set the hunter's target to the selected runner
-        Target runner = runnerList.get(runnerIndex); // Player runner = the runner with index runnerIndex
-        hunter.setTarget(runner); // the hunter is set to be hunting runner
+        Target runner = runnerList.get(runnerIndex);
+        hunter.setTarget(runner);
         player.sendMessage("Now tracking " + runner.getEntity().getName() + ".");
         hunter.updateCompassMeta();
     }
@@ -131,10 +117,7 @@ public class CompassListener implements Listener {
      */
     @EventHandler
     public void onHunterInteractWithEntity(PlayerInteractEntityEvent e){
-        //Debugger.send("§bInteracted w/Entity");
-        //Debugger.send("§bmain hand is trackingcompass" + (e.getPlayer().getInventory().getItemInMainHand() instanceof TrackingCompass));
         // if event is firing for offhand or player isn't holding tracking compass
-        //Debugger.send("§bis tracking compass: " + (TrackingCompassUtils.isTrackingCompass(e.getPlayer().getInventory().getItemInMainHand())));
         if(e.getHand().equals(EquipmentSlot.OFF_HAND)){
             return;
         }
@@ -152,40 +135,32 @@ public class CompassListener implements Listener {
         e.setCancelled(true);
         if(!TargetManager.hasRole(player,RoleEnum.HUNTER)){
             player.sendMessage("You are not a hunter!");
-            //System.out.println("BUGCHECK returned for not hunter");
             return;
         }
         // set the player's target to the clicked entity
         Hunter hunter = TargetManager.getHunter(player);
         if(player.isSneaking()){
-            //System.out.println("BUGCHECK gui for sneaking");
             return;
         }
         if(hunter.isLockedOnTarget()){
-            //System.out.println("BUGCHECK returned for locked");
             e.setCancelled(false);
             return;
         }
         // if hunter is already tracking the clicked entity
         if(hunter.getTargetEntity()==entity){
-            System.out.println("BUGCHECK returned for already tracking right clicked");
             return;
         }
         Target target;
         // if clicked entity is a target, set target to the clicked entity
         if(TargetManager.hasRole(entity,RoleEnum.TARGET)){
             target = TargetManager.getTargets().get(entity);
-            //System.out.println("BUGCHECK existing target: " + target.getEntity().getName());
-            // create a new target
         } else {
             target = new Target(entity);
-            //System.out.println("BUGCHECK new target: " + target.getEntity().getName());
             TargetManager.addTarget(target);
         }
         hunter.setTarget(target);
         hunter.updateCompassMeta();
         player.sendMessage("Now tracking " + entity.getName() + ".");
-        //System.out.println("Hunter object name: " + hunter.getTargetEntity().getName());
     }
 
     @EventHandler
@@ -205,20 +180,11 @@ public class CompassListener implements Listener {
         Hunter hunter = TargetManager.getHunter(entity);
         // only hunters with no tracking compass in their inventory can pick one up
         if(!TrackingCompassUtils.hasTrackingCompass(hunter)) {
-            System.out.println("§bNO COMPASS FOUND!");
             item.remove();
             TrackingCompassUtils.assignTrackingCompass(hunter);
             hunter.updateCompassMeta();
         }
     }
-
-//    @EventHandler
-//    public void onTrackingCompassDrop(EntityDropItemEvent e){
-//        Item item = e.getItemDrop();
-//        if(TrackingCompassUtils.isTrackingCompass(item.getItemStack())){
-//            e.setCancelled(true);
-//        }
-//    }
 
     // when player gets into a bed and their target is null, update their compass
     @EventHandler
@@ -234,9 +200,7 @@ public class CompassListener implements Listener {
 
     @EventHandler
     public void onInventoryCompassDrag(InventoryDragEvent e) {
-        System.out.println("§aDRAG ACTION!");
         if(TrackingCompassUtils.isTrackingCompass(e.getOldCursor())){
-            System.out.println("ILLEGAL COMPASS DRAG ACTION!");
             e.setCancelled(true);
         }
     }
@@ -246,14 +210,9 @@ public class CompassListener implements Listener {
         InventoryAction action = e.getAction();
         ItemStack cursorItem = e.getCursor();
         ItemStack currentItem = e.getCurrentItem();
-        System.out.println("§aCLICK ACTION: " + action.name());
-        System.out.println("§bCLICK TYPE: " + e.getClick().name());
-        System.out.println("INVENTORY TYPE: " + e.getInventory().getType().name());
         Player player = (Player) e.getWhoClicked();
         if(TrackingCompassUtils.isTrackingCompass(currentItem)){
-            System.out.println("CURSOR HAS COMPASS!");
             if (e.isRightClick()){// && compassPickupActions.contains(action)) {
-                System.out.println("RIGHT/SHIFT CLICKED!");
                 Hunter hunter = TargetManager.getHunter(player);
                 if (hunter != null) {
                     hunter.getGUI().show();
@@ -264,18 +223,13 @@ public class CompassListener implements Listener {
         // if cursor has tc, cancel if trying to put it in a player's inventory who already
         // has a tc, or cancel if trying to stack
         if(TrackingCompassUtils.isTrackingCompass(cursorItem)) {
-//            if(compassDropActions.contains(action)){
-//                return;
-//            }
             Inventory inventory = e.getClickedInventory();
             if(inventory==null){
                 return;
             }
             if(inventory instanceof PlayerInventory){
                 if(TrackingCompassUtils.hasTrackingCompass(player)) {
-                    System.out.println("PLAYER HAS TRACKING COMPASS");
                     if(illegalTrackingCompassActions.contains(action)) {
-                        System.out.println("ILLEGAL COMPASS ACTION!");
                         e.setCancelled(true);
                     }
                 }
@@ -285,5 +239,4 @@ public class CompassListener implements Listener {
             }
         }
     }
-
 }

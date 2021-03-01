@@ -16,7 +16,6 @@ public class CompassRunnable {
         for (Hunter hunter : TargetManager.getHunters().values()) {
             Target target = hunter.getTarget();
             if (target != null) {
-                //System.out.println(hunter.getEntity().getName() + "'s compass null: " + (hunter.getCompass()==null));
                 // if hunter is tracking death or portal, don't set compass. compass will continue to track the target's last location.
                 if(hunter.getCompass() == null || (!hunter.isLodestoneTracking() && (hunter.isTrackingDeath() || hunter.isTrackingPortal()))){
                     continue;
@@ -30,9 +29,6 @@ public class CompassRunnable {
                     } else {
                         compass = hunter.getLodestoneCompass();
                     }
-//                    if(!hunter.inventoryHasCompass()){
-//                        return;
-//                    }
                     CompassMeta meta = ((CompassMeta)(compass.getItemMeta()));
                     meta.setLodestoneTracked(false);
                     // if tracking a portal or a death location (which don't change), track lastTracked

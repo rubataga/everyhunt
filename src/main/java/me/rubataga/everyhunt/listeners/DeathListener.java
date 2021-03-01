@@ -21,18 +21,13 @@ public class DeathListener implements Listener {
      */
     @EventHandler
     public void onTargetDeath(EntityDeathEvent e){
-        //System.out.println("BUGCHECK Entity died: " + e.getEntity().getName());
-        //if a target dies, notify the player and set their target to the target's death location
         Entity entity = e.getEntity();
-        if(TargetManager.hasRole(entity,RoleEnum.TARGET)) { // if dead entity is target
-            //System.out.println("has role");
-            //System.out.println("role works");
-            //System.out.println("entity hunter list size:" + TargetManager.getTargets().get(e.getEntity()).getHunters().size());
+        if(TargetManager.hasRole(entity,RoleEnum.TARGET)) {
             Target target = TargetManager.getTarget(entity);
             target.updateLastLocation();
-            for (Hunter hunter : target.getHunters()) { // for each hunter targeting the dead entity
-                //System.out.println("Hunter found: " + hunter.getEntity().getName());
-                hunter.setTrackingDeath(true); // hunter is now targeting death location and compass is not updated
+            target.updateDeathWorld();
+            for (Hunter hunter : target.getHunters()) {
+                hunter.setTrackingDeath(true);
                 hunter.getEntity().sendMessage(entity.getName() + " has died. Now tracking " + hunter.getTargetEntity().getName() + "'s death location.");
                 hunter.setLastTracked(entity.getLocation());
                 hunter.updateCompassMeta();

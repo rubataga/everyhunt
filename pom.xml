@@ -46,10 +46,6 @@
                                     <shadedPattern>me.rubataga.everyhunt.commandapi</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>de.tr7zw.changeme.nbtapi</pattern>
-                                    <shadedPattern>me.rubataga.everyhunt.nbtapi</shadedPattern>
-                                </relocation>
-                                <relocation>
                                     <pattern>de.themoep</pattern>
                                     <shadedPattern>me.rubataga.everyhunt.inventorygui</shadedPattern>
                                 </relocation>
@@ -100,30 +96,13 @@
         </dependency>
         <dependency>
             <groupId>dev.jorel</groupId>
-            <artifactId>commandapi-core</artifactId>
-            <version>5.3</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>dev.jorel</groupId>
             <artifactId>commandapi-shade</artifactId>
             <version>5.8</version>
-        </dependency>
-        <dependency>
-            <groupId>de.tr7zw</groupId>
-            <artifactId>item-nbt-api</artifactId>
-            <version>2.7.1</version>
         </dependency>
         <dependency>
             <groupId>de.themoep</groupId>
             <artifactId>inventorygui</artifactId>
             <version>1.4.3-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
-        <!--        <dependency>-->
-<!--            <groupId>me.rockyhawk</groupId>-->
-<!--            <artifactId>commandpanels</artifactId>-->
-<!--            <version>3.15.2.4</version>-->
-<!--        </dependency>-->
     </dependencies>
 </project>

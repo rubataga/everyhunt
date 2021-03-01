@@ -6,6 +6,8 @@ import me.rubataga.everyhunt.roles.Target;
 import me.rubataga.everyhunt.utils.GameRules;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -62,9 +64,47 @@ public class CompassService {
         //delete yourself from entityList
         targetsInit.remove(player);
         if(targetsInit.size()>0){
-            if(targetsInit.size()>1){
-                player.sendMessage("Multiple targets found! Tracking closest target.");
+            if(targetsInit.size()==1){
+               targetEntity = targetsInit.toArray(new Entity[1])[0];
+               if(TargetManager.hasRole(targetEntity,RoleEnum.TARGET)){
+                   target = TargetManager.getTarget(targetEntity);
+                   World targetWorld;
+                   if(targetEntity.isDead()){
+                       targetWorld = target.getDeathWorld();
+                   } else {
+                       targetWorld = targetEntity.getWorld();
+                   }
+                   Location targetHunterDimensionLocation = target.getLastLocationDimension(player.getWorld().getEnvironment());
+                   if(targetWorld!=player.getWorld()){
+                       if(targetHunterDimensionLocation!=null){
+                           hunter.setLastTracked(targetHunterDimensionLocation);
+                           hunter.setTrackingPortal();
+                           player.sendMessage("Now tracking " + targetEntity.getName() + "'s portal.");
+                       } else {
+                           player.sendMessage("Sorry, " + targetEntity.getName() + " has not been in this world yet.");
+                           return;
+                       }
+                   } else {
+                       if(targetEntity.isDead()){
+                           hunter.setLastTracked(targetHunterDimensionLocation);
+                           hunter.setTrackingDeath(true);
+                           player.sendMessage("Now tracking " + targetEntity.getName() + "'s death location.");
+                       }
+                   }
+
+               } else if (targetEntity.isDead() || targetEntity.getWorld()!=player.getWorld()){
+                   player.sendMessage("Sorry, you are not allowed to track " + targetEntity.getName());
+                   return;
+               } else {
+                   target = new Target(targetEntity);
+                   TargetManager.addTarget(target);
+                   player.sendMessage("Now tracking " + targetEntity.getName());
+               }
+               hunter.setTarget(target);
+               hunter.updateCompassMeta();
+               return;
             }
+            player.sendMessage("Multiple targets found! Tracking closest target.");
             Double min = null;
             //find closest target
             for(Entity entity : targetsInit){
@@ -111,6 +151,7 @@ public class CompassService {
         }
         hunter = TargetManager.getHunter(player);
         hunter.setTarget(null);
+        hunter.setLastTracked(null);
         hunter.updateCompassMeta();
         player.sendMessage("Compass reset!");
     }
