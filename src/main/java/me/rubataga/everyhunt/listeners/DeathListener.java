@@ -1,18 +1,28 @@
 package me.rubataga.everyhunt.listeners;
 
+import me.rubataga.everyhunt.game.GameProgression;
 import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
 import me.rubataga.everyhunt.services.TargetManager;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
+import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EnderDragonChangePhaseEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class DeathListener implements Listener {
+
+    private final Map<Entity,Target> dragonHunterMap = new HashMap<>();
 
     /**
      * EventHandler for a target dying
@@ -33,6 +43,27 @@ public class DeathListener implements Listener {
                 hunter.updateCompassMeta();
             }
         }
+    }
+
+    @EventHandler
+    public void onEnderDragonDeath(EnderDragonChangePhaseEvent e){
+        Entity dragon = e.getEntity();
+        if(e.getNewPhase()==EnderDragon.Phase.DYING){
+            GameProgression.anypercentWon(dragonHunterMap.getOrDefault(dragon, null));
+        }
+    }
+
+    @EventHandler
+    public void onTargetKillEnderDragon(EntityDamageByEntityEvent e){
+        Entity damager = e.getDamager();
+        Entity dragon = e.getEntity();
+        if(!TargetManager.hasRole(damager,RoleEnum.TARGET) || dragon.getType()!= EntityType.ENDER_DRAGON){
+            return;
+        }
+        if(dragon.isDead()){
+            dragonHunterMap.put(dragon,TargetManager.getTarget(damager));
+        }
+
     }
 
     /**

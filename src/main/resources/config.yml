@@ -1,6 +1,8 @@
 debug: true
 
-gamemode: "classic"
+name: "classic"
+
+baseGame: "anypercent"
 
 description: ["A classic game of","Minecraft Manhunt!"]
 

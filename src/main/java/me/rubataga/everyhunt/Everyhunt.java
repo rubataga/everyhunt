@@ -1,27 +1,16 @@
 package me.rubataga.everyhunt;
 
-import de.themoep.inventorygui.DynamicGuiElement;
 import me.rubataga.everyhunt.commands.CommandConfiguration;
 import me.rubataga.everyhunt.listeners.CompassListener;
 import me.rubataga.everyhunt.listeners.DeathListener;
-import me.rubataga.everyhunt.roles.Hunter;
-import me.rubataga.everyhunt.roles.Target;
 import me.rubataga.everyhunt.listeners.PortalListener;
 import dev.jorel.commandapi.CommandAPI;
 import me.rubataga.everyhunt.services.CompassRunnable;
-import me.rubataga.everyhunt.services.TargetManager;
 import me.rubataga.everyhunt.utils.Debugger;
-import me.rubataga.everyhunt.utils.GameRules;
-import me.rubataga.everyhunt.utils.TrackingCompassUtils;
+import me.rubataga.everyhunt.game.GameRules;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Entity;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import javax.sound.midi.Track;
 
 /**
  * Plugin class

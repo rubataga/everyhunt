@@ -11,7 +11,7 @@ public class CommandConfiguration {
      * Registers all of the plugin's commands
      */
     public static void register() {
-        new CommandAPICommand("mh")
+        new CommandAPICommand("eh")
 
                 //TargetManagerCommands
                 .withSubcommand(TargetManagerCommands.addRunner())

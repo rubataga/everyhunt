@@ -5,7 +5,7 @@ import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
 import me.rubataga.everyhunt.services.TargetManager;
 import me.rubataga.everyhunt.utils.Debugger;
-import me.rubataga.everyhunt.utils.GameRules;
+import me.rubataga.everyhunt.game.GameRules;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;

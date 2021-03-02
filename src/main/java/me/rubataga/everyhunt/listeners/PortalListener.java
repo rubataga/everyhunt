@@ -4,6 +4,7 @@ import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
 import me.rubataga.everyhunt.services.TargetManager;
+import me.rubataga.everyhunt.utils.Debugger;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 
 import org.bukkit.Location;
@@ -14,7 +15,6 @@ import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
-import org.bukkit.event.entity.EntityPortalExitEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -24,26 +24,28 @@ import org.bukkit.event.player.PlayerTeleportEvent;
  */
 public class PortalListener implements Listener {
 
-//    @EventHandler
-//    public void onEnterPortal(EntityPortalEnterEvent e){
-//        portal(e.getEntity());
-//    }
-
     @EventHandler
     public void onEntityTeleport(EntityTeleportEvent e){
-        portal(e.getEntity(),e.getFrom(), e);
+        teleportHandler(e.getEntity(),e.getFrom(), e);
     }
 
     @EventHandler
-    public void onPlayerEnterPortal(PlayerTeleportEvent e){
-        portal(e.getPlayer(),e.getFrom(), e);
+    public void onPlayerPortal(PlayerPortalEvent e){
+        teleportHandler(e.getPlayer(), e.getFrom(), e);
     }
 
-//    @EventHandler
-//    public void onEntityTeleport(EntityTeleportEvent e){
-//    }
+    @EventHandler
+    public void onEntityPortal(EntityPortalEnterEvent e){
+        teleportHandler(e.getEntity(), e.getLocation(), e);
+    }
 
-    private void portal(Entity entity, Location from, Event e){
+    @EventHandler
+    public void onPlayerTeleport(PlayerTeleportEvent e){
+        teleportHandler(e.getPlayer(),e.getFrom(), e);
+    }
+
+    private void teleportHandler(Entity entity, Location from, Event e){
+        Debugger.send("Event name: " + e.getEventName());
         if(TargetManager.hasRole(entity,RoleEnum.TARGET)) {
             Target target = TargetManager.getTarget(entity);
             target.updateDimensionLocation(from.getWorld().getEnvironment(), from);
@@ -74,9 +76,13 @@ public class PortalListener implements Listener {
 
                 // hunter joins otherworld, target in overworld
                 if(hunter.isTrackingPortal() && hunter.isLodestoneTracking()){
+                    Debugger.send("Hunter is trakcing portal and lodestone Tracking");
                     if(e instanceof PlayerPortalEvent){
+                        Location lastPlayerLocation = player.getLocation();
+                        Debugger.send("Player last location environment: " + lastPlayerLocation.getWorld().getEnvironment());
                         hunter.setLastTracked(player.getLocation());
                     } else {
+                        Debugger.send("Event was not PlayerPortalEvent");
                         Target target = hunter.getTarget();
                         Location lastDimensionLocation = target.getLastLocationDimension(player.getWorld().getEnvironment());
                         if(lastDimensionLocation!=null){

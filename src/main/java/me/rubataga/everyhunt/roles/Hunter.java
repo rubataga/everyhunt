@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
 
@@ -43,20 +44,21 @@ public class Hunter extends EveryhuntEntity{
     }
 
     public void setCompass(ItemStack trackingCompass, boolean addToInv, int slot){
+        Inventory inventory = getEntity().getInventory();
         if(slot==-1){
             if(addToInv){
-                slot = getEntity().getInventory().firstEmpty();
+                slot = inventory.firstEmpty();
             } else {
                 slot = TrackingCompassUtils.getTrackingCompassIndex(getEntity());
             }
         }
         if(isLodestoneTracking()){
-            getEntity().getInventory().setItem(slot, lodestoneCompass);
-            this.compass = getEntity().getInventory().getItem(slot);
+            inventory.setItem(slot, lodestoneCompass);
+            this.compass = inventory.getItem(slot);
         } else {
             if (addToInv) {
-                getEntity().getInventory().setItem(slot, trackingCompass);
-                this.compass = getEntity().getInventory().getItem(slot);
+                inventory.setItem(slot, trackingCompass);
+                this.compass = inventory.getItem(slot);
             } else {
                 this.compass = trackingCompass;
             }
@@ -109,8 +111,9 @@ public class Hunter extends EveryhuntEntity{
     }
 
     public void setTrackingPortal() {
-        this.lodestoneTracking = getEntity().getWorld().getEnvironment()!= World.Environment.NORMAL;
-        this.trackingPortal = getEntity().getWorld()!=getTargetEntity().getWorld();
+        World world = getEntity().getWorld();
+        this.lodestoneTracking = world.getEnvironment() != World.Environment.NORMAL;
+        this.trackingPortal = world !=getTargetEntity().getWorld();
         // if player is in overworld, un"lode" compass
         if(!lodestoneTracking && inventoryHasCompass()){
             CompassMeta meta = (CompassMeta)(compass.getItemMeta());

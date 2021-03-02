@@ -1,5 +1,6 @@
-package me.rubataga.everyhunt.utils;
+package me.rubataga.everyhunt.game;
 
+import me.rubataga.everyhunt.utils.Debugger;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 
@@ -8,7 +9,7 @@ import java.util.List;
 public class GameRules {
 
     public FileConfiguration config;
-    public static String GAMEMODE;
+    public static String NAME;
     public static boolean USE_BLACKLIST;
     public static String BLACKLIST_MESSAGE;
     public static List<String> COMPASS_BLACKLIST;
@@ -17,7 +18,7 @@ public class GameRules {
 
     public void loadConfig(){
         Debugger.enabled = config.getBoolean("debug");
-        GAMEMODE = config.getString("gamemode");
+        NAME = config.getString("name");
         USE_BLACKLIST = config.getBoolean("useBlacklist");
         BLACKLIST_MESSAGE = config.getString("blacklistMessage");
         COMPASS_BLACKLIST = config.getStringList("compassBlacklist");
@@ -27,7 +28,6 @@ public class GameRules {
 
     public void setConfig(FileConfiguration config){
         this.config = config;
-
     }
 
     public static boolean isBlacklisted(Entity entity){
