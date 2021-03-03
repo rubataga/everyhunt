@@ -26,29 +26,30 @@ public class PortalListener implements Listener {
 
     @EventHandler
     public void onEntityTeleport(EntityTeleportEvent e){
-        teleportHandler(e.getEntity(),e.getFrom(), e);
+        teleportHandler(e.getEntity(),e.getFrom(),e.getTo(), e);
     }
 
     @EventHandler
     public void onPlayerPortal(PlayerPortalEvent e){
-        teleportHandler(e.getPlayer(), e.getFrom(), e);
+        teleportHandler(e.getPlayer(), e.getFrom(),e.getTo(), e);
     }
 
     @EventHandler
     public void onEntityPortal(EntityPortalEnterEvent e){
-        teleportHandler(e.getEntity(), e.getLocation(), e);
+        teleportHandler(e.getEntity(), e.getLocation(),e.getLocation(), e);
     }
 
     @EventHandler
     public void onPlayerTeleport(PlayerTeleportEvent e){
-        teleportHandler(e.getPlayer(),e.getFrom(), e);
+        teleportHandler(e.getPlayer(),e.getFrom(),e.getTo(), e);
     }
 
-    private void teleportHandler(Entity entity, Location from, Event e){
+    private void teleportHandler(Entity entity, Location from, Location to, Event e){
         Debugger.send("Event name: " + e.getEventName());
         if(TargetManager.hasRole(entity,RoleEnum.TARGET)) {
             Target target = TargetManager.getTarget(entity);
             target.updateDimensionLocation(from.getWorld().getEnvironment(), from);
+            target.updateDimensionLocation(to.getWorld().getEnvironment(), to);
             target.updateLastLocation();
             for(Hunter hunter : target.getHunters()){
                 Player player = hunter.getEntity();
@@ -77,14 +78,14 @@ public class PortalListener implements Listener {
                 // hunter joins otherworld, target in overworld
                 if(hunter.isTrackingPortal() && hunter.isLodestoneTracking()){
                     Debugger.send("Hunter is trakcing portal and lodestone Tracking");
-                    if(e instanceof PlayerPortalEvent){
-                        Location lastPlayerLocation = player.getLocation();
-                        Debugger.send("Player last location environment: " + lastPlayerLocation.getWorld().getEnvironment());
-                        hunter.setLastTracked(player.getLocation());
+                    if(to.getWorld().getEnvironment()!=from.getWorld().getEnvironment()){
+                        //Location lastPlayerLocation = player.getLocation();
+                        Debugger.send("Player last location environment: " + to.getWorld().getEnvironment());
+                        hunter.setLastTracked(to);
                     } else {
-                        Debugger.send("Event was not PlayerPortalEvent");
+                        Debugger.send("Player is in same world");
                         Target target = hunter.getTarget();
-                        Location lastDimensionLocation = target.getLastLocationDimension(player.getWorld().getEnvironment());
+                        Location lastDimensionLocation = target.getLastLocationDimension(to.getWorld().getEnvironment());
                         if(lastDimensionLocation!=null){
                             hunter.setLastTracked(lastDimensionLocation);
                         } else {

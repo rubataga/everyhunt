@@ -1,4 +1,4 @@
-debug: true
+debugMode: true
 
 name: "classic"
 

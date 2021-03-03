@@ -83,11 +83,11 @@ public class TrackingCompassCommands {
      *
      * @return CommandAPICommand
      */
-    public static CommandAPICommand recalibrate(){
-        return new CommandAPICommand("recalibrate")
-                .withAliases("recompass","recal","rc")
+    public static CommandAPICommand reset(){
+        return new CommandAPICommand("reset")
+                .withAliases("rs")
                 .executesPlayer((sender, args) -> {
-                    CompassService.recalibrate(sender);
+                    CompassService.reset(sender);
                 });
     }
 

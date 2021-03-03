@@ -154,21 +154,4 @@ public class TargetManagerCommands {
                 });
     }
 
-    public static CommandAPICommand sumSelf() {
-        return new CommandAPICommand("sum")
-                .executesPlayer((sender, args) -> {
-                    Collection<Entity> player = Collections.singletonList(sender);
-                    TargetService.sum(sender, player);
-                });
-    }
-
-    public static CommandAPICommand sum() {
-        return new CommandAPICommand("sum")
-                .withArguments(new EntitySelectorArgument("entity", EntitySelectorArgument.EntitySelector.MANY_ENTITIES))
-                .executes((sender, args) -> {
-                    Collection<Entity> entities = (Collection) args[0];
-                    TargetService.sum(sender, entities);
-                });
-    }
-
 }

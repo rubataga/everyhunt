@@ -13,6 +13,11 @@ public class CommandConfiguration {
     public static void register() {
         new CommandAPICommand("eh")
 
+                //AdminCommands
+                .withSubcommand(AdminCommands.sum())
+                .withSubcommand(AdminCommands.sumSelf())
+                .withSubcommand(AdminCommands.config())
+
                 //TargetManagerCommands
                 .withSubcommand(TargetManagerCommands.addRunner())
                 .withSubcommand(TargetManagerCommands.addRunnerSelf())
@@ -24,15 +29,13 @@ public class CommandConfiguration {
                 .withSubcommand(TargetManagerCommands.removeEntity())
                 .withSubcommand(TargetManagerCommands.removeSelf())
                 .withSubcommand(TargetManagerCommands.teams())
-                .withSubcommand(TargetManagerCommands.sum())
-                .withSubcommand(TargetManagerCommands.sumSelf())
 
                 //TrackingCompassCommands
                 .withSubcommand(TrackingCompassCommands.compass())
                 .withSubcommand(TrackingCompassCommands.compassSelf())
                 .withSubcommand(TrackingCompassCommands.trackRunner())
                 .withSubcommand(TrackingCompassCommands.trackEntity())
-                .withSubcommand(TrackingCompassCommands.recalibrate())
+                .withSubcommand(TrackingCompassCommands.reset())
                 .withSubcommand(TrackingCompassCommands.gui())
 
                 .register();

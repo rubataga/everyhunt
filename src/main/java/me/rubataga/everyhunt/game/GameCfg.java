@@ -1,48 +1,165 @@
 package me.rubataga.everyhunt.game;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import me.rubataga.everyhunt.utils.Debugger;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
-public class GameRules {
+public class GameCfg {
 
-    public FileConfiguration config;
-    public static String NAME;
-    public static boolean USE_BLACKLIST;
-    public static String BLACKLIST_MESSAGE;
-    public static List<String> COMPASS_BLACKLIST;
-    public static List<String> COMPASS_WHITELIST;
-    public static boolean RIGHT_CLICK_CYCLES_RUNNERS;
+    private static FileConfiguration config;
 
-    public void loadConfig(){
-        Debugger.enabled = config.getBoolean("debug");
-        NAME = config.getString("name");
-        USE_BLACKLIST = config.getBoolean("useBlacklist");
-        BLACKLIST_MESSAGE = config.getString("blacklistMessage");
-        COMPASS_BLACKLIST = config.getStringList("compassBlacklist");
-        COMPASS_WHITELIST = config.getStringList("compassWhitelist");
-        RIGHT_CLICK_CYCLES_RUNNERS = config.getBoolean("rightClickCyclesRunners");
+    //PARAMETERS
+    public static final String DEBUG = "debugMode";
+    public static final String GAME_NAME = "name";
+    public static final String USE_BLACKLIST = "useBlacklist";
+    public static final String COMPASS_BLACKLIST = "compassBlacklist";
+    public static final String COMPASS_WHITELIST = "compassWhitelist";
+
+    //VALUES
+    public static boolean debugMode;
+    public static String name;
+    public static boolean useBlacklist;
+    public static List<String> compassBlacklist;
+    public static List<String> compassWhitelist;
+
+    private static final String VALUE_TEMPLATE = "%s: %s";
+    public static final ImmutableList<String> PARAMETERS;
+    private static final ImmutableMap<String, Object> defaultValues;
+
+    static {
+        PARAMETERS = ImmutableList.copyOf(Arrays.asList(DEBUG,GAME_NAME,USE_BLACKLIST,COMPASS_BLACKLIST,
+                COMPASS_WHITELIST));
+
+        defaultValues = ImmutableMap.copyOf(new HashMap<>() {{
+            put(DEBUG,false);
+            put(GAME_NAME,"default");
+            put(USE_BLACKLIST,true);
+            put(COMPASS_BLACKLIST,new ArrayList<>());
+            put(COMPASS_WHITELIST,new ArrayList<>());
+        }});
     }
 
-    public void setConfig(FileConfiguration config){
-        this.config = config;
+    public static void setConfig(FileConfiguration cfg){
+        config = cfg;
+    }
+
+    public static void loadConfig(){
+        loadConfig(config);
+    }
+
+    public static void loadConfig(FileConfiguration cfg){
+        config = cfg;
+        Debugger.send("Loading config using : " + config.getString(GAME_NAME));
+        debugMode = (boolean) getValue(DEBUG);
+        if(debugMode){
+            Debugger.enable();
+        }
+        name = (String) getValue(GAME_NAME);
+        useBlacklist = (boolean) getValue(USE_BLACKLIST);
+        setCompassList();
+    }
+
+    private static void setCompassList(){
+        if(config.contains(COMPASS_BLACKLIST)){
+            compassBlacklist = config.getStringList(COMPASS_BLACKLIST);
+        } else {
+            compassBlacklist = new ArrayList<>();
+        }
+        if (config.contains(COMPASS_WHITELIST)) {
+            compassWhitelist = config.getStringList(COMPASS_WHITELIST);
+        } else {
+            compassWhitelist = new ArrayList<>();
+        }
+        Debugger.send("blacklisted entities: " + compassBlacklist);
+        Debugger.send("whitelisted entities: " + compassWhitelist);
+    }
+
+    private static Object getValue(String key){
+        Object value;
+        if(config.contains(key)){
+            value = config.get(key);
+        } else {
+            value = defaultValues.get(key);
+        }
+        Debugger.send(key + " set to " + value);
+        return value;
+    }
+//
+//    private static String getStringValue(String key){
+//        String value;
+//        if(config.contains(key)){
+//            value = config.getString(key);
+//        } else {
+//            value = (String) defaultValues.get(key);
+//        }
+//        Debugger.send(key + " set to " + value);
+//        return value;
+//    }
+//
+//    private static boolean getBoolValue(String key){
+//        boolean value;
+//        if(config.contains(key)){
+//            value = config.getBoolean(key);
+//        } else {
+//            value = (boolean) defaultValues.get(key);
+//        }
+//        Debugger.send(key + " set to " + value);
+//        return value;
+//    }
+
+    public static String getFormattedValue(String key){
+        switch (key) {
+            case DEBUG: return String.format(VALUE_TEMPLATE, key, debugMode);
+            case GAME_NAME: return String.format(VALUE_TEMPLATE, key, name);
+            case USE_BLACKLIST: return String.format(VALUE_TEMPLATE, key, useBlacklist);
+            case COMPASS_BLACKLIST: return String.format(VALUE_TEMPLATE, key, compassBlacklist);
+            case COMPASS_WHITELIST: return String.format(VALUE_TEMPLATE, key, compassWhitelist);
+        }
+        return "whoops";
+    }
+
+    public static String formatEntityList(String key){
+        StringBuilder sb = new StringBuilder(key).append(": ");
+        List<String> entityList;
+        if(key.equals(COMPASS_BLACKLIST)){
+            entityList = compassBlacklist;
+        } else if (key.equals(COMPASS_WHITELIST)) {
+            entityList = compassWhitelist;
+        } else {
+            return sb.append("empty!").toString();
+        }
+        if(entityList.size()==0){
+            return sb.append("empty!").toString();
+        }
+        for(String entity : entityList){
+            sb.append(entity).append(", ");
+        }
+        int i = sb.length();
+        sb.delete(i-2,i).append(".");
+        return sb.toString();
     }
 
     public static boolean isBlacklisted(Entity entity){
-        if(USE_BLACKLIST){
-            for(String key : COMPASS_BLACKLIST){
+        String entityKey = entity.getType().getKey().getKey();
+        if(useBlacklist){
+            for(String key : compassBlacklist){
                 Debugger.send("CHECKING BLACKLIST KEY: " + key);
-                if(entity.getType().getKey().getKey().equals(key)){
+                if(entityKey.equals(key)){
                     return true;
                 }
             }
             return false;
         } else {
-            for(String key : COMPASS_WHITELIST){
+            for(String key : compassWhitelist){
                 Debugger.send("CHECKING WHITELIST KEY: " + key);
-                if(entity.getType().getKey().getKey().equals(key)){
+                if(entityKey.equals(key)){
                     return false;
                 }
             }

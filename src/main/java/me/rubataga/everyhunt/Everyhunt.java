@@ -7,7 +7,7 @@ import me.rubataga.everyhunt.listeners.PortalListener;
 import dev.jorel.commandapi.CommandAPI;
 import me.rubataga.everyhunt.services.CompassRunnable;
 import me.rubataga.everyhunt.utils.Debugger;
-import me.rubataga.everyhunt.game.GameRules;
+import me.rubataga.everyhunt.game.GameCfg;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -18,12 +18,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class Everyhunt extends JavaPlugin {
 
     private static Everyhunt pluginInstance;
-    private static GameRules gameRules;
 
     public static Everyhunt getInstance(){
         return pluginInstance;
     }
-    public static GameRules getGameRules() { return gameRules; }
 
     @Override
     public void onEnable() {
@@ -39,12 +37,10 @@ public final class Everyhunt extends JavaPlugin {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, CompassRunnable.compassRepeatingTask,0L,10L);
 
         this.saveDefaultConfig();
-        gameRules = new GameRules();
-        gameRules.setConfig(getConfig());
-        gameRules.loadConfig();
+        GameCfg.setConfig(getConfig());
+        GameCfg.loadConfig();
 
         System.out.println("§bRubataga's Everyhunt plugin enabled!");
-        Debugger.send("§aDebug mode for Everyhunt is enabled!");
     }
 
     @Override

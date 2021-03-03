@@ -5,7 +5,7 @@ import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
 import me.rubataga.everyhunt.services.TargetManager;
 import me.rubataga.everyhunt.utils.Debugger;
-import me.rubataga.everyhunt.game.GameRules;
+import me.rubataga.everyhunt.game.GameCfg;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -129,7 +129,7 @@ public class CompassListener implements Listener {
             return;
         }
         Debugger.send(entity.getType().getKey().getKey());
-        if(GameRules.isBlacklisted(entity)){
+        if(GameCfg.isBlacklisted(entity)){
             return;
         }
         e.setCancelled(true);

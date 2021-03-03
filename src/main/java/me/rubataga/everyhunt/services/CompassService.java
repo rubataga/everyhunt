@@ -3,7 +3,7 @@ package me.rubataga.everyhunt.services;
 import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
-import me.rubataga.everyhunt.game.GameRules;
+import me.rubataga.everyhunt.game.GameCfg;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 
 import org.bukkit.Location;
@@ -112,7 +112,7 @@ public class CompassService {
                 if(entity instanceof Player && !TargetManager.getRunners().containsKey(entity)
                         || !(entity instanceof LivingEntity)
                         || player.getWorld() != entity.getWorld()
-                        || GameRules.isBlacklisted(entity)){
+                        || GameCfg.isBlacklisted(entity)){
                     continue;
                 }
                 double dist = player.getLocation().distanceSquared(entity.getLocation());
@@ -142,7 +142,7 @@ public class CompassService {
         }
     }
 
-    public static void recalibrate(CommandSender sender){
+    public static void reset(CommandSender sender){
         Player player = (Player) sender;
         Hunter hunter;
         if(!TargetManager.hasRole(player,RoleEnum.HUNTER)){
