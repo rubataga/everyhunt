@@ -5,6 +5,7 @@ import de.themoep.inventorygui.GuiStateElement;
 import de.themoep.inventorygui.InventoryGui;
 import de.themoep.inventorygui.StaticGuiElement;
 import me.rubataga.everyhunt.Everyhunt;
+import me.rubataga.everyhunt.game.GameCfg;
 import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 import net.md_5.bungee.api.ChatColor;
@@ -15,22 +16,23 @@ import org.bukkit.inventory.ItemStack;
 
 public class HunterGui extends InventoryGui {
 
-    private final Hunter hunter;
-    private final Player player;
+    private final Hunter HUNTER;
+    private final Player PLAYER;
+    private static final String[] LAYOUT = new String[]{
+            " l ",
+            "tcb",
+            " p "
+    };
 
     public HunterGui(Hunter hunter) {
-        super(Everyhunt.getInstance(),hunter.getEntity(),"Rubataga's Everyhunt v1.0", new String[]{
-                " l ",
-                "tcb",
-                " p "
-        });
-        this.hunter = hunter;
-        this.player = hunter.getEntity();
+        super(Everyhunt.getInstance(),hunter.getEntity(),"Rubataga's Everyhunt v1.0",LAYOUT);
+        this.HUNTER = hunter;
+        this.PLAYER = hunter.getEntity();
         initialize();
     }
 
     public void show(){
-        show(player);
+        show(PLAYER);
     }
 
     private void initialize(){
@@ -45,45 +47,45 @@ public class HunterGui extends InventoryGui {
     private DynamicGuiElement guiCompassElement(){
         return new DynamicGuiElement('c', (viewer) -> {
             ItemStack trackingCompass;
-            if(hunter.isLodestoneTracking()){
-                if(hunter.inventoryHasCompass()){
-                    trackingCompass = hunter.getCompass();
+            if(HUNTER.isLodestoneTracking()){
+                if(HUNTER.inventoryHasCompass()){
+                    trackingCompass = HUNTER.getCompass();
                 } else {
-                    trackingCompass = hunter.getLodestoneCompass(); // issue!!! works fine when compass is in inventory
+                    trackingCompass = HUNTER.getLodestoneCompass();
                 }
             } else {
-                trackingCompass = TrackingCompassUtils.trackingCompass(hunter); // this works fine
+                trackingCompass = TrackingCompassUtils.trackingCompass(HUNTER);
             }
             StaticGuiElement compass = new StaticGuiElement('c',
                     trackingCompass,
                     1,
                     click -> {
-                        if(TrackingCompassUtils.isTrackingCompass(player.getItemOnCursor())){
-                            player.setItemOnCursor(null);
+                        if(TrackingCompassUtils.isTrackingCompass(PLAYER.getItemOnCursor())){
+                            PLAYER.setItemOnCursor(null);
                         }
-                        TrackingCompassUtils.assignTrackingCompass(hunter);
+                        TrackingCompassUtils.assignTrackingCompass(HUNTER);
                         return true;
             });
-            if(hunter.getTarget()!=null){
+            if(HUNTER.getTarget()!=null){
                 String alive = ChatColor.GREEN + "Alive!";
-                if(hunter.getTargetEntity().isDead()){
+                if(HUNTER.getTargetEntity().isDead()){
                     alive = ChatColor.RED + "Dead!";
                 }
                 String environment = "Overworld";
-                if(hunter.getTargetEntity().getWorld().getEnvironment()==World.Environment.NETHER){
+                if(HUNTER.getTargetEntity().getWorld().getEnvironment()==World.Environment.NETHER){
                     environment = "The Nether";
-                } else if (hunter.getTargetEntity().getWorld().getEnvironment()==World.Environment.THE_END){
+                } else if (HUNTER.getTargetEntity().getWorld().getEnvironment()==World.Environment.THE_END){
                     environment = "The End";
                 }
                 compass.setText(
-                        hunter.getTargetEntity().getName(),
+                        HUNTER.getTargetEntity().getName(),
                         environment,
                         alive
                 );
 
             } else {
                 String spawn = "World Spawn";
-                if(player.getBedSpawnLocation()!=null){
+                if(PLAYER.getBedSpawnLocation()!=null){
                     spawn = "Bed Spawn";
                 }
                 compass.setText("No target!",spawn);
@@ -96,8 +98,8 @@ public class HunterGui extends InventoryGui {
         GuiStateElement lock = new GuiStateElement('l',
                 new GuiStateElement.State(
                         change -> {
-                            hunter.setLockedOnTarget(true);
-                            player.sendMessage("Your compass is locked");
+                            HUNTER.setLockedOnTarget(true);
+                            PLAYER.sendMessage("Your compass is locked");
                         },
                         "compassLocked",
                         new ItemStack(Material.BEDROCK),
@@ -106,8 +108,8 @@ public class HunterGui extends InventoryGui {
                 ),
                 new GuiStateElement.State(
                         change -> {
-                            hunter.setLockedOnTarget(false);
-                            player.sendMessage("Your compass is unlocked");
+                            HUNTER.setLockedOnTarget(false);
+                            PLAYER.sendMessage("Your compass is unlocked");
                         },
                         "compassUnlocked",
                         new ItemStack(Material.DIRT),
@@ -115,7 +117,7 @@ public class HunterGui extends InventoryGui {
                         "Click here to lock your compass"
                 )
         );
-        if(hunter.isLockedOnTarget()){
+        if(HUNTER.isLockedOnTarget()){
             lock.setState("compassLocked");
         } else {
             lock.setState("compassUnlocked");
@@ -135,7 +137,13 @@ public class HunterGui extends InventoryGui {
         return new StaticGuiElement('p',
                 new ItemStack(Material.PUFFERFISH_BUCKET),
                 1,
-                click -> true
+                click -> {
+                    if(PLAYER.isOp()){
+                        GameCfg.getGui().show(PLAYER);
+                    }
+                    this.close();
+                    return true;
+                }
         );
     }
 

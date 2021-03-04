@@ -143,4 +143,13 @@ public class CompassService {
         hunter.updateCompassMeta();
         csm.msg("Compass reset!");
     }
+
+    public static void gui(CommandSender sender){
+        Hunter hunter = TargetManager.getHunter((Entity)sender);
+        if(hunter!=null){
+            hunter.getGUI().show();
+        } else {
+            sender.sendMessage("Only hunters can do this!");
+        }
+    }
 }

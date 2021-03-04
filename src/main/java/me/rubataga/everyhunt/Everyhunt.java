@@ -25,21 +25,21 @@ public final class Everyhunt extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        CommandAPI.onEnable(this);
-        CommandConfiguration.register();
         pluginInstance = this;
         PluginManager pluginManager = getServer().getPluginManager();
+
+        this.saveDefaultConfig();
+        GameCfg.setConfig(getConfig());
+        GameCfg.loadConfig();
+
+        CommandAPI.onEnable(this);
+        CommandConfiguration.register();
 
         pluginManager.registerEvents(new PortalListener(), this);
         pluginManager.registerEvents(new CompassListener(), this);
         pluginManager.registerEvents(new DeathListener(), this);
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, CompassRunnable.compassRepeatingTask,0L,10L);
-
-        this.saveDefaultConfig();
-        GameCfg.setConfig(getConfig());
-        GameCfg.loadConfig();
-
         System.out.println("§bRubataga's Everyhunt plugin enabled!");
     }
 

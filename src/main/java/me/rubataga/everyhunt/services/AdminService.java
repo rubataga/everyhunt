@@ -5,6 +5,7 @@ import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.utils.Debugger;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.HumanEntity;
 
 import java.util.Collection;
 
@@ -43,6 +44,10 @@ public class AdminService {
 //                sender.sendMessage(entity.getName() + " had no roles.");
 //            }
         }
+    }
+
+    public static void configGui(CommandSender sender){
+        GameCfg.getGui().show((HumanEntity)sender);
     }
 
 }

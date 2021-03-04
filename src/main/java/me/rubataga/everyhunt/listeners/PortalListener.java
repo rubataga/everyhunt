@@ -28,11 +28,6 @@ public class PortalListener implements Listener {
         teleportHandler(e.getEntity(),e.getFrom(),e.getTo(), e);
     }
 
-//    @EventHandler
-//    public void onPlayerPortal(PlayerPortalEvent e){
-//        teleportHandler(e.getPlayer(), e.getFrom(),e.getTo(), e);
-//    }
-//
     @EventHandler
     public void onEntityPortal(EntityPortalEvent e){
         teleportHandler(e.getEntity(), e.getFrom(),e.getTo(), e);

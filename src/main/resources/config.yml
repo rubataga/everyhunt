@@ -6,6 +6,12 @@ baseGame: "anypercent"
 
 description: ["A classic game of","Minecraft Manhunt!"]
 
+### COMMANDS
+
+commandPrefix: "eh"
+
+disabledCommands: []
+
 ### TRACKING COMPASS
 
 useBlacklist: true

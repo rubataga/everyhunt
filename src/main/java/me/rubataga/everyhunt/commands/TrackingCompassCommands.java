@@ -94,12 +94,7 @@ public class TrackingCompassCommands {
     public static CommandAPICommand gui(){
         return new CommandAPICommand("gui")
                 .executesPlayer((sender, args) -> {
-                    Hunter hunter = TargetManager.getHunter(sender);
-                    if(hunter!=null){
-                        hunter.getGUI().show();
-                    } else {
-                        sender.sendMessage("Only hunters can do this!");
-                    }
+                    CompassService.gui(sender);
                 });
     }
 }

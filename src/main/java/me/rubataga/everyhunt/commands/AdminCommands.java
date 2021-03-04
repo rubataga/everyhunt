@@ -3,7 +3,7 @@ package me.rubataga.everyhunt.commands;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import me.rubataga.everyhunt.services.AdminService;
-import me.rubataga.everyhunt.services.TargetService;
+import me.rubataga.everyhunt.utils.Debugger;
 import org.bukkit.entity.Entity;
 
 import java.util.Collection;
@@ -13,7 +13,7 @@ public class AdminCommands {
 
     public static CommandAPICommand config() {
         return new CommandAPICommand("config")
-                .executes((sender,args) -> {
+                .executes((sender, args) -> {
                     AdminService.config(sender);
                 });
     }
@@ -34,4 +34,21 @@ public class AdminCommands {
                     AdminService.sum(sender, entities);
                 });
     }
+
+    public static CommandAPICommand configGui() {
+        return new CommandAPICommand("configgui")
+                .withAliases("cfgui")
+                .executesPlayer((sender, args) -> {
+                    AdminService.configGui(sender);
+                });
+    }
+
+    public static CommandAPICommand dummy() {
+        return new CommandAPICommand("dummy")
+                .executes((sender, args) -> {
+                    Debugger.send("DUMMY!");
+                    sender.sendMessage("DUMMY!");
+                });
+    }
+
 }
