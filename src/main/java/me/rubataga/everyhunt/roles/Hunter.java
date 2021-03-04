@@ -110,18 +110,28 @@ public class Hunter extends EveryhuntEntity{
         return trackingPortal;
     }
 
-    public void setTrackingPortal() {
-        World world = getEntity().getWorld();
-        this.lodestoneTracking = world.getEnvironment() != World.Environment.NORMAL;
-        this.trackingPortal = world !=getTargetEntity().getWorld();
+    public void setLodestoneTracking(Location finalLoc) {
+        this.lodestoneTracking = finalLoc.getWorld().getEnvironment() != World.Environment.NORMAL;
         // if player is in overworld, un"lode" compass
         if(!lodestoneTracking && inventoryHasCompass()){
             CompassMeta meta = (CompassMeta)(compass.getItemMeta());
             meta.setLodestone(null);
             compass.setItemMeta(meta);
         }
-        updateCompassMeta();
     }
+
+    public void setLodestoneTracking() {
+        setLodestoneTracking(getEntity().getLocation());
+    }
+
+    public void setTrackingPortal(Location hunterLoc, Location targetLoc){
+        this.trackingPortal = hunterLoc.getWorld() != targetLoc.getWorld();
+    }
+
+    public void setTrackingPortal(){
+        setTrackingPortal(getEntity().getLocation(),getTargetEntity().getLocation());
+    }
+
 
     public boolean isLodestoneTracking(){
         return lodestoneTracking;
@@ -135,7 +145,7 @@ public class Hunter extends EveryhuntEntity{
         if(target!=null){
             target.addHunter(this);
             this.trackingDeath = target.getEntity().isDead();
-            setTrackingPortal();
+            setLodestoneTracking();
         }
     }
 

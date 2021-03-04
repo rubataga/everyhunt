@@ -5,7 +5,6 @@ import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
@@ -13,105 +12,72 @@ import java.util.Collection;
 public class TargetService {
 
     public static void addRunner(CommandSender sender, Collection<Entity> runners){
+        CommandSenderMessenger senderCsm = new CommandSenderMessenger(sender);
         for(Entity entity : runners){
             if(!(entity instanceof Player)){
-                sender.sendMessage(entity.getName() + " is not a player!");
+                senderCsm.msg(entity.getName() + " not a player!");
             } else {
                 Player player = (Player) entity;
-                boolean senderIsPlayer = sender == player;
                 if (!TargetManager.hasRole(player,RoleEnum.RUNNER)) {
                     TargetManager.addRunner(new Target(player));
-                    player.sendMessage("You are now a runner!");
-                    if (!senderIsPlayer) {
-                        sender.sendMessage(player.getName() + " is now a runner!");
-                    }
+                    senderCsm.povMsg(player," now a runner!");
                 } else {
-                    if (senderIsPlayer) {
-                        sender.sendMessage("You are already a runner!");
-                    } else {
-                        sender.sendMessage(player.getName() + " is already a runner!");
-                    }
+                    senderCsm.povMsgSenderOnly(player," already a runner!");
                 }
             }
         }
     }
 
     public static void addHunter(CommandSender sender, Collection<Entity> hunters){
+        CommandSenderMessenger senderCsm = new CommandSenderMessenger(sender);
         for(Entity entity : hunters) {
             if (!(entity instanceof Player)) {
-                sender.sendMessage(entity.getName() + " is not a player!");
+                senderCsm.msg(entity.getName() + " is not a player!");
             } else {
                 Player player = (Player) entity;
-                boolean senderIsPlayer = sender == player;
                 if (!TargetManager.hasRole(player,RoleEnum.HUNTER)) { // not a hunter
                     Hunter hunter = new Hunter(player);
                     TargetManager.addHunter(hunter);
                     hunter.setTarget(null);
                     TrackingCompassUtils.assignTrackingCompass(hunter);
-                    player.sendMessage("You are now a hunter!");
-                    if (!senderIsPlayer) {
-                        sender.sendMessage(player.getName() + " is now a hunter!");
-                    }
+                    senderCsm.povMsg(player," now a hunter!");
                 } else {
-                    if (senderIsPlayer) {
-                        player.sendMessage("You are already a hunter!");
-                    } else {
-                        sender.sendMessage(player.getName() + " is already a hunter!");
-                    }
+                    senderCsm.povMsgSenderOnly(player," already a hunter!");
                 }
             }
         }
     }
 
     public static void removeEntity(CommandSender sender, Collection<Entity> entities){
+        CommandSenderMessenger csm = new CommandSenderMessenger(sender);
         for(Entity entity : entities) {
-            boolean isPlayer = entity instanceof Player;
             boolean isTarget = TargetManager.hasRole(entity, RoleEnum.TARGET);
-            boolean senderIsEntity = sender == entity;
             if (isTarget) {
                 TargetManager.removeTarget(entity);
-                if(isPlayer){
-                    entity.sendMessage("You are no longer a target!");
-                }
-                if(!senderIsEntity){
-                    sender.sendMessage(entity.getName() + " is no longer a target!");
-                }
+                csm.povMsg(entity," no longer a target!");
             }
             if(entity instanceof Player) {
                 Player player = (Player) entity;
-                String name = player.getName();
                 boolean isRunner = TargetManager.hasRole(player,RoleEnum.RUNNER);
                 boolean isHunter = TargetManager.hasRole(player,RoleEnum.HUNTER);
                 if (isRunner) {
                     TargetManager.removeRunner(player);
-                    if (senderIsEntity) {
-                        player.sendMessage("You are no longer a runner!");
-                    } else {
-                        sender.sendMessage(name + " is no longer a runner!");
-                    }
+                    csm.povMsg(entity," no longer a runner!");
                 }
                 if (isHunter) {
                     TargetManager.removeHunter(player);
-                    if (senderIsEntity) {
-                        TrackingCompassUtils.removeTrackingCompasses(player);
-                        player.sendMessage("You are no longer a hunter!");
-                    } else {
-                        sender.sendMessage(name + " is no longer a hunter!");
-                    }
+                    TrackingCompassUtils.removeTrackingCompasses(player);
+                    csm.povMsg(entity," no longer a hunter!");
                 }
                 if (!isTarget && !isRunner && !isHunter) {
-                    if (senderIsEntity) {
-                        player.sendMessage("You are neither a hunter, runner, nor target!");
-                    } else {
-                        sender.sendMessage(name + " is neither a hunter, runner, nor target!");
-                    }
+                    csm.povMsgSenderOnly(entity, " not a hunter, runner, nor target!");
                 }
             } else if (!isTarget){
-                sender.sendMessage(entity.getName() + " is neither a hunter, runner, nor target!");
+                csm.povMsgSenderOnly(entity," neither a hunter, runner, nor target!");
             }
         }
         if(entities.size()>1){
-            sender.sendMessage("All selected entities checked.");
+            csm.msg("All selected entities checked.");
         }
     }
 

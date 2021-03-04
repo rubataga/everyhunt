@@ -15,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EnderDragonChangePhaseEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
 import java.util.HashMap;
@@ -31,7 +32,15 @@ public class DeathListener implements Listener {
      */
     @EventHandler
     public void onTargetDeath(EntityDeathEvent e){
-        Entity entity = e.getEntity();
+        targetDeathHandler(e.getEntity());
+    }
+
+    @EventHandler
+    public void onTargetExplode(EntityExplodeEvent e){
+        targetDeathHandler(e.getEntity());
+    }
+
+    private void targetDeathHandler(Entity entity){
         if(TargetManager.hasRole(entity,RoleEnum.TARGET)) {
             Target target = TargetManager.getTarget(entity);
             target.updateLastLocation();
@@ -63,7 +72,6 @@ public class DeathListener implements Listener {
         if(dragon.isDead()){
             dragonHunterMap.put(dragon,TargetManager.getTarget(damager));
         }
-
     }
 
     /**

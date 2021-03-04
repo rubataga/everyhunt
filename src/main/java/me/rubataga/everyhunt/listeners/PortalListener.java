@@ -14,9 +14,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityPortalEnterEvent;
+import org.bukkit.event.entity.EntityPortalEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
-import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 /**
@@ -29,14 +28,14 @@ public class PortalListener implements Listener {
         teleportHandler(e.getEntity(),e.getFrom(),e.getTo(), e);
     }
 
+//    @EventHandler
+//    public void onPlayerPortal(PlayerPortalEvent e){
+//        teleportHandler(e.getPlayer(), e.getFrom(),e.getTo(), e);
+//    }
+//
     @EventHandler
-    public void onPlayerPortal(PlayerPortalEvent e){
-        teleportHandler(e.getPlayer(), e.getFrom(),e.getTo(), e);
-    }
-
-    @EventHandler
-    public void onEntityPortal(EntityPortalEnterEvent e){
-        teleportHandler(e.getEntity(), e.getLocation(),e.getLocation(), e);
+    public void onEntityPortal(EntityPortalEvent e){
+        teleportHandler(e.getEntity(), e.getFrom(),e.getTo(), e);
     }
 
     @EventHandler
@@ -48,46 +47,48 @@ public class PortalListener implements Listener {
         Debugger.send("Event name: " + e.getEventName());
         if(TargetManager.hasRole(entity,RoleEnum.TARGET)) {
             Target target = TargetManager.getTarget(entity);
-            target.updateDimensionLocation(from.getWorld().getEnvironment(), from);
-            target.updateDimensionLocation(to.getWorld().getEnvironment(), to);
+            target.updateWorldLocation(from.getWorld(), from);
+            target.updateWorldLocation(to.getWorld(), to);
             target.updateLastLocation();
             for(Hunter hunter : target.getHunters()){
                 Player player = hunter.getEntity();
-                World.Environment environment = player.getWorld().getEnvironment();
-                hunter.setTrackingPortal();
+                World world = player.getWorld();
+                hunter.setLodestoneTracking(from);
+                hunter.setTrackingPortal(player.getLocation(),to);
                 // hunter in overworld, target joins otherworld
                 if(hunter.isTrackingPortal() && !hunter.isLodestoneTracking()){
-                    player.setCompassTarget(target.getLastLocationDimension(environment));
+                    player.setCompassTarget(target.getLastLocationWorld(world));
                 }
                 // hunter in otherworld, target joins overworld
                 if(hunter.isTrackingPortal() && hunter.isLodestoneTracking()){
-                    hunter.setLastTracked(target.getLastLocationDimension(environment));
+                    hunter.setLastTracked(target.getLastLocationWorld(world));
                 }
+                hunter.updateCompassMeta();
             }
         }
         if(TargetManager.hasRole(entity,RoleEnum.HUNTER)) {
             Hunter hunter = TargetManager.getHunter(entity);
-            if(hunter.getTarget()!=null){
+            Target target = hunter.getTarget();
+            if(target!=null){
                 Player player = hunter.getEntity();
-                hunter.setTrackingPortal();
+                hunter.setLodestoneTracking(to);
+                hunter.setTrackingPortal(to,hunter.getTargetEntity().getLocation());
                 // hunter joins overworld, target in otherworld
                 if(hunter.isTrackingPortal() && !hunter.isLodestoneTracking()){
                     player.setCompassTarget(player.getLocation());
                 }
-
                 // hunter joins otherworld, target in overworld
                 if(hunter.isTrackingPortal() && hunter.isLodestoneTracking()){
-                    Debugger.send("Hunter is trakcing portal and lodestone Tracking");
-                    if(to.getWorld().getEnvironment()!=from.getWorld().getEnvironment()){
+                    Debugger.send("Hunter is Portal Tracking and Lodestone Tracking");
+                    if(to.getWorld()!=from.getWorld()){
                         //Location lastPlayerLocation = player.getLocation();
-                        Debugger.send("Player last location environment: " + to.getWorld().getEnvironment());
+                        Debugger.send("Player last location world: " + to.getWorld().getName());
                         hunter.setLastTracked(to);
                     } else {
                         Debugger.send("Player is in same world");
-                        Target target = hunter.getTarget();
-                        Location lastDimensionLocation = target.getLastLocationDimension(to.getWorld().getEnvironment());
-                        if(lastDimensionLocation!=null){
-                            hunter.setLastTracked(lastDimensionLocation);
+                        Location lastWorldLocation = target.getLastLocationWorld(to.getWorld());
+                        if(lastWorldLocation!=null){
+                            hunter.setLastTracked(lastWorldLocation);
                         } else {
                             hunter.setLastTracked(player.getLocation());
                             player.sendMessage("No location information found for " + target.getEntity().getName());
@@ -97,8 +98,9 @@ public class PortalListener implements Listener {
 
                 // hunter joins overworld, target dead in overworld
                 if(!hunter.isTrackingPortal() && !hunter.isLodestoneTracking() && hunter.isTrackingDeath()){
-                    player.setCompassTarget(hunter.getTarget().getLastLocationDimension(player.getWorld().getEnvironment()));
+                    player.setCompassTarget(target.getLastLocationWorld(player.getWorld()));
                 }
+                hunter.updateCompassMeta();
             }
         }
     }

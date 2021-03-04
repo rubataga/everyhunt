@@ -31,3 +31,5 @@ disablePortals: false
 huntersCanBeRunners: true
 
 nonRunnersCanBeTargeted: false
+
+autoAddRunners: true

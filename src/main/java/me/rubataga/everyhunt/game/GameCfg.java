@@ -21,6 +21,8 @@ public class GameCfg {
     public static final String USE_BLACKLIST = "useBlacklist";
     public static final String COMPASS_BLACKLIST = "compassBlacklist";
     public static final String COMPASS_WHITELIST = "compassWhitelist";
+    public static final String AUTO_ADD_RUNNERS = "autoAddRunners";
+    public static final String RIGHT_CLICK_CYCLES_RUNNERS = "rightClickCyclesRunners";
 
     //VALUES
     public static boolean debugMode;
@@ -28,14 +30,18 @@ public class GameCfg {
     public static boolean useBlacklist;
     public static List<String> compassBlacklist;
     public static List<String> compassWhitelist;
+    public static boolean autoAddRunners;
+    public static boolean rightClickCyclesRunners;
 
     private static final String VALUE_TEMPLATE = "%s: %s";
     public static final ImmutableList<String> PARAMETERS;
     private static final ImmutableMap<String, Object> defaultValues;
 
     static {
-        PARAMETERS = ImmutableList.copyOf(Arrays.asList(DEBUG,GAME_NAME,USE_BLACKLIST,COMPASS_BLACKLIST,
-                COMPASS_WHITELIST));
+        PARAMETERS = ImmutableList.copyOf(Arrays.asList(
+                DEBUG,GAME_NAME,USE_BLACKLIST,
+                COMPASS_BLACKLIST, COMPASS_WHITELIST,
+                AUTO_ADD_RUNNERS,RIGHT_CLICK_CYCLES_RUNNERS));
 
         defaultValues = ImmutableMap.copyOf(new HashMap<>() {{
             put(DEBUG,false);
@@ -43,6 +49,8 @@ public class GameCfg {
             put(USE_BLACKLIST,true);
             put(COMPASS_BLACKLIST,new ArrayList<>());
             put(COMPASS_WHITELIST,new ArrayList<>());
+            put(AUTO_ADD_RUNNERS,true);
+            put(RIGHT_CLICK_CYCLES_RUNNERS,false);
         }});
     }
 
@@ -58,15 +66,13 @@ public class GameCfg {
         config = cfg;
         Debugger.send("Loading config using : " + config.getString(GAME_NAME));
         debugMode = (boolean) getValue(DEBUG);
-        if(debugMode){
-            Debugger.enable();
-        }
+        if(debugMode){ Debugger.enable(); }
         name = (String) getValue(GAME_NAME);
         useBlacklist = (boolean) getValue(USE_BLACKLIST);
-        setCompassList();
-    }
+        autoAddRunners = (boolean) getValue(AUTO_ADD_RUNNERS);
+        rightClickCyclesRunners = (boolean) getValue(RIGHT_CLICK_CYCLES_RUNNERS);
 
-    private static void setCompassList(){
+        //compass blacklist
         if(config.contains(COMPASS_BLACKLIST)){
             compassBlacklist = config.getStringList(COMPASS_BLACKLIST);
         } else {
@@ -88,7 +94,7 @@ public class GameCfg {
         } else {
             value = defaultValues.get(key);
         }
-        Debugger.send(key + " set to " + value);
+        Debugger.send(key + " returning as " + value);
         return value;
     }
 //
@@ -121,8 +127,9 @@ public class GameCfg {
             case USE_BLACKLIST: return String.format(VALUE_TEMPLATE, key, useBlacklist);
             case COMPASS_BLACKLIST: return String.format(VALUE_TEMPLATE, key, compassBlacklist);
             case COMPASS_WHITELIST: return String.format(VALUE_TEMPLATE, key, compassWhitelist);
+            case AUTO_ADD_RUNNERS: return String.format(VALUE_TEMPLATE, key, autoAddRunners);
         }
-        return "whoops";
+        return String.format(VALUE_TEMPLATE, key, "ERROR");
     }
 
     public static String formatEntityList(String key){

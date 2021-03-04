@@ -79,6 +79,9 @@ public class CompassListener implements Listener {
             hunter.updateCompassMeta();
             return;
         }
+        if(!GameCfg.rightClickCyclesRunners){
+            return;
+        }
         if(TargetManager.getRunners().size()==0 || // if there are no runners
                 !(target.getEntity() instanceof Player)) { // if target isn't a player
             return;
