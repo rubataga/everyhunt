@@ -37,7 +37,7 @@ public class AdminService {
         if(!substring.equalsIgnoreCase(".yml")){
             filename += ".yml";
         }
-        GameCfg.loadGamemode(filename);
+        GameCfg.loadGamemode(GameCfg.getInputStream(filename));
     }
 
     public static void sum(CommandSender sender, Collection<Entity> entities){
