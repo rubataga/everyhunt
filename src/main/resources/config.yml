@@ -1,3 +1,7 @@
-defaultGamemode: "pog.yml"
+defaultGamemode: "base.yml"
+
 commandPrefix: "eh"
+
 disabledCommands: []
+
+debugMode: false

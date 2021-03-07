@@ -1,10 +1,13 @@
-debugMode: true
-
+### GAME META
 gameName: "base"
 
-baseGame: "anypercent"
-
 gameDescription: ["A classic game of","Minecraft Manhunt!"]
+
+### DEBUGGER
+
+debugMode: true
+
+debugTag: "§d{DEBUG} "
 
 ### TRACKING COMPASS
 

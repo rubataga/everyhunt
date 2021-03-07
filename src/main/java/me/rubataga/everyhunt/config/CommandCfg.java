@@ -6,13 +6,9 @@ import me.rubataga.everyhunt.commands.AdminCommands;
 import me.rubataga.everyhunt.commands.TargetManagerCommands;
 import me.rubataga.everyhunt.commands.TrackingCompassCommands;
 import me.rubataga.everyhunt.utils.Debugger;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,12 +19,8 @@ import java.util.Map;
  */
 public class CommandCfg {
 
-    private static final Everyhunt EVERYHUNT = Everyhunt.getInstance();
-    private static final FileConfiguration DEFAULT_CONFIG = EVERYHUNT.getConfig();
-    private static final InputStream BASE_CONFIG_STREAM = EVERYHUNT.getResource("config.yml");
-    private static final FileConfiguration BASE_CONFIG = new YamlConfiguration();
-    private static final String COMMAND_PREFIX;
-    private static final List<String> DISABLED_COMMANDS;
+    public static final String COMMAND_PREFIX = PluginCfg.commandPrefix;
+    public static final List<String> DISABLED_COMMANDS = PluginCfg.disabledCommands;
 
     private static final CommandAPICommand SUM = AdminCommands.sum();
     private static final CommandAPICommand SUM_SELF = AdminCommands.sumSelf();
@@ -59,25 +51,6 @@ public class CommandCfg {
     private final static Map<CommandAPICommand,String> requiredCommands = new HashMap<>();
 
     static{
-        try {
-            BASE_CONFIG.load(new InputStreamReader(BASE_CONFIG_STREAM));
-        } catch (IOException | InvalidConfigurationException ignore) {
-        }
-
-        String prefix;
-        if(DEFAULT_CONFIG.contains("commandPrefix")){
-            prefix = DEFAULT_CONFIG.getString("commandPrefix");
-        } else {
-            prefix = BASE_CONFIG.getString("commandPrefix");
-        }
-        COMMAND_PREFIX = prefix;
-        List<String> disabled;
-        if(DEFAULT_CONFIG.contains("disabledCommands")){
-            disabled = DEFAULT_CONFIG.getStringList("disabledCommands");
-        } else {
-            disabled = BASE_CONFIG.getStringList("disabledCommands");
-        }
-        DISABLED_COMMANDS = disabled;
 
         //RequiredCommands
         requiredCommands.put(CONFIG,"config");

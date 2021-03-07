@@ -1,8 +1,28 @@
 package me.rubataga.everyhunt.utils;
 
+import me.rubataga.everyhunt.config.GameCfg;
+
 public class Debugger {
 
-    public static boolean enabled = true;
+    public static boolean enabled = false;
+    private static String tag = "§d{DEBUG} ";
+
+    public static void setToGameCfg(){
+        setEnabledToGameCfg();
+        setTagToGameCfg();
+    }
+
+    public static void setEnabledToGameCfg(){
+        if(GameCfg.debugMode){
+            enable();
+        } else {
+            disable();
+        }
+    }
+
+    public static void setTagToGameCfg(){
+        tag = GameCfg.debugTag;
+    }
 
     public static void enable(){
         Debugger.send("Debug mode for Everyhunt is §aenabled!");
@@ -16,14 +36,14 @@ public class Debugger {
 
     public static void send(String str){
         if(enabled){
-            System.out.println("§d{DEBUG} " + str);
+            System.out.println(tag + str);
         }
     }
 
     public static void send(String[] strings){
         if(enabled){
             for(String str : strings){
-                System.out.println("§d{DEBUG} " + str);
+                System.out.println(tag + str);
             }
         }
     }
@@ -31,7 +51,7 @@ public class Debugger {
     public static void send(Object[] objects){
         if(enabled){
             for(Object obj : objects){
-                System.out.println("§c{DEBUG} " + obj);
+                System.out.println(tag + obj);
             }
         }
     }

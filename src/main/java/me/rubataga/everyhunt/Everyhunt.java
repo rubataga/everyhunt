@@ -28,10 +28,9 @@ public final class Everyhunt extends JavaPlugin {
         CommandAPI.onEnable(this);
         pluginInstance = this;
 
-        saveDefaultConfig();
-
         GameCfg.initialize();
         CommandCfg.register();
+        Debugger.setToGameCfg();
 
         PluginManager pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(new PortalListener(), this);

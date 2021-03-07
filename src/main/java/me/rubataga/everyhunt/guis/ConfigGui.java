@@ -6,6 +6,7 @@ import de.themoep.inventorygui.InventoryGui;
 import de.themoep.inventorygui.StaticGuiElement;
 import me.rubataga.everyhunt.Everyhunt;
 import me.rubataga.everyhunt.config.GameCfg;
+import me.rubataga.everyhunt.utils.Debugger;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -26,7 +27,7 @@ public class ConfigGui extends InventoryGui {
         setFiller(new ItemStack(Material.BLACK_STAINED_GLASS_PANE,1));
         for(int i = 0; i < parameters.size(); i++){
             char c = Character.forDigit(i,10);
-            //Debugger.send("config char: " + c);
+            Debugger.send("config char: " + c);
             addElement(configElement(c, parameters.get(i)));
         }
     }
@@ -39,7 +40,7 @@ public class ConfigGui extends InventoryGui {
                     click -> true
                 );
             String text = String.format("%s", GameCfg.getValue(parameter));
-            //Debugger.send("dynamic gui element w/ text: " + parameter + ", " + text);
+            Debugger.send("dynamic gui element w/ text: " + parameter + ", " + text);
             element.setText(parameter,text);
             return element;
         });

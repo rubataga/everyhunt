@@ -33,7 +33,7 @@ public class AdminService {
             fileName += ".yml";
         }
         Debugger.send("fileName without last four chars: " + fileName.substring(0,fileName.length()-4));
-        GameCfg.loadGamemode(fileName);
+        GameCfg.load(fileName);
     }
 
     public static void sum(CommandSender sender, Collection<Entity> entities){
