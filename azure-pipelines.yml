@@ -30,7 +30,7 @@ steps:
   displayName: Copy Files
   inputs:
     SourceFolder: $(system.defaultworkingdirectory)/target/
-    Contents: 'GodMode*.jar'
+    Contents: 'Everyhunt*.jar'
     TargetFolder: $(build.artifactstagingdirectory)   
 
 - task: PublishBuildArtifacts@1

@@ -1,0 +1,37 @@
+debugMode: true
+
+gameName: "base"
+
+baseGame: "anypercent"
+
+gameDescription: ["A classic game of","Minecraft Manhunt!"]
+
+### TRACKING COMPASS
+
+useBlacklist: true
+
+blacklistMessage: "Tracking this entity is not allowed!"
+
+compassWhitelist: ["player"]
+
+compassBlacklist: []
+
+rightClickCyclesRunners: false
+
+rightClickResetsDeadCompass: true
+
+guiEnabled: true
+
+### PORTALS
+
+disablePortals: false
+
+### ROLES
+
+huntersCanBeRunners: true
+
+nonRunnersCanBeTargeted: false
+
+autoAddRunners: true
+
+autoRemoveRunners: true

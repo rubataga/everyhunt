@@ -11,7 +11,7 @@ import java.util.*;
 
 public class Target extends EveryhuntEntity {
 
-    private final Collection<Hunter> hunters = new LinkedList<>();
+    private final List<Hunter> hunters = new LinkedList<>();
     private final Map<World,Location> lastLocations = new HashMap<>();
     private World deathWorld = null;
     private boolean isRunner;
@@ -35,7 +35,7 @@ public class Target extends EveryhuntEntity {
         }
     }
 
-    public Collection<Hunter> getHunters(){
+    public List<Hunter> getHunters(){
         return hunters;
     }
 
@@ -54,6 +54,10 @@ public class Target extends EveryhuntEntity {
             return lastLocations.getOrDefault(world,null);
         }
         return null;
+    }
+
+    public Map<World,Location> getLastLocations(){
+        return lastLocations;
     }
 
     public void updateDeathWorld(){

@@ -1,9 +1,9 @@
 package me.rubataga.everyhunt.services;
 
+import me.rubataga.everyhunt.config.GameCfg;
 import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
-import me.rubataga.everyhunt.game.GameCfg;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 
 import org.bukkit.Location;

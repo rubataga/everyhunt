@@ -39,7 +39,7 @@ public class PortalListener implements Listener {
     }
 
     private void teleportHandler(Entity entity, Location from, Location to, Event e){
-        Debugger.send("Event name: " + e.getEventName());
+        //Debugger.send("Event name: " + e.getEventName());
         if(TargetManager.hasRole(entity,RoleEnum.TARGET)) {
             Target target = TargetManager.getTarget(entity);
             target.updateWorldLocation(from.getWorld(), from);

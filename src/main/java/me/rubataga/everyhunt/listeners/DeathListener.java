@@ -1,6 +1,5 @@
 package me.rubataga.everyhunt.listeners;
 
-import me.rubataga.everyhunt.game.GameProgression;
 import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
@@ -58,7 +57,18 @@ public class DeathListener implements Listener {
     public void onEnderDragonDeath(EnderDragonChangePhaseEvent e){
         Entity dragon = e.getEntity();
         if(e.getNewPhase()==EnderDragon.Phase.DYING){
-            GameProgression.anypercentWon(dragonHunterMap.getOrDefault(dragon, null));
+            anypercentWon(dragonHunterMap.getOrDefault(dragon, null));
+        }
+    }
+
+    private static void anypercentWon(Target target){
+        StringBuilder victoryTextBuilder = new StringBuilder("The Runners win!");
+        if (target!=null){
+            victoryTextBuilder.insert(0,target.getEntity().getName()).append(" has killed the Ender Dragon! ");
+        }
+        String victoryText = victoryTextBuilder.toString();
+        for(Entity hunter : TargetManager.getHunters().keySet()){
+            hunter.sendMessage(victoryText);
         }
     }
 

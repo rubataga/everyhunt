@@ -1,12 +1,15 @@
-package me.rubataga.everyhunt.game;
+package me.rubataga.everyhunt.config;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import me.rubataga.everyhunt.Everyhunt;
 import me.rubataga.everyhunt.guis.ConfigGui;
 import me.rubataga.everyhunt.utils.Debugger;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -69,12 +72,15 @@ public class GameCfg {
         config = cfg;
     }
 
-    public static void loadConfig(){
-        loadConfig(config);
+    public static void setConfig(String fileName) throws IOException {
+        File dataFolder = Everyhunt.getInstance().getDataFolder();
+        File configFile = new File(dataFolder,fileName);
+        InputStream inputStream = configFile.toURI().toURL().openStream();
+        Reader reader = new InputStreamReader(inputStream);
+        config = YamlConfiguration.loadConfiguration(reader);
     }
 
-    public static void loadConfig(FileConfiguration cfg){
-        config = cfg;
+    public static void loadConfig(){
         Debugger.send("Loading config using : " + config.getString(GAME_NAME));
         debugMode = (boolean) getValue(DEBUG);
         if(debugMode){ Debugger.enable(); }

@@ -1,32 +1,41 @@
 package me.rubataga.everyhunt.services;
 
+import me.rubataga.everyhunt.config.GameCfg;
 import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
 
 import org.bukkit.entity.Entity;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TargetManager {
 
     private static final Map<Entity, Hunter> hunters = new HashMap<>();
     private static final Map<Entity, Target> targets = new HashMap<>();
     private static final Map<Entity, Target> runners = new HashMap<>();
+    private static final Map<RoleEnum,Map> roleMaps = new HashMap<>();
+
     private static final List<Target> runnerList = new LinkedList<>();
 
-    public static boolean hasRole(Entity entity, RoleEnum role){
-        if(role.equals(RoleEnum.HUNTER)){
-            return hunters.containsKey(entity);
-        } else if (role.equals(RoleEnum.TARGET)){
-            return targets.containsKey(entity);
-        } else if (role.equals(RoleEnum.RUNNER)){
-            return runners.containsKey(entity);
+    static{
+        roleMaps.put(RoleEnum.HUNTER,hunters);
+        roleMaps.put(RoleEnum.TARGET,targets);
+        roleMaps.put(RoleEnum.RUNNER,runners);
+    }
+
+    public static boolean hasRole(Entity entity, RoleEnum role) {
+        return roleMaps.get(role).containsKey(entity);
+    }
+
+    public static List<RoleEnum> getRoles(Entity entity){
+        List<RoleEnum> roles = new ArrayList<>();
+        for(RoleEnum role : roleMaps.keySet()){
+            if(hasRole(entity,role)){
+                roles.add(role);
+            }
         }
-        return false;
+        return roles;
     }
 
     public static void addHunter(Hunter hunter){
@@ -38,10 +47,23 @@ public class TargetManager {
     }
 
     public static void addTarget(Target target){
-        targets.put(target.getEntity(), target);
+        Entity targetEntity = target.getEntity();
+        targets.put(targetEntity, target);
+        if(GameCfg.autoAddRunners){
+            if(runnerList.contains(target)){
+                runners.put(targetEntity,target);
+                runnerList.add(target);
+            }
+        }
     }
 
     public static void removeTarget(Entity target){
+        if(GameCfg.autoRemoveRunners){
+            if(runnerList.contains(target)){
+                runners.remove(target);
+                runnerList.remove(getTarget(target));
+            }
+        }
         targets.remove(target);
     }
 

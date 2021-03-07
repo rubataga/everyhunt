@@ -1,13 +1,13 @@
 package me.rubataga.everyhunt;
 
-import me.rubataga.everyhunt.commands.CommandConfiguration;
+import me.rubataga.everyhunt.config.CommandCfg;
+import me.rubataga.everyhunt.config.GameCfg;
 import me.rubataga.everyhunt.listeners.CompassListener;
 import me.rubataga.everyhunt.listeners.DeathListener;
 import me.rubataga.everyhunt.listeners.PortalListener;
 import dev.jorel.commandapi.CommandAPI;
 import me.rubataga.everyhunt.services.CompassRunnable;
 import me.rubataga.everyhunt.utils.Debugger;
-import me.rubataga.everyhunt.game.GameCfg;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,16 +25,15 @@ public final class Everyhunt extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        pluginInstance = this;
-        PluginManager pluginManager = getServer().getPluginManager();
-
-        this.saveDefaultConfig();
-        GameCfg.setConfig(getConfig());
-        GameCfg.loadConfig();
-
         CommandAPI.onEnable(this);
-        CommandConfiguration.register();
+        pluginInstance = this;
 
+        saveDefaultConfig();
+
+        GameCfg.initialize();
+        CommandCfg.register();
+
+        PluginManager pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(new PortalListener(), this);
         pluginManager.registerEvents(new CompassListener(), this);
         pluginManager.registerEvents(new DeathListener(), this);
@@ -52,5 +51,25 @@ public final class Everyhunt extends JavaPlugin {
     public void onDisable() {
         System.out.println("§bRubataga's Everyhunt plugin disabled!");
     }
+
+    public void initializeConfigs(){
+    }
+
+    //        try {
+//            GameCfg.setConfig(defaultGamemode);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        GameCfg.loadConfig();
+//
+//        GamemodeCfgHolder holder;
+//        try {
+//            holder = new GamemodeCfgHolder();
+//            holder.setInputStream(GamemodeCfgHolder.getInputStream(defaultGamemode));
+//            GamemodeCfgHolder loadedHolder = GamemodeCfgHolder.loadInputStream(holder);
+//            loadedHolder.injectGamemodeCfg();
+//        } catch (IOException | IllegalAccessException | NoSuchFieldException e) {
+//            e.printStackTrace();
+//        }
 
 }

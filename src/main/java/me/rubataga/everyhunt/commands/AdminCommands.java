@@ -2,6 +2,7 @@ package me.rubataga.everyhunt.commands;
 
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.StringArgument;
 import me.rubataga.everyhunt.services.AdminService;
 import me.rubataga.everyhunt.utils.Debugger;
 import org.bukkit.entity.Entity;
@@ -11,10 +12,30 @@ import java.util.Collections;
 
 public class AdminCommands {
 
+    static{
+
+    }
+
     public static CommandAPICommand config() {
         return new CommandAPICommand("config")
                 .executes((sender, args) -> {
                     AdminService.config(sender);
+                });
+    }
+
+    public static CommandAPICommand loadConfig() {
+        return new CommandAPICommand("loadConfig")
+                .withArguments(new StringArgument("filename.yml"))
+                .executes((sender, args) -> {
+                    AdminService.loadConfig(sender,(String)args[0]);
+                });
+    }
+
+    public static CommandAPICommand configGui() {
+        return new CommandAPICommand("configgui")
+                .withAliases("cfgui")
+                .executesPlayer((sender, args) -> {
+                    AdminService.configGui(sender);
                 });
     }
 
@@ -32,14 +53,6 @@ public class AdminCommands {
                 .executes((sender, args) -> {
                     Collection<Entity> entities = (Collection) args[0];
                     AdminService.sum(sender, entities);
-                });
-    }
-
-    public static CommandAPICommand configGui() {
-        return new CommandAPICommand("configgui")
-                .withAliases("cfgui")
-                .executesPlayer((sender, args) -> {
-                    AdminService.configGui(sender);
                 });
     }
 
