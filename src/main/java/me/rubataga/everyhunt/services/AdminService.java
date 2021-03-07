@@ -26,18 +26,14 @@ public class AdminService {
         }
     }
 
-    public static void loadConfig(CommandSender sender, String filename){
-        sender.sendMessage("Attempting to load new gamemode: " + filename);
-        if(filename.length()<=4){
-            return;
+    public static void loadConfig(CommandSender sender, String fileName){
+        sender.sendMessage("Attempting to load new gamemode: " + fileName);
+        int idx = fileName.indexOf(".yml");
+        if(idx==-1){
+            fileName += ".yml";
         }
-        Debugger.send("filename without last four chars: " + filename.substring(0,filename.length()-4));
-        String substring = filename.substring(filename.length() - 4);
-        Debugger.send("filename last four chars: " + substring);
-        if(!substring.equalsIgnoreCase(".yml")){
-            filename += ".yml";
-        }
-        GameCfg.loadGamemode(GameCfg.getInputStream(filename));
+        Debugger.send("fileName without last four chars: " + fileName.substring(0,fileName.length()-4));
+        GameCfg.loadGamemode(fileName);
     }
 
     public static void sum(CommandSender sender, Collection<Entity> entities){

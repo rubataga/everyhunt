@@ -24,7 +24,7 @@ public class AdminCommands {
     }
 
     public static CommandAPICommand loadConfig() {
-        return new CommandAPICommand("loadConfig")
+        return new CommandAPICommand("loadconfig")
                 .withArguments(new StringArgument("filename.yml"))
                 .executes((sender, args) -> {
                     AdminService.loadConfig(sender,(String)args[0]);

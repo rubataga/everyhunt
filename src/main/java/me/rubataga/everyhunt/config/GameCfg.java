@@ -6,6 +6,7 @@ import me.rubataga.everyhunt.utils.Debugger;
 import org.bukkit.entity.Entity;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,16 +19,16 @@ public class GameCfg {
     private static final Yaml YAML = new Yaml();
     private static final String BASE_GAMEMODE_NAME = "base.yml";
     private static final InputStream BASE_GAMEMODE_STREAM = EVERYHUNT.getResource(BASE_GAMEMODE_NAME);
-//    private static final String DEFAULT_GAMEMODE_NAME;
+    private static final String DEFAULT_GAMEMODE_NAME;
 //    private static final InputStream DEFAULT_GAMEMODE_STREAM;
     private static final Map<String,Field> FIELDS = new LinkedHashMap<>();
-//    private static final Map<String, Object> BASE_VALUE_MAP = YAML.load(BASE_GAMEMODE_STREAM);
+    private static final Map<String, Object> BASE_VALUE_MAP = YAML.load(BASE_GAMEMODE_STREAM);
     private static final ConfigGui GUI = new ConfigGui();
 
     private static InputStream gamemodeInputStream;
     private static String loadedFileName = "";
     private static Map<String,Object> valueMap = new LinkedHashMap<>();
-//    private static Map<String, Object> defaultValueMap = new LinkedHashMap<>();
+    private static Map<String, Object> defaultValueMap = new LinkedHashMap<>();
 
     public static boolean debugMode;
     public static String gameName;
@@ -56,12 +57,12 @@ public class GameCfg {
             FIELDS.put(f.getName(),f);
             Debugger.send("Added field " + f.getName() + " to fields.");
         }
-//        String defaultName =  EVERYHUNT.getConfig().getString("defaultGamemode");
-//        if(defaultName==null){
-//            defaultName = "base.yml";
-//        }
-//        Debugger.send("Default gamemode name: " + defaultName);
-//        DEFAULT_GAMEMODE_NAME = defaultName;
+        String defaultName =  EVERYHUNT.getConfig().getString("defaultGamemode");
+        if(defaultName==null){
+            defaultName = "base.yml";
+        }
+        Debugger.send("Default gamemode name: " + defaultName);
+        DEFAULT_GAMEMODE_NAME = defaultName;
 //        InputStream defaultStream = getInputStream(DEFAULT_GAMEMODE_NAME);
 //        if(defaultStream==null){
 //            defaultStream = BASE_GAMEMODE_STREAM;
@@ -71,17 +72,28 @@ public class GameCfg {
 
     // load the default gamemode from config.yml
     public static void initialize(){
-        loadGamemode(getInputStream("pog.yml"));
+        loadGamemode(DEFAULT_GAMEMODE_NAME);
+        defaultValueMap = valueMap;
+        //loadGamemode("pog.yml");
 //        defaultValueMap = valueMap;
     }
+//
+//    // loads a gamemode from an InputStream
+//    public static void loadGamemode(InputStream inputStream){
+////        Debugger.send("inputStream is null: " + (inputStream==null));
+////        Debugger.send("inputStream is base: " + (inputStream==BASE_GAMEMODE_STREAM));
+////        Debugger.send("Initial gamemode file: " + loadedFileName);
+//        setInputStream(inputStream);
+////        Debugger.send("Loaded gamemode file: " + loadedFileName);
+//        setValuesToInputStream();
+//        setFieldsToValues();
+//    }
 
-    // loads a gamemode from an InputStream
-    public static void loadGamemode(InputStream inputStream){
-//        Debugger.send("inputStream is null: " + (inputStream==null));
-//        Debugger.send("inputStream is base: " + (inputStream==BASE_GAMEMODE_STREAM));
-//        Debugger.send("Initial gamemode file: " + loadedFileName);
-        setInputStream(BASE_GAMEMODE_STREAM);
-//        Debugger.send("Loaded gamemode file: " + loadedFileName);
+    public static void loadGamemode(String fileName){
+        if(loadedFileName.equalsIgnoreCase(fileName)){
+            return;
+        }
+        setInputStream(getInputStream(fileName));
         setValuesToInputStream();
         setFieldsToValues();
     }
@@ -115,19 +127,31 @@ public class GameCfg {
 //            loadedFileName = "base.yml";
 //            return BASE_GAMEMODE_STREAM;
 //        }
-        File configFile = new File(EVERYHUNT.getDataFolder(),fileName);
-        Debugger.send("Looking for file " + configFile.getPath());
-        if(configFile.exists()){
-            try{
-                InputStream inputStream = configFile.toURI().toURL().openStream();
-                Debugger.send("Static input stream: " + inputStream);
-                loadedFileName = fileName;
-                return inputStream;
-            } catch (IOException e){
-                Debugger.send("ERROR! Could not get InputStream for file: " + fileName);
+        InputStream inputStream;
+        if(fileName.equalsIgnoreCase("base.yml")){
+            Debugger.send(("Using base.yml"));
+            inputStream = EVERYHUNT.getResource(BASE_GAMEMODE_NAME);
+        } else {
+            File configFile = new File(EVERYHUNT.getDataFolder(),fileName);
+            Debugger.send("Searching for file " + configFile.getPath());
+            if(configFile.exists()){
+                try{
+                    inputStream = configFile.toURI().toURL().openStream();
+                    Debugger.send("Static input stream: " + inputStream);
+                    Debugger.send("Using " + fileName);
+                } catch (IOException e){
+                    Debugger.send("ERROR! Could not get InputStream for file: " + fileName);
+                }
+            }
+            if(fileName.equalsIgnoreCase(DEFAULT_GAMEMODE_NAME)){
+                inputStream = getInputStream("base.yml");
+            } else {
+                Debugger.send("Recursive searching for default, file " + DEFAULT_GAMEMODE_NAME);
+                inputStream = getInputStream(DEFAULT_GAMEMODE_NAME);
             }
         }
-        return null;
+        loadedFileName = fileName;
+        return inputStream;
 //        if(fileName.equalsIgnoreCase(DEFAULT_GAMEMODE_NAME)){
 //            Debugger.send("3Config.yml's defaultGamemode is null! Using base values");
 //            loadedFileName = "base.yml";
@@ -142,7 +166,6 @@ public class GameCfg {
 //        Debugger.send("gamemodeInputStream equals BASE_GAMEMODE_STREAM: " + (gamemodeInputStream==BASE_GAMEMODE_STREAM));
         Debugger.send("gamemodeInputStream is null: " + (gamemodeInputStream==null));
         Debugger.send("Initial values map: " + valueMap);
-
         valueMap = YAML.load(gamemodeInputStream);
         Debugger.send("Final values map: " + valueMap);
     }
@@ -153,32 +176,26 @@ public class GameCfg {
     
     // sets GameCfg's public fields to valueMap;
     public static void setFieldsToValues() {
-        Debugger.send("Setting static values!");
+        //Debugger.send("Setting static values!");
         for(String key : FIELDS.keySet()){
-            Debugger.send("Editing key " + key);
+            //Debugger.send("Editing key " + key);
             Field f = FIELDS.get(key);
             if(f!=null){
-                Debugger.send("Field name: " + f.getName());
+                //Debugger.send("Field name: " + f.getName());
                 Object obj = valueMap.get(key);
-//                if(obj==null){
-//                    Debugger.send("Could find value! Using default value: " + obj);
-//                    obj = defaultValueMap.get(key);
-//                    if(obj==null){
-//                        obj = BASE_VALUE_MAP.get(key);
-//                        Debugger.send("Couldn't find value! Using base value: " + obj);
-//                    }
-//                }
+                if(obj==null){
+                    Debugger.send("Could find value! Using default value: " + obj);
+                    obj = defaultValueMap.get(key);
+                    if(obj==null){
+                        obj = BASE_VALUE_MAP.get(key);
+                        Debugger.send("Couldn't find value! Using base value: " + obj);
+                    }
+                }
                 try {
                     f.set(GameCfg.class, obj);
                     Debugger.send("Static set: " + key + " = " + obj);
                 } catch(IllegalAccessException set) {
                     Debugger.send("ERROR! Failed to set key: " + key);
-                }
-                try{
-                    Object check = f.get(GameCfg.class);
-                    Debugger.send("Static check: " + key + " = " + check);
-                } catch(IllegalAccessException check){
-                    Debugger.send("ERROR! Failed to set or check key: " + key);
                 }
             }
         }
