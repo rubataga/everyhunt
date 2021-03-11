@@ -5,6 +5,7 @@ import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
 import me.rubataga.everyhunt.services.TargetManager;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
+import org.bukkit.Location;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -49,6 +50,12 @@ public class DeathListener implements Listener {
                 hunter.getEntity().sendMessage(entity.getName() + " has died. Now tracking " + hunter.getTargetEntity().getName() + "'s death location.");
                 hunter.setLastTracked(entity.getLocation());
                 hunter.updateCompassMeta();
+            }
+        }
+        if(TargetManager.hasRole(entity,RoleEnum.HUNTER)){
+            Hunter hunter = TargetManager.getHunter(entity);
+            if(!hunter.isLodestoneTracking()){
+                hunter.setLastTracked(hunter.getLastTracked());
             }
         }
     }
@@ -97,6 +104,9 @@ public class DeathListener implements Listener {
             // initialize the hunter object
             Hunter hunter = TargetManager.getHunter(player);
             // assign a compass to the hunter
+            Location loc = player.getLocation();
+            hunter.setLodestoneTracking(loc);
+            hunter.setTrackingPortal(loc,hunter.getTargetEntity().getLocation());
             TrackingCompassUtils.assignTrackingCompass(hunter);
             if(hunter.isTrackingPortal() || hunter.isTrackingDeath()){
                 hunter.getEntity().setCompassTarget(hunter.getLastTracked());

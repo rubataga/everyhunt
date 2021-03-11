@@ -1,14 +1,11 @@
 package me.rubataga.everyhunt.config;
 
 import dev.jorel.commandapi.CommandAPICommand;
-import me.rubataga.everyhunt.Everyhunt;
 import me.rubataga.everyhunt.commands.AdminCommands;
 import me.rubataga.everyhunt.commands.TargetManagerCommands;
 import me.rubataga.everyhunt.commands.TrackingCompassCommands;
 import me.rubataga.everyhunt.utils.Debugger;
-import org.bukkit.configuration.file.FileConfiguration;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,8 +51,8 @@ public class CommandCfg {
 
         //RequiredCommands
         requiredCommands.put(CONFIG,"config");
-        requiredCommands.put(LOAD_CONFIG,"loadConfig");
-        requiredCommands.put(CONFIG_GUI,"configGui");
+        requiredCommands.put(LOAD_CONFIG,"loadconfig");
+        requiredCommands.put(CONFIG_GUI,"configgui");
 
         //AdminCommands
         commands.put(SUM,"sum");

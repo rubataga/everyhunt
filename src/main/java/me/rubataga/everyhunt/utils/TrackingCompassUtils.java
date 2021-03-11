@@ -178,18 +178,19 @@ public class TrackingCompassUtils {
 
     public static void compassUpdater(Hunter hunter, ItemStack compass){
         StringBuilder displayName = new StringBuilder("§cTracking Compass");
+        Player player = hunter.getEntity();
         // if hunter has no target
         if(hunter.getTarget()==null){
-            if(hunter.getEntity().getBedSpawnLocation()!=null){
+            if(player.getBedSpawnLocation()!=null){
                 displayName.append(" - Bed Spawn");
-                hunter.getEntity().setCompassTarget(hunter.getEntity().getBedSpawnLocation());
+                player.setCompassTarget(player.getBedSpawnLocation());
             } else {
                 displayName.append(" - World Spawn");
-                hunter.getEntity().setCompassTarget(hunter.getEntity().getWorld().getSpawnLocation());
+                player.setCompassTarget(player.getWorld().getSpawnLocation());
             }
         // if hunter has target
         } else {
-            displayName.append(" - ").append(hunter.getTargetEntity().getName());
+            displayName.append(" - ").append(player.getName());
             if (hunter.isTrackingDeath()) {
                 displayName.append("'s death location");
             } else if (hunter.isTrackingPortal()) {
@@ -199,8 +200,8 @@ public class TrackingCompassUtils {
         ItemMeta meta = compass.getItemMeta();
         meta.setDisplayName(displayName.toString());
         compass.setItemMeta(meta);
-        if(TrackingCompassUtils.hasTrackingCompass(hunter.getEntity())){
-            getTrackingCompass(hunter.getEntity()).setItemMeta(meta);
+        if(TrackingCompassUtils.hasTrackingCompass(player)){
+            getTrackingCompass(player).setItemMeta(meta);
         }
     }
 }

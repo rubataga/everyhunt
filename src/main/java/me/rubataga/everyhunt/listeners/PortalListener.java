@@ -25,20 +25,20 @@ public class PortalListener implements Listener {
 
     @EventHandler
     public void onEntityTeleport(EntityTeleportEvent e){
-        teleportHandler(e.getEntity(),e.getFrom(),e.getTo(), e);
+        teleportHandler(e.getEntity(),e.getFrom(),e.getTo());
     }
 
     @EventHandler
     public void onEntityPortal(EntityPortalEvent e){
-        teleportHandler(e.getEntity(), e.getFrom(),e.getTo(), e);
+        teleportHandler(e.getEntity(), e.getFrom(),e.getTo());
     }
 
     @EventHandler
     public void onPlayerTeleport(PlayerTeleportEvent e){
-        teleportHandler(e.getPlayer(),e.getFrom(),e.getTo(), e);
+        teleportHandler(e.getPlayer(),e.getFrom(),e.getTo());
     }
 
-    private void teleportHandler(Entity entity, Location from, Location to, Event e){
+    private void teleportHandler(Entity entity, Location from, Location to){
         //Debugger.send("Event name: " + e.getEventName());
         if(TargetManager.hasRole(entity,RoleEnum.TARGET)) {
             Target target = TargetManager.getTarget(entity);

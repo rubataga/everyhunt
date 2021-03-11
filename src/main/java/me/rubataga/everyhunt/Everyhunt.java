@@ -2,6 +2,7 @@ package me.rubataga.everyhunt;
 
 import me.rubataga.everyhunt.config.CommandCfg;
 import me.rubataga.everyhunt.config.GameCfg;
+import me.rubataga.everyhunt.config.PluginCfg;
 import me.rubataga.everyhunt.listeners.CompassListener;
 import me.rubataga.everyhunt.listeners.DeathListener;
 import me.rubataga.everyhunt.listeners.PortalListener;
@@ -27,10 +28,9 @@ public final class Everyhunt extends JavaPlugin {
     public void onEnable() {
         CommandAPI.onEnable(this);
         pluginInstance = this;
-
+        PluginCfg.initialize();
         GameCfg.initialize();
         CommandCfg.register();
-        Debugger.setToGameCfg();
 
         PluginManager pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(new PortalListener(), this);

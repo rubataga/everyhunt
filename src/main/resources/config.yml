@@ -4,4 +4,4 @@ commandPrefix: "eh"
 
 disabledCommands: []
 
-debugMode: false
+debugMode: true
