@@ -124,12 +124,29 @@ public class Hunter extends EveryhuntEntity{
         setLodestoneTracking(getEntity().getLocation());
     }
 
+    public void setTrackingPortal(World hunterWorld, World targetWorld){
+        this.trackingPortal = hunterWorld != targetWorld;
+    }
+
     public void setTrackingPortal(Location hunterLoc, Location targetLoc){
-        this.trackingPortal = hunterLoc.getWorld() != targetLoc.getWorld();
+        setTrackingPortal(hunterLoc.getWorld(),targetLoc.getWorld());
     }
 
     public void setTrackingPortal(){
-        setTrackingPortal(getEntity().getLocation(),getTargetEntity().getLocation());
+        World checkWorld;
+        if(trackingDeath){
+            checkWorld = lastTracked.getWorld();
+        } else if (target==null) {
+            Location bed = getEntity().getBedSpawnLocation();
+            if (bed == null) {
+                checkWorld = getEntity().getWorld();
+            } else {
+                checkWorld = bed.getWorld();
+            }
+        } else {
+            checkWorld = getTargetEntity().getLocation().getWorld();
+        }
+        setTrackingPortal(getEntity().getLocation().getWorld(),checkWorld);
     }
 
 

@@ -106,7 +106,7 @@ public class DeathListener implements Listener {
             // assign a compass to the hunter
             Location loc = player.getLocation();
             hunter.setLodestoneTracking(loc);
-            hunter.setTrackingPortal(loc,hunter.getTargetEntity().getLocation());
+            hunter.setTrackingPortal();
             TrackingCompassUtils.assignTrackingCompass(hunter);
             if(hunter.isTrackingPortal() || hunter.isTrackingDeath()){
                 hunter.getEntity().setCompassTarget(hunter.getLastTracked());

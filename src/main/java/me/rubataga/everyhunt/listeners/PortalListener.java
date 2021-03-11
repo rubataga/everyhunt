@@ -64,9 +64,9 @@ public class PortalListener implements Listener {
         if(TargetManager.hasRole(entity,RoleEnum.HUNTER)) {
             Hunter hunter = TargetManager.getHunter(entity);
             Target target = hunter.getTarget();
+            hunter.setLodestoneTracking(to);
             if(target!=null){
                 Player player = hunter.getEntity();
-                hunter.setLodestoneTracking(to);
                 hunter.setTrackingPortal(to,hunter.getTargetEntity().getLocation());
                 // hunter joins overworld, target in otherworld
                 if(hunter.isTrackingPortal() && !hunter.isLodestoneTracking()){

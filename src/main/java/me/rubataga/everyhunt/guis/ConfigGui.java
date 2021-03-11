@@ -10,7 +10,6 @@ import me.rubataga.everyhunt.utils.Debugger;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public class ConfigGui extends InventoryGui {

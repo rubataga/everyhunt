@@ -18,21 +18,16 @@ public class AdminService {
 
     public static void config(CommandSender sender){
         for(String key : GameCfg.getFields().keySet()){
-            Debugger.send("Checking " + key);
-            if(key.equals("values") || key.equals("fields")){
-                continue;
-            }
             sender.sendMessage(GameCfg.getFormattedValue(key));
         }
     }
 
     public static void loadConfig(CommandSender sender, String fileName){
         sender.sendMessage("Attempting to load new gamemode: " + fileName);
-        int idx = fileName.indexOf(".yml");
-        if(idx==-1){
+        int i = fileName.indexOf(".yml");
+        if(i==-1){
             fileName += ".yml";
         }
-        Debugger.send("fileName without last four chars: " + fileName.substring(0,fileName.length()-4));
         GameCfg.load(fileName);
     }
 

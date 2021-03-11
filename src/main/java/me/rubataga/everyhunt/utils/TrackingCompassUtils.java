@@ -190,7 +190,7 @@ public class TrackingCompassUtils {
             }
         // if hunter has target
         } else {
-            displayName.append(" - ").append(player.getName());
+            displayName.append(" - ").append(hunter.getTargetEntity().getName());
             if (hunter.isTrackingDeath()) {
                 displayName.append("'s death location");
             } else if (hunter.isTrackingPortal()) {

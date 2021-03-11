@@ -2,6 +2,7 @@ package me.rubataga.everyhunt.config;
 
 import me.rubataga.everyhunt.Everyhunt;
 import me.rubataga.everyhunt.utils.Debugger;
+import me.rubataga.yamleditor.YamlEditor;
 
 import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
