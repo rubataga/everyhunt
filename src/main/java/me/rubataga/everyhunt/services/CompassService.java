@@ -70,7 +70,7 @@ public class CompassService {
                            hunter.setLodestoneTracking();
                            player.sendMessage("Now tracking " + targetEntity.getName() + "'s portal.");
                        } else {
-                           player.sendMessage("Sorry, " + targetEntity.getName() + " has not been in this world yet.");
+                           player.sendMessage("Sorry, " + targetEntity.getName() + " has    not been in this world yet.");
                            return;
                        }
                    } else {
@@ -140,6 +140,9 @@ public class CompassService {
         hunter = TargetManager.getHunter(player);
         hunter.setTarget(null);
         hunter.setLastTracked(null);
+        hunter.setTrackingDeath(false);
+        hunter.setLodestoneTracking();
+        hunter.setTrackingPortal();
         hunter.updateCompassMeta();
         csm.msg("Compass reset!");
     }

@@ -1,6 +1,7 @@
 package me.rubataga.everyhunt.roles;
 
 import me.rubataga.everyhunt.guis.HunterGui;
+import me.rubataga.everyhunt.utils.Debugger;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 
 import org.bukkit.Location;
@@ -35,8 +36,12 @@ public class Hunter extends EveryhuntEntity{
         return compass;
     }
 
+    public void setCompass(){
+        setCompass(TrackingCompassUtils.trackingCompass(this));
+    }
+
     public void setCompass(ItemStack trackingCompass){
-        setCompass(trackingCompass,false,-1);
+        setCompass(trackingCompass,false);
     }
 
     public void setCompass(ItemStack trackingCompass, boolean addToInv){
@@ -44,15 +49,27 @@ public class Hunter extends EveryhuntEntity{
     }
 
     public void setCompass(ItemStack trackingCompass, boolean addToInv, int slot){
+        setCompass(trackingCompass,addToInv,slot,false);
+    }
+
+    public void setCompass(ItemStack trackingCompass, boolean addToInv, int slot, boolean replace){
         Inventory inventory = getEntity().getInventory();
+        // slot == -1 indicates a nonexistent inventory slot
         if(slot==-1){
-            if(addToInv){
+            if(replace){
+                slot = TrackingCompassUtils.getTrackingCompassIndex(getEntity());
+            } else if(addToInv){
                 slot = inventory.firstEmpty();
             } else {
                 slot = TrackingCompassUtils.getTrackingCompassIndex(getEntity());
             }
+            if(slot==-1){
+                slot = inventory.firstEmpty();
+            }
+            Debugger.send("Using slot " + slot);
         }
         if(isLodestoneTracking()){
+            Debugger.send("replacing with lodestone!");
             inventory.setItem(slot, lodestoneCompass);
             this.compass = inventory.getItem(slot);
         } else {
@@ -68,6 +85,14 @@ public class Hunter extends EveryhuntEntity{
 
     public ItemStack getLodestoneCompass(){
         return lodestoneCompass;
+    }
+
+    public void updateCompassLodedStatus(){
+        if(lodestoneTracking){
+            setCompass(lodestoneCompass,true,-1,true);
+        } else {
+            setCompass(TrackingCompassUtils.trackingCompass(this),true,-1,true);
+        }
     }
 
     public boolean inventoryHasCompass() {
@@ -124,29 +149,43 @@ public class Hunter extends EveryhuntEntity{
         setLodestoneTracking(getEntity().getLocation());
     }
 
+    public void setTrackingPortal(boolean trackingPortal){
+        this.trackingPortal = trackingPortal;
+    }
+
     public void setTrackingPortal(World hunterWorld, World targetWorld){
         this.trackingPortal = hunterWorld != targetWorld;
     }
 
     public void setTrackingPortal(Location hunterLoc, Location targetLoc){
-        setTrackingPortal(hunterLoc.getWorld(),targetLoc.getWorld());
+        if(hunterLoc!=null && targetLoc!=null){
+            setTrackingPortal(hunterLoc.getWorld(),targetLoc.getWorld());
+        } else {
+            setTrackingPortal();
+        }
+    }
+
+    public void setTrackingPortal(Location hunterLoc){
+        World checkWorld;
+        World hunterWorld = hunterLoc.getWorld();
+        if(trackingDeath){
+            checkWorld = target.getDeathWorld();
+        } else if (target==null) {
+            Location bed = getEntity().getBedSpawnLocation();
+            if (bed != null) {
+                checkWorld = bed.getWorld();
+            } else {
+                setTrackingPortal(hunterWorld.getEnvironment() != World.Environment.NORMAL);
+                return;
+            }
+        } else {
+            checkWorld = target.getEntity().getWorld();
+        }
+        setTrackingPortal(hunterWorld,checkWorld);
     }
 
     public void setTrackingPortal(){
-        World checkWorld;
-        if(trackingDeath){
-            checkWorld = lastTracked.getWorld();
-        } else if (target==null) {
-            Location bed = getEntity().getBedSpawnLocation();
-            if (bed == null) {
-                checkWorld = getEntity().getWorld();
-            } else {
-                checkWorld = bed.getWorld();
-            }
-        } else {
-            checkWorld = getTargetEntity().getLocation().getWorld();
-        }
-        setTrackingPortal(getEntity().getLocation().getWorld(),checkWorld);
+        setTrackingPortal(getEntity().getLocation());
     }
 
 

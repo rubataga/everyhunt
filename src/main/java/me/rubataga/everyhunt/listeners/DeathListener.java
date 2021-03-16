@@ -4,6 +4,7 @@ import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
 import me.rubataga.everyhunt.services.TargetManager;
+import me.rubataga.everyhunt.utils.Debugger;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.EnderDragon;
@@ -46,16 +47,12 @@ public class DeathListener implements Listener {
             target.updateLastLocation();
             target.updateDeathWorld();
             for (Hunter hunter : target.getHunters()) {
+                hunter.getEntity().sendMessage(entity.getName() + " has died. Now tracking " + entity.getName() + "'s death location.");
                 hunter.setTrackingDeath(true);
-                hunter.getEntity().sendMessage(entity.getName() + " has died. Now tracking " + hunter.getTargetEntity().getName() + "'s death location.");
-                hunter.setLastTracked(entity.getLocation());
+                if(!hunter.isTrackingPortal()){
+                    hunter.setLastTracked(entity.getLocation());
+                }
                 hunter.updateCompassMeta();
-            }
-        }
-        if(TargetManager.hasRole(entity,RoleEnum.HUNTER)){
-            Hunter hunter = TargetManager.getHunter(entity);
-            if(!hunter.isLodestoneTracking()){
-                hunter.setLastTracked(hunter.getLastTracked());
             }
         }
     }
@@ -66,6 +63,7 @@ public class DeathListener implements Listener {
         if(e.getNewPhase()==EnderDragon.Phase.DYING){
             anypercentWon(dragonHunterMap.getOrDefault(dragon, null));
         }
+        targetDeathHandler(dragon);
     }
 
     private static void anypercentWon(Target target){
@@ -109,6 +107,7 @@ public class DeathListener implements Listener {
             hunter.setTrackingPortal();
             TrackingCompassUtils.assignTrackingCompass(hunter);
             if(hunter.isTrackingPortal() || hunter.isTrackingDeath()){
+                Debugger.send("compass target 1");
                 hunter.getEntity().setCompassTarget(hunter.getLastTracked());
             }
             hunter.updateCompassMeta();

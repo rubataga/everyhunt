@@ -14,7 +14,7 @@ public class TargetManager {
     private static final Map<Entity, Hunter> hunters = new HashMap<>();
     private static final Map<Entity, Target> targets = new HashMap<>();
     private static final Map<Entity, Target> runners = new HashMap<>();
-    private static final Map<RoleEnum,Map> roleMaps = new HashMap<>();
+    private static final Map<RoleEnum,Map<Entity,?>> roleMaps = new HashMap<>();
 
     private static final List<Target> runnerList = new LinkedList<>();
 

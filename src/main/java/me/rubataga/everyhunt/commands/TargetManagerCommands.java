@@ -52,12 +52,12 @@ public class TargetManagerCommands {
      *
      * @return CommandAPICommand
      */
+    @SuppressWarnings("unchecked")
     public static CommandAPICommand addRunnerMultiple() {
         return new CommandAPICommand("addrunner")
                 .withArguments(new EntitySelectorArgument("players", EntitySelectorArgument.EntitySelector.MANY_ENTITIES))
                 .executes((sender, args) -> {
-                    // AP CSA : Casting
-                    TargetService.addRunner(sender, (Collection) args[0]);
+                    TargetService.addRunner(sender, (Collection<Entity>) args[0]);
                 });
     }
 
@@ -79,12 +79,14 @@ public class TargetManagerCommands {
      * Command to add multiple entities as hunters
      *
      * @return CommandAPICommand
+     *
      */
+    @SuppressWarnings("unchecked")
     public static CommandAPICommand addHunterMultiple() {
         return new CommandAPICommand("addhunter")
                 .withArguments(new EntitySelectorArgument("players", EntitySelectorArgument.EntitySelector.MANY_ENTITIES))
                 .executes((sender, args) -> {
-                    TargetService.addRunner(sender, (Collection) args[0]);
+                    TargetService.addRunner(sender, (Collection<Entity>) args[0]);
                 });
     }
 
@@ -120,11 +122,12 @@ public class TargetManagerCommands {
      *
      * @return CommandAPICommand
      */
+    @SuppressWarnings("unchecked")
     public static CommandAPICommand removeEntity() {
         return new CommandAPICommand("remove")
                 .withArguments(new EntitySelectorArgument("entity", EntitySelectorArgument.EntitySelector.MANY_ENTITIES))
                 .executes((sender, args) -> {
-                    Collection<Entity> entities = (Collection) args[0];
+                    Collection<Entity> entities = (Collection<Entity>) args[0];
                     TargetService.removeEntity(sender, entities);
                 });
     }

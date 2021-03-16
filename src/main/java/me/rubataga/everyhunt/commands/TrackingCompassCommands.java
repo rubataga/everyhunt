@@ -1,8 +1,6 @@
 package me.rubataga.everyhunt.commands;
 
-import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.services.CompassService;
-import me.rubataga.everyhunt.services.TargetManager;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;

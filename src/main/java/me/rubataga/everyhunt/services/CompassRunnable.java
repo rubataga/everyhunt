@@ -2,7 +2,9 @@ package me.rubataga.everyhunt.services;
 
 import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.roles.Target;
+import me.rubataga.everyhunt.utils.Debugger;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
+import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
 
@@ -14,34 +16,53 @@ public class CompassRunnable {
     public static final Runnable compassRepeatingTask = ()-> {
         //for each hunter with a target
         for (Hunter hunter : TargetManager.getHunters().values()) {
+            if(hunter.getCompass() == null){
+                continue;
+            }
             Target target = hunter.getTarget();
-            if (target != null) {
-                // if hunter is tracking death or portal, don't set compass. compass will continue to track the target's last location.
-                if(hunter.getCompass() == null || (!hunter.isLodestoneTracking() && (hunter.isTrackingDeath() || hunter.isTrackingPortal()))){
-                    continue;
-                }
-                // lodestone tracking logic used when the hunter is in the nether or the end
-                // lodestone tracking requires interval CompassMeta refreshes
-                if(hunter.isLodestoneTracking()){
-                    ItemStack compass;
-                    if(TrackingCompassUtils.hasTrackingCompass(hunter)){
-                        compass = hunter.getCompass();
-                    } else {
-                        compass = hunter.getLodestoneCompass();
+            if(!hunter.isLodestoneTracking()) {
+                Location playerCompassLocation = hunter.getEntity().getCompassTarget();
+                if (hunter.isTrackingDeath() || hunter.isTrackingPortal()){
+                    if (playerCompassLocation == hunter.getLastTracked()){
+                        continue;
                     }
-                    CompassMeta meta = ((CompassMeta)(compass.getItemMeta()));
-                    meta.setLodestoneTracked(false);
-                    // if tracking a portal or a death location (which don't change), track lastTracked
-                    if (hunter.isTrackingPortal() || hunter.isTrackingDeath()) {
-                        meta.setLodestone(hunter.getLastTracked());
-                    } else {
-                        meta.setLodestone(target.getEntity().getLocation());
-                    }
-                    compass.setItemMeta(meta);
-                    hunter.getGUI().draw();
+                    playerCompassLocation = hunter.getLastTracked();
+                } else if (target!=null){
+                    playerCompassLocation = target.getEntity().getLocation();
                 } else {
-                    hunter.getEntity().setCompassTarget(target.getEntity().getLocation());
+                    playerCompassLocation = hunter.getLastTracked();
                 }
+                if(playerCompassLocation==null){
+                    playerCompassLocation = hunter.getEntity().getWorld().getSpawnLocation();
+                }
+                hunter.getEntity().setCompassTarget(playerCompassLocation);
+            // if lodestone tracking
+            } else {
+                ItemStack compass;
+                if (TrackingCompassUtils.hasTrackingCompass(hunter)) {
+                    compass = hunter.getCompass();
+                } else {
+                    compass = hunter.getLodestoneCompass();
+                }
+                CompassMeta meta = ((CompassMeta) (compass.getItemMeta()));
+                meta.setLodestoneTracked(false);
+                Location lodeLocation = meta.getLodestone();
+                // if tracking death/portal, the target location shouldn't be changing
+                if (hunter.isTrackingDeath() || hunter.isTrackingPortal()) {
+                    // lodeLocation should equal the hunter's lastTracked. else, update it
+                    if (lodeLocation == hunter.getLastTracked()) {
+                        continue;
+                    }
+                    lodeLocation = hunter.getLastTracked();
+                } else if (target != null) {
+                    Debugger.send("tracking new entity location!");
+                    lodeLocation = target.getEntity().getLocation();
+                } else {
+                    lodeLocation = hunter.getLastTracked();
+                }
+                meta.setLodestone(lodeLocation);
+                compass.setItemMeta(meta);
+                hunter.getGUI().draw();
             }
         }
     };

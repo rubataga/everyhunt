@@ -181,11 +181,14 @@ public class TrackingCompassUtils {
         Player player = hunter.getEntity();
         // if hunter has no target
         if(hunter.getTarget()==null){
+            Debugger.send("setting compass to a spawn!");
             if(player.getBedSpawnLocation()!=null){
                 displayName.append(" - Bed Spawn");
+                Debugger.send("compass target 5");
                 player.setCompassTarget(player.getBedSpawnLocation());
             } else {
                 displayName.append(" - World Spawn");
+                Debugger.send("compass target 6");
                 player.setCompassTarget(player.getWorld().getSpawnLocation());
             }
         // if hunter has target
@@ -193,9 +196,10 @@ public class TrackingCompassUtils {
             displayName.append(" - ").append(hunter.getTargetEntity().getName());
             if (hunter.isTrackingDeath()) {
                 displayName.append("'s death location");
-            } else if (hunter.isTrackingPortal()) {
-                displayName.append("'s portal");
             }
+        }
+        if (hunter.isTrackingPortal()) {
+            displayName.append("'s portal");
         }
         ItemMeta meta = compass.getItemMeta();
         meta.setDisplayName(displayName.toString());

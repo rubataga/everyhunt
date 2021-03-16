@@ -1,7 +1,8 @@
 package me.rubataga.everyhunt.roles;
 
 import me.rubataga.everyhunt.services.TargetManager;
-import me.rubataga.everyhunt.services.TargetService;
+import me.rubataga.everyhunt.utils.Debugger;
+import me.rubataga.everyhunt.utils.GeneralUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -46,7 +47,9 @@ public class Target extends EveryhuntEntity {
     public void updateLastLocation() {
         World world = getEntity().getWorld();
         Location currentLocation = getEntity().getLocation();
+        Debugger.send("adding last location to world " + world + " : " + GeneralUtils.formatBlockLocation(currentLocation));
         lastLocations.put(world,currentLocation);
+        Debugger.send("all locations: " + lastLocations);
     }
 
     public Location getLastLocationWorld(World world){

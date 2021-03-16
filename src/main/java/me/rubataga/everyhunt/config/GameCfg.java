@@ -14,8 +14,8 @@ public class GameCfg {
 
     private static final Everyhunt EVERYHUNT = Everyhunt.getInstance();
     private static final String EMBEDDED_GAMEMODE_NAME = "base.yml";
-    private static ConfigGui GUI;
 
+    private static ConfigGui gui;
     private static YamlEditor editor;
 
     public static boolean debugMode;
@@ -46,9 +46,9 @@ public class GameCfg {
         }
         editor = new YamlEditor(GameCfg.class, EVERYHUNT, defaultName, EMBEDDED_GAMEMODE_NAME);
         editor.load(defaultName);
-        Debugger.setToGameCfg();
         EVERYHUNT.saveDefaultConfig();
-        GUI = new ConfigGui();
+        gui = new ConfigGui();
+        Debugger.setToGameCfg();
     }
 
     public static Object getValue(String key){
@@ -89,7 +89,7 @@ public class GameCfg {
     }
 
     public static ConfigGui getGui(){
-        return GUI;
+        return gui;
     }
 
 }

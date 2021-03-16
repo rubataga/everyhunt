@@ -16,7 +16,7 @@ public class EmbeddedYamlEditor {
     // constants
     private static final Yaml YAML = new Yaml();
     private final JavaPlugin PLUGIN;
-    private final Class OWNER_CLASS;
+    private final Class<?> OWNER_CLASS;
     private final Map<String, Field> FIELDS = new LinkedHashMap<>();
     private final String DEFAULT_RESOURCE_NAME;
     private final String EMBEDDED_RESOURCE_NAME;
@@ -31,7 +31,7 @@ public class EmbeddedYamlEditor {
     private boolean loadDefaultBeforeEmbedded = true;
     private String valueFormat = "%s: %s";
 
-    public EmbeddedYamlEditor(Class ownerClass, JavaPlugin plugin, String DEFAULT_RESOURCE_NAME, String EMBEDDED_RESOURCE_NAME, String fileName) {
+    public EmbeddedYamlEditor(Class<?> ownerClass, JavaPlugin plugin, String DEFAULT_RESOURCE_NAME, String EMBEDDED_RESOURCE_NAME, String fileName) {
         this.PLUGIN = plugin;
         this.OWNER_CLASS = ownerClass;
         for(Field f : ownerClass.getFields()){
@@ -44,7 +44,7 @@ public class EmbeddedYamlEditor {
         defaultValueMap = loadedValueMap;
     }
 
-    public EmbeddedYamlEditor(Class ownerClass, JavaPlugin plugin, String DEFAULT_RESOURCE_NAME, String EMBEDDED_RESOURCE_NAME) {
+    public EmbeddedYamlEditor(Class<?> ownerClass, JavaPlugin plugin, String DEFAULT_RESOURCE_NAME, String EMBEDDED_RESOURCE_NAME) {
         this.PLUGIN = plugin;
         this.OWNER_CLASS = ownerClass;
         for(Field f : ownerClass.getFields()){
@@ -163,7 +163,7 @@ public class EmbeddedYamlEditor {
                 value = f.get(OWNER_CLASS);
                 return value;
             }
-            catch(IllegalAccessException e){
+            catch(IllegalAccessException ignored){
             }
         }
         return getSafeValueFromMap(key);
