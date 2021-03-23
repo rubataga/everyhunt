@@ -6,10 +6,7 @@ import me.rubataga.everyhunt.commands.TargetManagerCommands;
 import me.rubataga.everyhunt.commands.TrackingCompassCommands;
 import me.rubataga.everyhunt.utils.Debugger;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Class containing all of the plugin's commands
@@ -44,40 +41,40 @@ public class CommandCfg {
     private static final CommandAPICommand RESET = TrackingCompassCommands.reset();
     private static final CommandAPICommand GUI = TrackingCompassCommands.gui();
 
-    private final static Map<CommandAPICommand,String> commands = new HashMap<>();
-    private final static Map<CommandAPICommand,String> requiredCommands = new HashMap<>();
+    private static final Map<CommandAPICommand,String> COMMANDS = new LinkedHashMap<>();
+    private static final Map<CommandAPICommand,String> REQUIRED_COMMANDS = new HashMap<>();
 
     static{
 
         //RequiredCommands
-        requiredCommands.put(CONFIG,"config");
-        requiredCommands.put(LOAD_CONFIG,"loadconfig");
-        requiredCommands.put(CONFIG_GUI,"configgui");
+        REQUIRED_COMMANDS.put(CONFIG,"config");
+        REQUIRED_COMMANDS.put(LOAD_CONFIG,"loadconfig");
+        REQUIRED_COMMANDS.put(CONFIG_GUI,"configgui");
 
         //AdminCommands
-        commands.put(SUM,"sum");
-        commands.put(SUM_SELF,"sum");
-        commands.put(DUMMY,"dummy");
+        COMMANDS.put(SUM,"sum");
+        COMMANDS.put(SUM_SELF,"sum");
+        COMMANDS.put(DUMMY,"dummy");
 
         //TargetManagerCommands
-        commands.put(ADD_RUNNER,"addrunner");
-        commands.put(ADD_RUNNER_SELF,"addrunner");
-        commands.put(ADD_RUNNER_MULTIPLE,"addrunner");
-        commands.put(ADD_HUNTER,"addhunter");
-        commands.put(ADD_HUNTER_SELF,"addhunter");
-        commands.put(ADD_HUNTER_MULTIPLE,"addhunter");
-        commands.put(REMOVE_PLAYER,"remove");
-        commands.put(REMOVE_ENTITY,"remove");
-        commands.put(REMOVE_SELF,"remove");
-        commands.put(TEAMS,"teams");
+        COMMANDS.put(ADD_RUNNER,"addrunner");
+        COMMANDS.put(ADD_RUNNER_SELF,"addrunner");
+        COMMANDS.put(ADD_RUNNER_MULTIPLE,"addrunner");
+        COMMANDS.put(ADD_HUNTER,"addhunter");
+        COMMANDS.put(ADD_HUNTER_SELF,"addhunter");
+        COMMANDS.put(ADD_HUNTER_MULTIPLE,"addhunter");
+        COMMANDS.put(REMOVE_PLAYER,"remove");
+        COMMANDS.put(REMOVE_ENTITY,"remove");
+        COMMANDS.put(REMOVE_SELF,"remove");
+        COMMANDS.put(TEAMS,"teams");
 
         //TrackingCompassCommands
-        commands.put(COMPASS,"compass");
-        commands.put(COMPASS_SELF,"compass");
-        commands.put(TRACK_RUNNER,"track");
-        commands.put(TRACK_ENTITY,"track");
-        commands.put(RESET,"reset");
-        commands.put(GUI,"gui");
+        COMMANDS.put(COMPASS,"compass");
+        COMMANDS.put(COMPASS_SELF,"compass");
+        COMMANDS.put(TRACK_RUNNER,"track");
+        COMMANDS.put(TRACK_ENTITY,"track");
+        COMMANDS.put(RESET,"reset");
+        COMMANDS.put(GUI,"gui");
 
     }
 
@@ -88,8 +85,8 @@ public class CommandCfg {
         if(COMMAND_PREFIX!=null && !COMMAND_PREFIX.equals("")) {
             CommandAPICommand prefix = new CommandAPICommand(COMMAND_PREFIX);
             List<CommandAPICommand> enabledCommands = new ArrayList<>();
-            for (CommandAPICommand c : commands.keySet()) {
-                String commandName = commands.get(c);
+            for (CommandAPICommand c : COMMANDS.keySet()) {
+                String commandName = COMMANDS.get(c);
                 if (DISABLED_COMMANDS.contains(commandName)) {
                     Debugger.send("Disabled command: " + commandName);
                     continue;
@@ -97,7 +94,7 @@ public class CommandCfg {
                 Debugger.send("Registering command: " + c.getName());
                 enabledCommands.add(c);
             }
-            for (CommandAPICommand c : requiredCommands.keySet()) {
+            for (CommandAPICommand c : REQUIRED_COMMANDS.keySet()) {
                 Debugger.send("Registering required command: " + c.getName());
                 enabledCommands.add(c);
             }
@@ -105,14 +102,14 @@ public class CommandCfg {
             prefix.register();
         }
         else {
-            for(CommandAPICommand c : commands.keySet()){
-                if(DISABLED_COMMANDS.contains(commands.get(c))){
+            for(CommandAPICommand c : COMMANDS.keySet()){
+                if(DISABLED_COMMANDS.contains(COMMANDS.get(c))){
                     continue;
                 }
                 Debugger.send("Registering command: " + c.getName());
                 c.register();
             }
-            for (CommandAPICommand c : requiredCommands.keySet()) {
+            for (CommandAPICommand c : REQUIRED_COMMANDS.keySet()) {
                 Debugger.send("Registering required command: " + c.getName());
                 c.register();
             }

@@ -13,13 +13,14 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.CompassMeta;
 
+import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.List;
 
 public class AdminService {
 
     public static void config(CommandSender sender){
-        for(String key : GameCfg.getFields().keySet()){
+        for(String key : GameCfg.getKeyFields().keySet()){
             sender.sendMessage(GameCfg.getFormattedValue(key));
         }
     }
@@ -30,7 +31,11 @@ public class AdminService {
         if(i==-1){
             fileName += ".yml";
         }
-        GameCfg.load(fileName);
+        try{
+            GameCfg.load(fileName);
+        } catch (FileNotFoundException e){
+            sender.sendMessage("File not found!");
+        }
     }
 
     public static void sum(CommandSender sender, Collection<Entity> entities){

@@ -25,7 +25,7 @@ public class HunterGui extends InventoryGui {
     };
 
     public HunterGui(Hunter hunter) {
-        super(Everyhunt.getInstance(),hunter.getEntity(),"Rubataga's Everyhunt v1.0",LAYOUT);
+        super(Everyhunt.getInstance(),hunter.getEntity(),"Rubataga's Everyhunt v1.0.2",LAYOUT);
         this.HUNTER = hunter;
         this.PLAYER = hunter.getEntity();
         initialize();

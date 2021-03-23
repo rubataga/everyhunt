@@ -1,6 +1,7 @@
 package me.rubataga.everyhunt.listeners;
 
 import me.rubataga.everyhunt.config.GameCfg;
+import me.rubataga.everyhunt.config.Rules;
 import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
@@ -29,9 +30,9 @@ import java.util.List;
 
 public class CompassListener implements Listener {
 
-    private final List<InventoryAction> illegalTrackingCompassActions = new ArrayList<>();
+    private static final List<InventoryAction> illegalTrackingCompassActions = new ArrayList<>();
 
-    public CompassListener(){
+    static{
         illegalTrackingCompassActions.add(InventoryAction.PLACE_ONE);
         illegalTrackingCompassActions.add(InventoryAction.PLACE_SOME);
         illegalTrackingCompassActions.add(InventoryAction.PLACE_ALL);
@@ -132,7 +133,7 @@ public class CompassListener implements Listener {
             return;
         }
         Debugger.send(entity.getType().getKey().getKey());
-        if(GameCfg.isBlacklisted(entity)){
+        if(Rules.isBlacklisted(entity)){
             return;
         }
         e.setCancelled(true);

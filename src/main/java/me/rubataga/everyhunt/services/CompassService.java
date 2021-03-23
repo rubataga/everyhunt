@@ -1,6 +1,6 @@
 package me.rubataga.everyhunt.services;
 
-import me.rubataga.everyhunt.config.GameCfg;
+import me.rubataga.everyhunt.config.Rules;
 import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
@@ -101,7 +101,7 @@ public class CompassService {
                 if(entity instanceof Player && !TargetManager.getRunners().containsKey(entity)
                         || !(entity instanceof LivingEntity)
                         || player.getWorld() != entity.getWorld()
-                        || GameCfg.isBlacklisted(entity)){
+                        || Rules.isBlacklisted(entity)){
                     continue;
                 }
                 double dist = player.getLocation().distanceSquared(entity.getLocation());

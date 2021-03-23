@@ -85,6 +85,14 @@
             <id>minebench-repo</id>
             <url>https://repo.minebench.de/</url>
         </repository>
+<!--        <repository>-->
+<!--            <id>yamledit-mvn-repo</id>-->
+<!--            <url>https://www.dropbox.com/sh/ovb6l52nkynt2ek/AADp8sRKKSH9TjbAn9CeYpSCa?dl=0</url>-->
+<!--        </repository>-->
+<!--        <repository>-->
+<!--            <id>jitpack.io</id>-->
+<!--            <url>https://jitpack.io</url>-->
+<!--        </repository>-->
     </repositories>
 
     <dependencies>
@@ -94,11 +102,11 @@
             <version>1.16.5-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>me.rubataga</groupId>
-            <artifactId>yamleditor</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>me.rubataga</groupId>-->
+<!--            <artifactId>yamleditor</artifactId>-->
+<!--            <version>1.0-SNAPSHOT</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>dev.jorel</groupId>
             <artifactId>commandapi-shade</artifactId>

@@ -3,20 +3,20 @@ package me.rubataga.everyhunt.config;
 import me.rubataga.everyhunt.Everyhunt;
 import me.rubataga.everyhunt.guis.ConfigGui;
 import me.rubataga.everyhunt.utils.Debugger;
-import me.rubataga.yamleditor.YamlEditor;
 import org.bukkit.entity.Entity;
 
+import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
-public class GameCfg {
+public class GameCfg extends AbstractCfg{
 
     private static final Everyhunt EVERYHUNT = Everyhunt.getInstance();
     private static final String EMBEDDED_GAMEMODE_NAME = "base.yml";
 
     private static ConfigGui gui;
-    private static YamlEditor editor;
+    private static EmbeddedYamlEditor editor;
 
     public static boolean debugMode;
     public static String debugTag;
@@ -44,49 +44,29 @@ public class GameCfg {
         if (defaultName == null) {
             defaultName = "base.yml";
         }
-        editor = new YamlEditor(GameCfg.class, EVERYHUNT, defaultName, EMBEDDED_GAMEMODE_NAME);
-        editor.load(defaultName);
+        editor = new EmbeddedYamlEditor(GameCfg.class, EVERYHUNT, EMBEDDED_GAMEMODE_NAME, defaultName);
         EVERYHUNT.saveDefaultConfig();
+        ConfigGui.initialize();
         gui = new ConfigGui();
         Debugger.setToGameCfg();
     }
 
-    public static Object getValue(String key){
-        return editor.getValue(key);
-    }
-
-    public static void load(String fileName){
-        editor.load(fileName);
+    public static Object getValue(String key) {
+        return getValue(key,GameCfg.class);
     }
 
     public static String getFormattedValue(String key){
-        return editor.getFormattedValue(key);
+        return getFormattedValue(key,GameCfg.class);
     }
 
-    public static Map<String,Field> getFields(){
-        return editor.getFields();
+    public static void load(String fileName) throws FileNotFoundException {
+        editor.load(fileName);
     }
 
-    public static boolean isBlacklisted(Entity entity){
-        String entityKey = entity.getType().getKey().getKey();
-        if(useBlacklist){
-            for(String key : compassBlacklist){
-                Debugger.send("CHECKING BLACKLIST KEY: " + key);
-                if(entityKey.equals(key)){
-                    return true;
-                }
-            }
-            return false;
-        } else {
-            for(String key : compassWhitelist){
-                Debugger.send("CHECKING WHITELIST KEY: " + key);
-                if(entityKey.equals(key)){
-                    return false;
-                }
-            }
-            return true;
-        }
+    public static Map<String,Field> getKeyFields(){
+        return editor.getKeyFields();
     }
+
 
     public static ConfigGui getGui(){
         return gui;

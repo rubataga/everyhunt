@@ -2,14 +2,13 @@ package me.rubataga.everyhunt.config;
 
 import me.rubataga.everyhunt.Everyhunt;
 import me.rubataga.everyhunt.utils.Debugger;
-import me.rubataga.yamleditor.YamlEditor;
 
 import java.util.List;
 
 public class PluginCfg {
 
     private static final Everyhunt EVERYHUNT = Everyhunt.getInstance();
-    private static YamlEditor editor;
+    private static EmbeddedYamlEditor editor;
 
     public static String defaultGamemode;
     public static String commandPrefix;
@@ -17,8 +16,7 @@ public class PluginCfg {
     public static boolean debugMode;
 
     public static void initialize(){
-        editor = new YamlEditor(PluginCfg.class,EVERYHUNT,"config.yml","config.yml");
-        editor.setFieldsToValues();
+        editor = new EmbeddedYamlEditor(PluginCfg.class,EVERYHUNT,"config.yml","config.yml");
         Debugger.enabled = debugMode;
     }
 

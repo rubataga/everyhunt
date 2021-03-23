@@ -118,7 +118,7 @@ public class TargetManagerCommands {
     }
 
     /**
-     * Remove entity as target
+     * Remove entity as hunter, target, and/or runner
      *
      * @return CommandAPICommand
      */

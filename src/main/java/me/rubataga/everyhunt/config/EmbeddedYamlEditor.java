@@ -5,6 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -18,88 +19,85 @@ public class EmbeddedYamlEditor {
     private final JavaPlugin PLUGIN;
     private final Class<?> OWNER_CLASS;
     private final Map<String, Field> FIELDS = new LinkedHashMap<>();
-    private final String DEFAULT_RESOURCE_NAME;
     private final String EMBEDDED_RESOURCE_NAME;
+    private final Map<String, Object> EMBEDDED_VALUE_MAP;
 
     // variables
-    public String loadedResourceName = "";
-    public Map<String, Object> embeddedValueMap;
-    public Map<String, Object> defaultValueMap;
-    public Map<String, Object> loadedValueMap;
+    private String loadedResourceName = "";
+//    private Map<String, Object> defaultValueMap;
+//    private Map<String, Object> loadedValueMap;
 
     // settings
-    private boolean loadDefaultBeforeEmbedded = true;
-    private String valueFormat = "%s: %s";
+//    private boolean loadDefaultBeforeEmbedded = true;
+    private final String valueFormat = "%s: %s";
 
-    public EmbeddedYamlEditor(Class<?> ownerClass, JavaPlugin plugin, String DEFAULT_RESOURCE_NAME, String EMBEDDED_RESOURCE_NAME, String fileName) {
+    public EmbeddedYamlEditor(Class<?> ownerClass, JavaPlugin plugin, String EMBEDDED_RESOURCE_NAME, String DEFAULT_RESOURCE_NAME) {
         this.PLUGIN = plugin;
         this.OWNER_CLASS = ownerClass;
         for(Field f : ownerClass.getFields()){
             this.FIELDS.put(f.getName(),f);
         }
-        this.DEFAULT_RESOURCE_NAME = DEFAULT_RESOURCE_NAME;
         this.EMBEDDED_RESOURCE_NAME = EMBEDDED_RESOURCE_NAME;
-        this.embeddedValueMap = YAML.load(getEmbeddedResource());
-        load(fileName);
-        defaultValueMap = loadedValueMap;
-    }
-
-    public EmbeddedYamlEditor(Class<?> ownerClass, JavaPlugin plugin, String DEFAULT_RESOURCE_NAME, String EMBEDDED_RESOURCE_NAME) {
-        this.PLUGIN = plugin;
-        this.OWNER_CLASS = ownerClass;
-        for(Field f : ownerClass.getFields()){
-            this.FIELDS.put(f.getName(),f);
+        this.EMBEDDED_VALUE_MAP = YAML.load(getEmbeddedResource());
+        try{
+            load(DEFAULT_RESOURCE_NAME);
+        } catch (FileNotFoundException e){
+            loadEmbed();
         }
-        this.DEFAULT_RESOURCE_NAME = DEFAULT_RESOURCE_NAME;
-        this.EMBEDDED_RESOURCE_NAME = EMBEDDED_RESOURCE_NAME;
-        this.embeddedValueMap = YAML.load(getEmbeddedResource());
-        load(DEFAULT_RESOURCE_NAME);
-        setFieldsToValues();
-        defaultValueMap = loadedValueMap;
     }
 
-    public Map<String,Field> getFields() {
+    public Map<String,Field> getKeyFields() {
         return FIELDS;
     }
 
-    public String getLoadedResourceName() {
-        return loadedResourceName;
-    }
+//    public String getLoadedResourceName() {
+//        return loadedResourceName;
+//    }
+//
+//    public Map<String, Object> getEmbeddedValueMap() {
+//        return EMBEDDED_VALUE_MAP;
+//    }
+//
+//    public Map<String, Object> getDefaultValueMap() {
+//        return defaultValueMap;
+//    }
+//
+//    public Map<String, Object> getLoadedValueMap() {
+//        return loadedValueMap;
+//    }
+//
+//    public void setLoadDefaultBeforeEmbedded(boolean b){
+//        loadDefaultBeforeEmbedded = b;
+//    }
+//
+//    public void setValueFormat(String s){
+//        valueFormat = s;
+//    }
 
-    public Map<String, Object> getEmbeddedValueMap() {
-        return embeddedValueMap;
-    }
-
-    public Map<String, Object> getDefaultValueMap() {
-        return defaultValueMap;
-    }
-
-    public Map<String, Object> getLoadedValueMap() {
-        return loadedValueMap;
-    }
-
-    public void setLoadDefaultBeforeEmbedded(boolean b){
-        loadDefaultBeforeEmbedded = b;
-    }
-
-    public void setValueFormat(String s){
-        valueFormat = s;
-    }
-
-    public void load(String fileName) {
+    public void load(String fileName) throws FileNotFoundException {
+        Map<String,Object> loadedValueMap;
+        if(fileName==null){
+            throw new FileNotFoundException("Filename cannot be null!");
+        }
         if (loadedResourceName.equalsIgnoreCase(fileName)) {
             return;
         }
         loadedValueMap = YAML.load(getInputStream(fileName));
+        setFieldsToValues(loadedValueMap);
         loadedResourceName = fileName;
-        setFieldsToValues();
     }
+
+    public void loadEmbed() {
+        Map<String,Object> loadedValueMap = YAML.load(getEmbeddedResource());
+        setFieldsToValues(loadedValueMap);
+        loadedResourceName = "base.yml";
+}
 
     public InputStream getEmbeddedResource() {
         return PLUGIN.getResource(EMBEDDED_RESOURCE_NAME);
     }
 
-    public InputStream getInputStream(String fileName) {
+    public InputStream getInputStream(String fileName) throws FileNotFoundException {
         InputStream inputStream = null;
         if (fileName.equalsIgnoreCase("$embedded")) {
             inputStream = getEmbeddedResource();
@@ -112,22 +110,18 @@ public class EmbeddedYamlEditor {
                 }
             }
             if (inputStream == null) {
-                if (fileName.equalsIgnoreCase(DEFAULT_RESOURCE_NAME)) {
-                    inputStream = getInputStream("$embedded");
-                } else {
-                    inputStream = getInputStream(DEFAULT_RESOURCE_NAME);
-                }
+                throw new FileNotFoundException("Config file " + fileName + " not found!");
             }
         }
         loadedResourceName = fileName;
         return inputStream;
     }
 
-    public void setFieldsToValues() {
+    private void setFieldsToValues(Map<String,Object> loadedValueMap) {
         for(String key : FIELDS.keySet()){
             Field f = FIELDS.get(key);
             if(f!=null){
-                Object obj = getSafeValueFromMap(key);
+                Object obj = getSafeValueFromMap(key,loadedValueMap);
                 try {
                     f.set(OWNER_CLASS, obj);
                 } catch(IllegalAccessException ignored) {
@@ -136,44 +130,38 @@ public class EmbeddedYamlEditor {
         }
     }
 
-    public Object getSafeValueFromMap(String key){
+    private Object getSafeValueFromMap(String key, Map<String,Object> loadedValueMap){
         Object obj = loadedValueMap.get(key);
         if(obj==null){
-            if(loadDefaultBeforeEmbedded){
-                obj = defaultValueMap.get(key);
-                if(obj==null){
-                    obj = embeddedValueMap.get(key);
-                }
-            } else {
-                obj = embeddedValueMap.get(key);
-                if(obj==null){
-                    obj = defaultValueMap.get(key);
-                }
-            }
+            obj = EMBEDDED_VALUE_MAP.get(key);
         }
         return obj;
     }
 
-    // returns the value of a GameCfg public field
-    public Object getValue(String key) {
-        Object value;
-        if(FIELDS.containsKey(key)){
-            Field f = FIELDS.get(key);
-            try {
-                value = f.get(OWNER_CLASS);
-                return value;
-            }
-            catch(IllegalAccessException ignored){
-            }
-        }
-        return getSafeValueFromMap(key);
-    }
+//    // returns the value of a GameCfg public field
+//    public Object getValue(String key) throws NoSuchFieldException, IllegalAccessException {
+//        Field field = OWNER_CLASS.getField(key);
+//        return field.get(OWNER_CLASS);
+//    }
 
-    // returns a formatted string of a value accessible by getValue()
-    public String getFormattedValue(String key){
-        return String.format(valueFormat,key,getValue(key));
-    }
-
+//    public Object getaValue(String key) {
+//        Object value;
+//        if(FIELDS.containsKey(key)){
+//            Field f = FIELDS.get(key);
+//            try {
+//                value = f.get(OWNER_CLASS);
+//                return value;
+//            }
+//            catch(IllegalAccessException ignored){
+//            }
+//        }
+//        return getSafeValueFromMap(key);
+//    }
+//
+//    // returns a formatted string of a value accessible by getValue()
+//    public String getFormattedValue(String key) throws NoSuchFieldException, IllegalAccessException {
+//        return String.format(valueFormat,key,getValue(key));
+//    }
 
     public void test(){
         System.out.println("test");
