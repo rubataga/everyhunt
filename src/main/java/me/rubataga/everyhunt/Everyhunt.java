@@ -1,17 +1,17 @@
 package me.rubataga.everyhunt;
 
-import me.rubataga.everyhunt.config.CommandCfg;
-import me.rubataga.everyhunt.config.GameCfg;
-import me.rubataga.everyhunt.config.PluginCfg;
-import me.rubataga.everyhunt.listeners.CompassListener;
-import me.rubataga.everyhunt.listeners.DeathListener;
-import me.rubataga.everyhunt.listeners.PortalListener;
+import me.rubataga.everyhunt.configs.CommandCfg;
+import me.rubataga.everyhunt.configs.GameCfg;
+import me.rubataga.everyhunt.configs.PluginCfg;
 import dev.jorel.commandapi.CommandAPI;
-import me.rubataga.everyhunt.services.CompassRunnable;
-import me.rubataga.everyhunt.utils.Debugger;
+import me.rubataga.everyhunt.managers.GameManager;
+import me.rubataga.everyhunt.managers.LobbyManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Plugin class
@@ -19,25 +19,28 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class Everyhunt extends JavaPlugin {
 
     private static Everyhunt pluginInstance;
+    private static PluginManager pluginManager;
 
     public static Everyhunt getInstance(){
         return pluginInstance;
+    }
+    public static PluginManager getPluginManager(){
+        return pluginManager;
     }
 
     @Override
     public void onEnable() {
         CommandAPI.onEnable(this);
         pluginInstance = this;
+        pluginManager = getServer().getPluginManager();
+
         PluginCfg.initialize();
         GameCfg.initialize();
         CommandCfg.register();
+        LobbyManager.initialize();
+        GameManager.initialize();
 
-        PluginManager pluginManager = getServer().getPluginManager();
-        pluginManager.registerEvents(new PortalListener(), this);
-        pluginManager.registerEvents(new CompassListener(), this);
-        pluginManager.registerEvents(new DeathListener(), this);
-
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, CompassRunnable.compassRepeatingTask,0L,10L);
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, TrackingCompassRunnable.compassRepeatingTask,0L,10L);
         System.out.println("§bRubataga's Everyhunt plugin enabled!");
     }
 
@@ -50,25 +53,5 @@ public final class Everyhunt extends JavaPlugin {
     public void onDisable() {
         System.out.println("§bRubataga's Everyhunt plugin disabled!");
     }
-
-    public void initializeConfigs(){
-    }
-
-    //        try {
-//            GameCfg.setConfig(defaultGamemode);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        GameCfg.loadConfig();
-//
-//        GamemodeCfgHolder holder;
-//        try {
-//            holder = new GamemodeCfgHolder();
-//            holder.setInputStream(GamemodeCfgHolder.getInputStream(defaultGamemode));
-//            GamemodeCfgHolder loadedHolder = GamemodeCfgHolder.loadInputStream(holder);
-//            loadedHolder.injectGamemodeCfg();
-//        } catch (IOException | IllegalAccessException | NoSuchFieldException e) {
-//            e.printStackTrace();
-//        }
 
 }

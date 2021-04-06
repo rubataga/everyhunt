@@ -3,7 +3,7 @@ package me.rubataga.everyhunt.listeners;
 import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
-import me.rubataga.everyhunt.services.TargetManager;
+import me.rubataga.everyhunt.managers.TrackingManager;
 import me.rubataga.everyhunt.utils.Debugger;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 
@@ -16,8 +16,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPortalEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-
-import java.util.Objects;
 
 /**
  * Listener for events relating to {@link TrackingCompassUtils}
@@ -42,8 +40,8 @@ public class PortalListener implements Listener {
     private void teleportHandler(Entity entity, Location from, Location to){
         World toWorld = to.getWorld();
         World fromWorld = from.getWorld();
-        if(TargetManager.hasRole(entity,RoleEnum.TARGET)) {
-            Target target = TargetManager.getTarget(entity);
+        if(TrackingManager.hasRole(entity,RoleEnum.TARGET)) {
+            Target target = TrackingManager.getTarget(entity);
             target.updateWorldLocation(toWorld, to);
             target.updateWorldLocation(fromWorld, from);
             target.updateLastLocation();
@@ -58,8 +56,8 @@ public class PortalListener implements Listener {
                 }
             }
         }
-        if(TargetManager.hasRole(entity,RoleEnum.HUNTER)) {
-            Hunter hunter = TargetManager.getHunter(entity);
+        if(TrackingManager.hasRole(entity,RoleEnum.HUNTER)) {
+            Hunter hunter = TrackingManager.getHunter(entity);
             Target target = hunter.getTarget();
             boolean initialLodestoneTrackingStatus = hunter.isLodestoneTracking();
 
@@ -68,9 +66,14 @@ public class PortalListener implements Listener {
             Debugger.send("hunter lodestone tracking? " + hunter.isLodestoneTracking());
             Debugger.send("hunter tracking portal? " + hunter.isTrackingPortal());
             // if target has a lastLocation in the toWorld, use it
-            Location targetLast = target.getLastLocationWorld(toWorld);
+            Location targetLast;
+            if(target==null){
+                targetLast = to;
+            } else {
+                targetLast = target.getLastLocationWorld(toWorld);
+            }
             if(toWorld!=fromWorld) {
-                hunter.setLastTracked(Objects.requireNonNullElse(targetLast, to));
+                hunter.setLastTracked(targetLast);
             }
             if(initialLodestoneTrackingStatus!=hunter.isLodestoneTracking()){
                 hunter.updateCompassLodedStatus();

@@ -1,8 +1,9 @@
 package me.rubataga.everyhunt.roles;
 
+import me.rubataga.everyhunt.config.GameCfg;
 import me.rubataga.everyhunt.services.TargetManager;
 import me.rubataga.everyhunt.utils.Debugger;
-import me.rubataga.everyhunt.utils.GeneralUtils;
+import me.rubataga.everyhunt.utils.LocationUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -19,7 +20,15 @@ public class Target extends EveryhuntEntity {
 
     public Target(Entity target){
         super(target);
-        if(target instanceof Player){
+        if(target instanceof Player && GameCfg.autoAddRunners){
+            TargetManager.addRunner(this);
+            this.isRunner = true;
+        }
+    }
+
+    public Target(Entity target, boolean addRunner){
+        super(target);
+        if(target instanceof Player && GameCfg.autoAddRunners && addRunner){
             TargetManager.addRunner(this);
             this.isRunner = true;
         }
@@ -47,7 +56,7 @@ public class Target extends EveryhuntEntity {
     public void updateLastLocation() {
         World world = getEntity().getWorld();
         Location currentLocation = getEntity().getLocation();
-        Debugger.send("adding last location to world " + world + " : " + GeneralUtils.formatBlockLocation(currentLocation));
+        Debugger.send("adding last location to world " + world + " : " + LocationUtils.formatBlockLocation(currentLocation));
         lastLocations.put(world,currentLocation);
         Debugger.send("all locations: " + lastLocations);
     }

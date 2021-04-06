@@ -2,7 +2,10 @@ package me.rubataga.everyhunt.utils;
 
 import org.bukkit.Location;
 
-public class GeneralUtils {
+/**
+ * Class containing methods to nicely format Locations
+ */
+public class LocationUtils {
 
     public static String formatLocation(Location location){
         return "[" + location.getX() + "," + location.getY() + "," + location.getZ() + "]";

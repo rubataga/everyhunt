@@ -1,6 +1,6 @@
-package me.rubataga.everyhunt.config;
+package me.rubataga.everyhunt.utils;
 
-import me.rubataga.everyhunt.utils.Debugger;
+import me.rubataga.everyhunt.configs.GameCfg;
 import org.bukkit.entity.Entity;
 
 public class Rules {

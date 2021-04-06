@@ -1,4 +1,4 @@
-package me.rubataga.everyhunt.services;
+package me.rubataga.everyhunt.utils;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -9,18 +9,18 @@ public class CommandSenderMessenger {
     private String otherString;
 
     private final CommandSender SENDER;
-    private final boolean IS_NULL;
+    private final boolean SENDER_IS_NULL;
 
     public CommandSenderMessenger(CommandSender cs, String youString, String otherString){
         this.SENDER = cs;
-        this.IS_NULL = (cs==null);
+        this.SENDER_IS_NULL = (cs==null);
         this.youString = youString;
         this.otherString = otherString;
     }
 
     public CommandSenderMessenger(CommandSender cs){
         this.SENDER = cs;
-        this.IS_NULL = (cs==null);
+        this.SENDER_IS_NULL = (cs==null);
         this.youString = "You are";
         this.otherString = " is";
     }
@@ -41,33 +41,31 @@ public class CommandSenderMessenger {
         this.otherString = str;
     }
 
-    public void msg(String s){
-        if(!IS_NULL){
+    public void message(String s){
+        if(!SENDER_IS_NULL){
             SENDER.sendMessage(s);
         }
     }
 
-    public void povMsg(Entity entity, String s, boolean sendToEntity, boolean sendToSender){
+    public void povMessage(Entity entity, String s, boolean sendToEntity, boolean sendToSender){
         StringBuilder sb = new StringBuilder(s);
-        if(!IS_NULL){
             if(sendToEntity) {
                 StringBuilder entitySb = new StringBuilder(sb);
                 entitySb.insert(0, youString);
                 entity.sendMessage(entitySb.toString());
             }
-            if(sendToSender){
+            if(sendToSender && !SENDER_IS_NULL){
                 sb.insert(0,otherString).insert(0, entity.getName());
                 SENDER.sendMessage(sb.toString());
             }
-        }
     }
 
-    public void povMsg(Entity entity, String s){
-        povMsg(entity,s,true,SENDER!=entity);
+    public void povMessage(Entity entity, String s){
+        povMessage(entity,s,true,SENDER!=entity);
     }
 
-    public void povMsgSenderOnly(Entity entity, String s){
-        povMsg(entity,s,SENDER==entity, SENDER!=entity);
+    public void povMessageSenderOnly(Entity entity, String s){
+        povMessage(entity,s,SENDER==entity, SENDER!=entity);
     }
 
 }

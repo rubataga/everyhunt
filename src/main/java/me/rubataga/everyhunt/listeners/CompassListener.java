@@ -58,7 +58,9 @@ public class CompassListener implements Listener {
         }
         Hunter hunter = TargetManager.getHunter(player);
         if(player.isSneaking()){
-            hunter.getGUI().show();
+            if(GameCfg.guiEnabled){
+                hunter.getGUI().show();
+            }
             return;
         }
         if(hunter.isLockedOnTarget()){
@@ -219,7 +221,9 @@ public class CompassListener implements Listener {
             if (e.isRightClick()){// && compassPickupActions.contains(action)) {
                 Hunter hunter = TargetManager.getHunter(player);
                 if (hunter != null) {
-                    hunter.getGUI().show();
+                    if(GameCfg.guiEnabled){
+                        hunter.getGUI().show();
+                    }
                     e.setCancelled(true);
                 }
             }

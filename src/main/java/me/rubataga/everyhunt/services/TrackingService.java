@@ -1,6 +1,8 @@
 package me.rubataga.everyhunt.services;
 
+import me.rubataga.everyhunt.config.GameCfg;
 import me.rubataga.everyhunt.roles.*;
+import me.rubataga.everyhunt.utils.CommandSenderMessenger;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 
 import org.bukkit.command.CommandSender;
@@ -18,11 +20,17 @@ public class TargetService {
                 senderCsm.msg(entity.getName() + " not a player!");
             } else {
                 Player player = (Player) entity;
-                if (!TargetManager.hasRole(player,RoleEnum.RUNNER)) {
-                    TargetManager.addRunner(new Target(player));
-                    senderCsm.povMsg(player," now a runner!");
-                } else {
+                if(TargetManager.hasRole(player,RoleEnum.RUNNER)){
                     senderCsm.povMsgSenderOnly(player," already a runner!");
+                } else if (!GameCfg.huntersCanBeRunners && TargetManager.hasRole(player,RoleEnum.HUNTER)){
+                    senderCsm.povMsgSenderOnly(player," already a hunter!");
+                } else {
+                    Target target = TargetManager.getTarget(player);
+                    if(target == null){
+                        target = new Target(player,false);
+                    }
+                    TargetManager.addRunner(target);
+                    senderCsm.povMsg(player," now a runner!");
                 }
             }
         }
@@ -41,6 +49,8 @@ public class TargetService {
                     hunter.setTarget(null);
                     TrackingCompassUtils.assignTrackingCompass(hunter);
                     senderCsm.povMsg(player," now a hunter!");
+                } else if (!GameCfg.huntersCanBeRunners && TargetManager.hasRole(player,RoleEnum.RUNNER)){
+                    senderCsm.povMsgSenderOnly(player," already a runner!");
                 } else {
                     senderCsm.povMsgSenderOnly(player," already a hunter!");
                 }

@@ -9,7 +9,7 @@ import org.bukkit.entity.Entity;
 
 import java.util.*;
 
-public class TargetManager {
+public class TrackingManager {
 
     private static final Map<Entity, Hunter> hunters = new HashMap<>();
     private static final Map<Entity, Target> targets = new HashMap<>();
@@ -59,7 +59,7 @@ public class TargetManager {
 
     public static void removeTarget(Entity target){
         if(GameCfg.autoRemoveRunners){
-            if(runnerList.contains(target)){
+            if(runners.containsKey(target)){
                 runners.remove(target);
                 runnerList.remove(getTarget(target));
             }
@@ -75,6 +75,12 @@ public class TargetManager {
     public static void removeRunner(Entity runner){
         runners.remove(runner);
         runnerList.remove(runners.get(runner));
+    }
+
+    public static void removeAll(Entity entity){
+        removeHunter(entity);
+        removeRunner(entity);
+        removeTarget(entity);
     }
 
     public static Map<Entity, Hunter> getHunters() {

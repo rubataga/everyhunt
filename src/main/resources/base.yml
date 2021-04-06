@@ -1,40 +1,41 @@
-### GAME META
+### GAME
 gameName: "base"
+gameDescription: ["Base configuration for","Everyhunt"]
 
-gameDescription: ["A classic game of","Minecraft Manhunt!"]
+### STARTUP
+autoStartOnLoad: false
+minimumPlayers: 0
+minimumRunners: 0
+playersCanMidjoin: true
+autoAddToGame: true
+clearInventory: false
 
-### DEBUGGER
-
-debugMode: true
-
-debugTag: "§d{DEBUG} "
+### SHUTDOWN
+removeCompasses: true
 
 ### TRACKING COMPASS
-
 useBlacklist: true
-
 blacklistMessage: "Tracking this entity is not allowed!"
-
-compassWhitelist: ["player"]
-
 compassBlacklist: []
-
+compassWhitelist: ["player"]
 rightClickCyclesRunners: false
-
 rightClickResetsDeadCompass: true
-
 guiEnabled: true
 
 ### PORTALS
-
 disablePortals: false
 
 ### ROLES
+assignRolesAtStart: false
+assignRoleAtMidjoin: "hunter"
+playersCanChangeRole: true
 
+### HUNTERS
+assignTargetAtStart: true
+huntersCanChangeTarget: false
 huntersCanBeRunners: true
 
+### RUNNERS
 nonRunnersCanBeTargeted: false
-
-autoAddRunners: true
-
+autoAddRunners: false
 autoRemoveRunners: true

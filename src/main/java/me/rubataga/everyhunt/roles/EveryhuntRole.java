@@ -2,7 +2,7 @@ package me.rubataga.everyhunt.roles;
 
 import org.bukkit.entity.Entity;
 
-public class EveryhuntEntity {
+public abstract class EveryhuntEntity {
 
     private final Entity entity;
 

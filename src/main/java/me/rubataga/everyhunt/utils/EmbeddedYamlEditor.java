@@ -1,5 +1,6 @@
-package me.rubataga.everyhunt.config;
+package me.rubataga.everyhunt.utils;
 
+import com.google.common.primitives.Primitives;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import org.yaml.snakeyaml.Yaml;
@@ -24,11 +25,8 @@ public class EmbeddedYamlEditor {
 
     // variables
     private String loadedResourceName = "";
-//    private Map<String, Object> defaultValueMap;
-//    private Map<String, Object> loadedValueMap;
 
     // settings
-//    private boolean loadDefaultBeforeEmbedded = true;
     private final String valueFormat = "%s: %s";
 
     public EmbeddedYamlEditor(Class<?> ownerClass, JavaPlugin plugin, String EMBEDDED_RESOURCE_NAME, String DEFAULT_RESOURCE_NAME) {
@@ -75,14 +73,13 @@ public class EmbeddedYamlEditor {
 //    }
 
     public void load(String fileName) throws FileNotFoundException {
-        Map<String,Object> loadedValueMap;
         if(fileName==null){
             throw new FileNotFoundException("Filename cannot be null!");
         }
         if (loadedResourceName.equalsIgnoreCase(fileName)) {
             return;
         }
-        loadedValueMap = YAML.load(getInputStream(fileName));
+        Map<String,Object> loadedValueMap = YAML.load(getInputStream(fileName));
         setFieldsToValues(loadedValueMap);
         loadedResourceName = fileName;
     }
@@ -90,7 +87,7 @@ public class EmbeddedYamlEditor {
     public void loadEmbed() {
         Map<String,Object> loadedValueMap = YAML.load(getEmbeddedResource());
         setFieldsToValues(loadedValueMap);
-        loadedResourceName = "base.yml";
+        loadedResourceName = EMBEDDED_RESOURCE_NAME;
 }
 
     public InputStream getEmbeddedResource() {
@@ -99,7 +96,7 @@ public class EmbeddedYamlEditor {
 
     public InputStream getInputStream(String fileName) throws FileNotFoundException {
         InputStream inputStream = null;
-        if (fileName.equalsIgnoreCase("$embedded")) {
+        if (fileName.equalsIgnoreCase("$embedded") || fileName.equalsIgnoreCase(EMBEDDED_RESOURCE_NAME)) {
             inputStream = getEmbeddedResource();
         } else {
             File configFile = new File(PLUGIN.getDataFolder(), fileName);
@@ -121,7 +118,8 @@ public class EmbeddedYamlEditor {
         for(String key : FIELDS.keySet()){
             Field f = FIELDS.get(key);
             if(f!=null){
-                Object obj = getSafeValueFromMap(key,loadedValueMap);
+                Object obj = getSafeValueFromMap(key,f,loadedValueMap);
+                Debugger.send(f.getName() + ": " + obj);
                 try {
                     f.set(OWNER_CLASS, obj);
                 } catch(IllegalAccessException ignored) {
@@ -130,11 +128,48 @@ public class EmbeddedYamlEditor {
         }
     }
 
-    private Object getSafeValueFromMap(String key, Map<String,Object> loadedValueMap){
-        Object obj = loadedValueMap.get(key);
-        if(obj==null){
-            obj = EMBEDDED_VALUE_MAP.get(key);
+    public void setFieldToValue(String key, Object value) throws IllegalAccessException {
+        Field f = FIELDS.get(key);
+        if(f!=null){
+            f.set(OWNER_CLASS,value);
         }
+    }
+
+    private Object getSafeValueFromMap(String key, Field f, Map<String,Object> loadedValueMap){
+        Object obj = loadedValueMap.get(key);
+        if(obj==null || !Primitives.unwrap(f.getType()).isAssignableFrom(Primitives.unwrap(obj.getClass()))){
+            obj = EMBEDDED_VALUE_MAP.get(key);
+            //            if(obj!=null && f.getType().isPrimitive()){
+//                if(!f.getType().isAssignableFrom(Primitives.unwrap(obj.getClass()))){
+//                    obj = EMBEDDED_VALUE_MAP.get(key);
+//                }
+//            }
+//            if(obj==null){
+//                obj = EMBEDDED_VALUE_MAP.get(key);
+//            }
+//            if(f.getType().isPrimitive()){
+//                if(!f.getType().isAssignableFrom(Primitives.unwrap(obj.getClass()))){
+//                    obj = EMBEDDED_VALUE_MAP.get(key);
+//                }
+//            }
+//
+//            if(obj==null){
+//                Debugger.send("Object is null: " + (true));
+//            } else {
+//                if(f.getType().isPrimitive()){
+//                    if(!f.getType().isAssignableFrom(Primitives.unwrap(obj.getClass()))){
+//                        Debugger.send("Object is null: " + (false));
+//                        Debugger.send("Object class: " + obj.getClass().getName());
+//                        Debugger.send("Field type: " + f.getType().getName());
+//                        Debugger.send("Object class is field type: " + false);
+//                        Debugger.send("Using embedded value!");
+//                    }
+//                }
+//
+//            }
+//            obj = EMBEDDED_VALUE_MAP.get(key);
+        }
+        Debugger.send(f.getName() + ": " + obj);
         return obj;
     }
 

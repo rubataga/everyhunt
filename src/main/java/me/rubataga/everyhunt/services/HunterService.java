@@ -4,6 +4,7 @@ import me.rubataga.everyhunt.config.Rules;
 import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
+import me.rubataga.everyhunt.utils.CommandSenderMessenger;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 
 import org.bukkit.Location;
@@ -105,13 +106,9 @@ public class CompassService {
                     continue;
                 }
                 double dist = player.getLocation().distanceSquared(entity.getLocation());
-                if(targetEntity==null){
+                if(targetEntity==null || dist<min){
                     targetEntity = entity;
                     min = dist;
-                }
-                else if(dist<min){
-                    targetEntity=entity;
-                    min=dist;
                 }
             }
         }

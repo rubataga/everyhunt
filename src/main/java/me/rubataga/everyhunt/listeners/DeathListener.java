@@ -3,7 +3,7 @@ package me.rubataga.everyhunt.listeners;
 import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
-import me.rubataga.everyhunt.services.TargetManager;
+import me.rubataga.everyhunt.services.TrackingManager;
 import me.rubataga.everyhunt.utils.Debugger;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 import org.bukkit.Location;
@@ -42,8 +42,8 @@ public class DeathListener implements Listener {
     }
 
     private void targetDeathHandler(Entity entity){
-        if(TargetManager.hasRole(entity,RoleEnum.TARGET)) {
-            Target target = TargetManager.getTarget(entity);
+        if(TrackingManager.hasRole(entity,RoleEnum.TARGET)) {
+            Target target = TrackingManager.getTarget(entity);
             target.updateLastLocation();
             target.updateDeathWorld();
             for (Hunter hunter : target.getHunters()) {
@@ -72,7 +72,7 @@ public class DeathListener implements Listener {
             victoryTextBuilder.insert(0,target.getEntity().getName()).append(" has killed the Ender Dragon! ");
         }
         String victoryText = victoryTextBuilder.toString();
-        for(Entity hunter : TargetManager.getHunters().keySet()){
+        for(Entity hunter : TrackingManager.getHunters().keySet()){
             hunter.sendMessage(victoryText);
         }
     }
@@ -81,11 +81,11 @@ public class DeathListener implements Listener {
     public void onTargetKillEnderDragon(EntityDamageByEntityEvent e){
         Entity damager = e.getDamager();
         Entity dragon = e.getEntity();
-        if(!TargetManager.hasRole(damager,RoleEnum.TARGET) || dragon.getType()!= EntityType.ENDER_DRAGON){
+        if(!TrackingManager.hasRole(damager,RoleEnum.TARGET) || dragon.getType()!= EntityType.ENDER_DRAGON){
             return;
         }
         if(dragon.isDead()){
-            dragonHunterMap.put(dragon,TargetManager.getTarget(damager));
+            dragonHunterMap.put(dragon, TrackingManager.getTarget(damager));
         }
     }
 
@@ -98,9 +98,9 @@ public class DeathListener implements Listener {
     public void onPlayerRevive(PlayerRespawnEvent e){
         // if respawning player is hunter, give trackingCompass
         Player player = e.getPlayer();
-        if(TargetManager.hasRole(player, RoleEnum.HUNTER)){
+        if(TrackingManager.hasRole(player, RoleEnum.HUNTER)){
             // initialize the hunter object
-            Hunter hunter = TargetManager.getHunter(player);
+            Hunter hunter = TrackingManager.getHunter(player);
             // assign a compass to the hunter
             Location loc = player.getLocation();
             hunter.setLodestoneTracking(loc);
@@ -113,8 +113,8 @@ public class DeathListener implements Listener {
             hunter.updateCompassMeta();
         }
         // if respawning player is runner, notify the hunter
-        if(TargetManager.hasRole(player,RoleEnum.RUNNER)){
-            Target runner = TargetManager.getRunner(player);
+        if(TrackingManager.hasRole(player,RoleEnum.RUNNER)){
+            Target runner = TrackingManager.getRunner(player);
             for(Hunter hunter : runner.getHunters()){
                 hunter.setTrackingDeath(false);
                 hunter.getEntity().sendMessage(player.getDisplayName() + " has respawned.");

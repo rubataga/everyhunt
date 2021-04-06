@@ -5,7 +5,7 @@ import de.themoep.inventorygui.GuiStateElement;
 import de.themoep.inventorygui.InventoryGui;
 import de.themoep.inventorygui.StaticGuiElement;
 import me.rubataga.everyhunt.Everyhunt;
-import me.rubataga.everyhunt.config.GameCfg;
+import me.rubataga.everyhunt.configs.GameCfg;
 import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 import net.md_5.bungee.api.ChatColor;

@@ -4,7 +4,7 @@ import me.rubataga.everyhunt.config.GameCfg;
 import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
-import me.rubataga.everyhunt.utils.GeneralUtils;
+import me.rubataga.everyhunt.utils.LocationUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -49,7 +49,7 @@ public class AdminService {
                 if(hunter.getTarget()!=null){
                     sender.sendMessage("Target: " + hunter.getTargetEntity().getName());
                     if(hunter.getTarget().getLastLocations().containsKey(entity.getWorld())){
-                        sender.sendMessage("Target last location in world " + entity.getWorld() + ": " + GeneralUtils.formatBlockLocation(hunter.getTarget().getLastLocationWorld(entity.getWorld())));
+                        sender.sendMessage("Target last location in world " + entity.getWorld() + ": " + LocationUtils.formatBlockLocation(hunter.getTarget().getLastLocationWorld(entity.getWorld())));
                     }
                 }
                 sender.sendMessage("Tracking death: " + hunter.isTrackingDeath());
@@ -58,20 +58,20 @@ public class AdminService {
                 Location lastTracked = hunter.getLastTracked();
                 if(lastTracked!=null){
                     sender.sendMessage("Last tracked world: " + lastTracked.getWorld());
-                    sender.sendMessage("Last tracked coords: " + GeneralUtils.formatBlockLocation(lastTracked));
+                    sender.sendMessage("Last tracked coords: " + LocationUtils.formatBlockLocation(lastTracked));
                 }
                 if(hunter.isLodestoneTracking()){
                     Location location = ((CompassMeta)hunter.getCompass().getItemMeta()).getLodestone();
-                    sender.sendMessage("Lodestone location: " + GeneralUtils.formatBlockLocation(location));
+                    sender.sendMessage("Lodestone location: " + LocationUtils.formatBlockLocation(location));
                 } else {
-                    sender.sendMessage("Player compass location: " + GeneralUtils.formatBlockLocation(((Player)entity).getCompassTarget()));
+                    sender.sendMessage("Player compass location: " + LocationUtils.formatBlockLocation(((Player)entity).getCompassTarget()));
                 }
             }
             if(roles.contains(RoleEnum.TARGET)){
                 Target target = TargetManager.getTarget(entity);
                 sender.sendMessage("Hunters in pursuit: " + target.getHunters());
                 for(World world : target.getLastLocations().keySet()){
-                    sender.sendMessage("Last location in world " + world.getName() + ": " + GeneralUtils.formatBlockLocation(target.getLastLocationWorld(world)));
+                    sender.sendMessage("Last location in world " + world.getName() + ": " + LocationUtils.formatBlockLocation(target.getLastLocationWorld(world)));
                 }
             }
         }

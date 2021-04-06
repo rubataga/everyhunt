@@ -1,21 +1,22 @@
-package me.rubataga.everyhunt.services;
+package me.rubataga.everyhunt;
 
 import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.roles.Target;
+import me.rubataga.everyhunt.managers.TrackingManager;
 import me.rubataga.everyhunt.utils.Debugger;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
 
-public class CompassRunnable {
+public class TrackingCompassRunnable {
 
     /**
      * Task that updates the compass location of a hunter with a {@link TrackingCompassUtils#trackingCompass()}
      */
     public static final Runnable compassRepeatingTask = ()-> {
         //for each hunter with a target
-        for (Hunter hunter : TargetManager.getHunters().values()) {
+        for (Hunter hunter : TrackingManager.getHunters().values()) {
             if(hunter.getCompass() == null){
                 continue;
             }

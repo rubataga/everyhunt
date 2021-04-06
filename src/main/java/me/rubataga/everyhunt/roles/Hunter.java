@@ -1,5 +1,6 @@
 package me.rubataga.everyhunt.roles;
 
+import me.rubataga.everyhunt.config.GameCfg;
 import me.rubataga.everyhunt.guis.HunterGui;
 import me.rubataga.everyhunt.utils.Debugger;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
@@ -194,6 +195,9 @@ public class Hunter extends EveryhuntEntity{
     }
 
     public void setTarget(Target target){
+        if(!GameCfg.huntersCanChangeTarget){
+            getEntity().sendMessage("You aren't allowed to change your target!");
+        }
         if(this.target!=null){
             this.target.removeHunter(this);
         }

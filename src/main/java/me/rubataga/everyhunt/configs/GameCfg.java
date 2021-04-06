@@ -18,22 +18,33 @@ public class GameCfg extends AbstractCfg{
     private static ConfigGui gui;
     private static EmbeddedYamlEditor editor;
 
-    public static boolean debugMode;
-    public static String debugTag;
     public static String gameName;
     public static List<String> gameDescription;
+    public static boolean autoStartOnLoad;
+    public static int minimumPlayers;
+    public static int minimumRunners;
+    public static boolean playersCanMidjoin;
+    public static boolean autoAddToGame;
 
     public static boolean useBlacklist;
+    public static String blacklistMessage;
     public static List<String> compassBlacklist;
     public static List<String> compassWhitelist;
-    public static String blacklistMessage;
 
     public static boolean rightClickCyclesRunners;
     public static boolean rightClickResetsDeadCompass;
-
     public static boolean guiEnabled;
+
     public static boolean disablePortals;
+
+    public static boolean assignRolesAtStart;
+    public static String assignRoleAtMidjoin;
+    public static boolean playersCanChangeRole;
+
+    public static boolean assignTargetAtStart;
+    public static boolean huntersCanChangeTarget;
     public static boolean huntersCanBeRunners;
+
     public static boolean nonRunnersCanBeTargeted;
     public static boolean autoAddRunners;
     public static boolean autoRemoveRunners;
@@ -48,7 +59,6 @@ public class GameCfg extends AbstractCfg{
         EVERYHUNT.saveDefaultConfig();
         ConfigGui.initialize();
         gui = new ConfigGui();
-        Debugger.setToGameCfg();
     }
 
     public static Object getValue(String key) {

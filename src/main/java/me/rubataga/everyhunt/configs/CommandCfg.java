@@ -2,8 +2,9 @@ package me.rubataga.everyhunt.config;
 
 import dev.jorel.commandapi.CommandAPICommand;
 import me.rubataga.everyhunt.commands.AdminCommands;
-import me.rubataga.everyhunt.commands.TargetManagerCommands;
-import me.rubataga.everyhunt.commands.TrackingCompassCommands;
+import me.rubataga.everyhunt.commands.GameManagerCommands;
+import me.rubataga.everyhunt.commands.TrackingCommands;
+import me.rubataga.everyhunt.commands.HunterCommands;
 import me.rubataga.everyhunt.utils.Debugger;
 
 import java.util.*;
@@ -23,23 +24,32 @@ public class CommandCfg {
     private static final CommandAPICommand CONFIG_GUI = AdminCommands.configGui();
     private static final CommandAPICommand DUMMY = AdminCommands.dummy();
 
-    private static final CommandAPICommand ADD_RUNNER = TargetManagerCommands.addRunner();
-    private static final CommandAPICommand ADD_RUNNER_SELF = TargetManagerCommands.addRunnerSelf();
-    private static final CommandAPICommand ADD_RUNNER_MULTIPLE = TargetManagerCommands.addRunnerMultiple();
-    private static final CommandAPICommand ADD_HUNTER = TargetManagerCommands.addHunter();
-    private static final CommandAPICommand ADD_HUNTER_SELF = TargetManagerCommands.addHunterSelf();
-    private static final CommandAPICommand ADD_HUNTER_MULTIPLE = TargetManagerCommands.addHunterMultiple();
-    private static final CommandAPICommand REMOVE_PLAYER = TargetManagerCommands.removePlayer();
-    private static final CommandAPICommand REMOVE_ENTITY = TargetManagerCommands.removeEntity();
-    private static final CommandAPICommand REMOVE_SELF = TargetManagerCommands.removeSelf();
-    private static final CommandAPICommand TEAMS = TargetManagerCommands.teams();
+    private static final CommandAPICommand NEW_GAME = GameManagerCommands.newGame();
+    private static final CommandAPICommand START_GAME = GameManagerCommands.startGame();
+    private static final CommandAPICommand STOP_GAME = GameManagerCommands.stopGame();
+    private static final CommandAPICommand JOIN_PLAYER = GameManagerCommands.joinPlayer();
+    private static final CommandAPICommand JOIN_PLAYER_MULTIPLE = GameManagerCommands.joinPlayerMultiple();
+    private static final CommandAPICommand JOIN_SELF = GameManagerCommands.joinSelf();
 
-    private static final CommandAPICommand COMPASS = TrackingCompassCommands.compass();
-    private static final CommandAPICommand COMPASS_SELF = TrackingCompassCommands.compassSelf();
-    private static final CommandAPICommand TRACK_RUNNER = TrackingCompassCommands.trackRunner();
-    private static final CommandAPICommand TRACK_ENTITY = TrackingCompassCommands.trackEntity();
-    private static final CommandAPICommand RESET = TrackingCompassCommands.reset();
-    private static final CommandAPICommand GUI = TrackingCompassCommands.gui();
+    private static final CommandAPICommand ADD_RUNNER = TrackingCommands.addRunner();
+    private static final CommandAPICommand ADD_RUNNER_SELF = TrackingCommands.addRunnerSelf();
+    private static final CommandAPICommand ADD_RUNNER_MULTIPLE = TrackingCommands.addRunnerMultiple();
+    private static final CommandAPICommand ADD_HUNTER = TrackingCommands.addHunter();
+    private static final CommandAPICommand ADD_HUNTER_SELF = TrackingCommands.addHunterSelf();
+    private static final CommandAPICommand ADD_HUNTER_MULTIPLE = TrackingCommands.addHunterMultiple();
+    private static final CommandAPICommand REMOVE_PLAYER = TrackingCommands.removePlayer();
+    private static final CommandAPICommand REMOVE_PLAYER_MULTIPLE = TrackingCommands.removePlayerMultiple();
+    private static final CommandAPICommand REMOVE_ENTITY = TrackingCommands.removeEntity();
+    private static final CommandAPICommand REMOVE_ENTITY_MULTIPLE = TrackingCommands.removeEntityMultiple();
+    private static final CommandAPICommand REMOVE_SELF = TrackingCommands.removeSelf();
+    private static final CommandAPICommand TEAMS = TrackingCommands.teams();
+
+    private static final CommandAPICommand COMPASS = HunterCommands.compass();
+    private static final CommandAPICommand COMPASS_SELF = HunterCommands.compassSelf();
+    private static final CommandAPICommand TRACK_RUNNER = HunterCommands.trackRunner();
+    private static final CommandAPICommand TRACK_ENTITY = HunterCommands.trackEntity();
+    private static final CommandAPICommand RESET = HunterCommands.reset();
+    private static final CommandAPICommand GUI = HunterCommands.gui();
 
     private static final Map<CommandAPICommand,String> COMMANDS = new LinkedHashMap<>();
     private static final Map<CommandAPICommand,String> REQUIRED_COMMANDS = new HashMap<>();
@@ -50,26 +60,36 @@ public class CommandCfg {
         REQUIRED_COMMANDS.put(CONFIG,"config");
         REQUIRED_COMMANDS.put(LOAD_CONFIG,"loadconfig");
         REQUIRED_COMMANDS.put(CONFIG_GUI,"configgui");
+        REQUIRED_COMMANDS.put(NEW_GAME,"newgame");
+        REQUIRED_COMMANDS.put(START_GAME,"startgame");
+        REQUIRED_COMMANDS.put(STOP_GAME,"stopgame");
+        REQUIRED_COMMANDS.put(JOIN_PLAYER,"join");
+        REQUIRED_COMMANDS.put(JOIN_PLAYER_MULTIPLE,"join");
+        REQUIRED_COMMANDS.put(ADD_RUNNER,"addrunner");
+        REQUIRED_COMMANDS.put(ADD_RUNNER_MULTIPLE,"addrunner");
+        REQUIRED_COMMANDS.put(ADD_HUNTER,"addhunter");
+        REQUIRED_COMMANDS.put(ADD_HUNTER_MULTIPLE,"addhunter");
+        REQUIRED_COMMANDS.put(REMOVE_PLAYER,"remove");
+        REQUIRED_COMMANDS.put(REMOVE_PLAYER_MULTIPLE,"remove");
+        REQUIRED_COMMANDS.put(REMOVE_ENTITY,"remove");
+        REQUIRED_COMMANDS.put(REMOVE_ENTITY_MULTIPLE,"remove");
+        REQUIRED_COMMANDS.put(COMPASS,"compass");
 
         //AdminCommands
         COMMANDS.put(SUM,"sum");
         COMMANDS.put(SUM_SELF,"sum");
         COMMANDS.put(DUMMY,"dummy");
 
+        //GameEngineCommands
+        COMMANDS.put(JOIN_SELF,"join");
+
         //TargetManagerCommands
-        COMMANDS.put(ADD_RUNNER,"addrunner");
         COMMANDS.put(ADD_RUNNER_SELF,"addrunner");
-        COMMANDS.put(ADD_RUNNER_MULTIPLE,"addrunner");
-        COMMANDS.put(ADD_HUNTER,"addhunter");
         COMMANDS.put(ADD_HUNTER_SELF,"addhunter");
-        COMMANDS.put(ADD_HUNTER_MULTIPLE,"addhunter");
-        COMMANDS.put(REMOVE_PLAYER,"remove");
-        COMMANDS.put(REMOVE_ENTITY,"remove");
         COMMANDS.put(REMOVE_SELF,"remove");
         COMMANDS.put(TEAMS,"teams");
 
         //TrackingCompassCommands
-        COMMANDS.put(COMPASS,"compass");
         COMMANDS.put(COMPASS_SELF,"compass");
         COMMANDS.put(TRACK_RUNNER,"track");
         COMMANDS.put(TRACK_ENTITY,"track");

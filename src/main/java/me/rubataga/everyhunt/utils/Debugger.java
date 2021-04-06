@@ -1,27 +1,27 @@
 package me.rubataga.everyhunt.utils;
 
-import me.rubataga.everyhunt.config.GameCfg;
+import me.rubataga.everyhunt.configs.PluginCfg;
 
 public class Debugger {
 
     public static boolean enabled = false;
     private static String tag = "§d{DEBUG} ";
 
-    public static void setToGameCfg(){
-        setEnabledToGameCfg();
-        setTagToGameCfg();
+    public static void setToPluginCfg(){
+        setEnabledToPluginCfg();
+        setTagToPluginCfg();
     }
 
-    public static void setEnabledToGameCfg(){
-        if(GameCfg.debugMode){
+    public static void setEnabledToPluginCfg(){
+        if(PluginCfg.debugMode){
             enable();
         } else {
             disable();
         }
     }
 
-    public static void setTagToGameCfg(){
-        tag = GameCfg.debugTag;
+    public static void setTagToPluginCfg(){
+        tag = PluginCfg.debugTag;
     }
 
     public static void enable(){

@@ -1,5 +1,6 @@
 package me.rubataga.everyhunt.commands;
 
+import me.rubataga.everyhunt.GameEngine;
 import me.rubataga.everyhunt.services.TargetService;
 import me.rubataga.everyhunt.services.TargetManager;
 import dev.jorel.commandapi.CommandAPICommand;
@@ -55,7 +56,7 @@ public class TargetManagerCommands {
     @SuppressWarnings("unchecked")
     public static CommandAPICommand addRunnerMultiple() {
         return new CommandAPICommand("addrunner")
-                .withArguments(new EntitySelectorArgument("players", EntitySelectorArgument.EntitySelector.MANY_ENTITIES))
+                .withArguments(new EntitySelectorArgument("players", EntitySelectorArgument.EntitySelector.MANY_PLAYERS))
                 .executes((sender, args) -> {
                     TargetService.addRunner(sender, (Collection<Entity>) args[0]);
                 });
@@ -84,7 +85,7 @@ public class TargetManagerCommands {
     @SuppressWarnings("unchecked")
     public static CommandAPICommand addHunterMultiple() {
         return new CommandAPICommand("addhunter")
-                .withArguments(new EntitySelectorArgument("players", EntitySelectorArgument.EntitySelector.MANY_ENTITIES))
+                .withArguments(new EntitySelectorArgument("players", EntitySelectorArgument.EntitySelector.MANY_PLAYERS))
                 .executes((sender, args) -> {
                     TargetService.addRunner(sender, (Collection<Entity>) args[0]);
                 });
@@ -117,6 +118,17 @@ public class TargetManagerCommands {
                 });
     }
 
+
+    @SuppressWarnings("unchecked")
+    public static CommandAPICommand removePlayerMultiple() {
+        return new CommandAPICommand("remove")
+                .withArguments(new EntitySelectorArgument("entity", EntitySelectorArgument.EntitySelector.MANY_PLAYERS))
+                .executes((sender, args) -> {
+                    Collection<Entity> players = (Collection<Entity>) args[0];
+                    TargetService.removeEntity(sender, players);
+                });
+    }
+
     /**
      * Remove entity as hunter, target, and/or runner
      *
@@ -124,6 +136,15 @@ public class TargetManagerCommands {
      */
     @SuppressWarnings("unchecked")
     public static CommandAPICommand removeEntity() {
+        return new CommandAPICommand("remove")
+                .withArguments(new EntitySelectorArgument("entity"))
+                .executes((sender, args) -> {
+                    TargetService.removeEntity(sender, Collections.singletonList((Entity) args[0]));
+                });
+    }
+
+    @SuppressWarnings("unchecked")
+    public static CommandAPICommand removeEntityMultiple() {
         return new CommandAPICommand("remove")
                 .withArguments(new EntitySelectorArgument("entity", EntitySelectorArgument.EntitySelector.MANY_ENTITIES))
                 .executes((sender, args) -> {

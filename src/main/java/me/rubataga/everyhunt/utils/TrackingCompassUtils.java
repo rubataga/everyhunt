@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -99,11 +100,10 @@ public class TrackingCompassUtils {
     /**
      * Returns a player's {@link TrackingCompassUtils#trackingCompass()}
      *
-     * @param player player to check for tracking compass
+     * @param inventory inventory to check for tracking compass
      * @return trackingCompass if player has one, null if player has 0 or more than 1 trackingCompasses
      */
-    public static ItemStack getTrackingCompass(Player player){
-        PlayerInventory inventory = player.getInventory();
+    public static ItemStack getTrackingCompass(Inventory inventory){
         ItemStack trackingCompass = null;
         for(int i = 0; i < inventory.getContents().length; i++){
             ItemStack item = inventory.getItem(i);
@@ -121,8 +121,7 @@ public class TrackingCompassUtils {
         return trackingCompass;
     }
 
-    public static void removeTrackingCompasses(Player player){
-        PlayerInventory inventory = player.getInventory();
+    public static void removeTrackingCompasses(Inventory inventory){
         for(int i = 0; i < inventory.getContents().length; i++){
             ItemStack item = inventory.getItem(i);
             if(item!=null){
@@ -133,12 +132,7 @@ public class TrackingCompassUtils {
         }
     }
 
-    public static ItemStack getTrackingCompass(Hunter hunter){
-        return getTrackingCompass(hunter.getEntity());
-    }
-
-    public static int getTrackingCompassIndex(Player player){
-        PlayerInventory inventory = player.getInventory();
+    public static int getTrackingCompassIndex(Inventory inventory){
         int index = -1;
         for(int i = 0; i < inventory.getContents().length; i++){
             ItemStack item = inventory.getItem(i);
@@ -155,17 +149,22 @@ public class TrackingCompassUtils {
         return index;
     }
 
-    public static boolean hasTrackingCompass(Player player){
-        return getTrackingCompass(player)!=null;
-    }
 
     public static boolean hasTrackingCompass(Hunter hunter){
         return hasTrackingCompass(hunter.getEntity());
     }
 
+    public static boolean hasTrackingCompass(Player player){
+        return hasTrackingCompass(player.getInventory());
+    }
+
+    public static boolean hasTrackingCompass(Inventory inventory){
+        return getTrackingCompass(inventory)!=null;
+    }
+
     public static boolean assignTrackingCompass(Hunter hunter){
         boolean hasCompass = true;
-        ItemStack tc = getTrackingCompass(hunter.getEntity());
+        ItemStack tc = getTrackingCompass(hunter.getEntity().getInventory());
         //hunter already has tracking compass
         if(tc==null) {
             hasCompass = false;
@@ -181,14 +180,11 @@ public class TrackingCompassUtils {
         Player player = hunter.getEntity();
         // if hunter has no target
         if(hunter.getTarget()==null){
-            Debugger.send("setting compass to a spawn!");
             if(player.getBedSpawnLocation()!=null){
                 displayName.append(" - Bed Spawn");
-                Debugger.send("compass target 5");
                 player.setCompassTarget(player.getBedSpawnLocation());
             } else {
                 displayName.append(" - World Spawn");
-                Debugger.send("compass target 6");
                 player.setCompassTarget(player.getWorld().getSpawnLocation());
             }
         // if hunter has target
@@ -205,7 +201,7 @@ public class TrackingCompassUtils {
         meta.setDisplayName(displayName.toString());
         compass.setItemMeta(meta);
         if(TrackingCompassUtils.hasTrackingCompass(player)){
-            getTrackingCompass(player).setItemMeta(meta);
+            getTrackingCompass(player.getInventory()).setItemMeta(meta);
         }
     }
 }
