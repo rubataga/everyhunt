@@ -1,6 +1,7 @@
 package me.rubataga.everyhunt.services;
 
-import me.rubataga.everyhunt.config.GameCfg;
+import me.rubataga.everyhunt.configs.GameCfg;
+import me.rubataga.everyhunt.managers.TrackingManager;
 import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
@@ -33,18 +34,19 @@ public class AdminService {
         }
         try{
             GameCfg.load(fileName);
+            sender.sendMessage("Loaded gamemode " + fileName);
         } catch (FileNotFoundException e){
-            sender.sendMessage("File not found!");
+            sender.sendMessage(e.getMessage());
         }
     }
 
     public static void sum(CommandSender sender, Collection<Entity> entities){
         for(Entity entity : entities){
-            List<RoleEnum> roles = TargetManager.getRoles(entity);
+            List<RoleEnum> roles = TrackingManager.getRoles(entity);
             sender.sendMessage("§b" + entity.getName());
             sender.sendMessage("Roles: " + roles);
             if(roles.contains(RoleEnum.HUNTER)){
-                Hunter hunter = TargetManager.getHunter(entity);
+                Hunter hunter = TrackingManager.getHunter(entity);
                 sender.sendMessage("Compass is null?: " + (hunter.getCompass()==null));
                 if(hunter.getTarget()!=null){
                     sender.sendMessage("Target: " + hunter.getTargetEntity().getName());
@@ -68,7 +70,7 @@ public class AdminService {
                 }
             }
             if(roles.contains(RoleEnum.TARGET)){
-                Target target = TargetManager.getTarget(entity);
+                Target target = TrackingManager.getTarget(entity);
                 sender.sendMessage("Hunters in pursuit: " + target.getHunters());
                 for(World world : target.getLastLocations().keySet()){
                     sender.sendMessage("Last location in world " + world.getName() + ": " + LocationUtils.formatBlockLocation(target.getLastLocationWorld(world)));

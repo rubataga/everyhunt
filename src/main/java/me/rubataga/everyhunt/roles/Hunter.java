@@ -1,6 +1,6 @@
 package me.rubataga.everyhunt.roles;
 
-import me.rubataga.everyhunt.config.GameCfg;
+import me.rubataga.everyhunt.configs.GameCfg;
 import me.rubataga.everyhunt.guis.HunterGui;
 import me.rubataga.everyhunt.utils.Debugger;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
@@ -13,7 +13,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
 
-public class Hunter extends EveryhuntEntity{
+public class Hunter extends EveryhuntRole {
 
     private Target target;
     private boolean lockedOnTarget;
@@ -58,19 +58,17 @@ public class Hunter extends EveryhuntEntity{
         // slot == -1 indicates a nonexistent inventory slot
         if(slot==-1){
             if(replace){
-                slot = TrackingCompassUtils.getTrackingCompassIndex(getEntity());
+                slot = TrackingCompassUtils.getTrackingCompassIndex(getEntity().getInventory());
             } else if(addToInv){
                 slot = inventory.firstEmpty();
             } else {
-                slot = TrackingCompassUtils.getTrackingCompassIndex(getEntity());
+                slot = TrackingCompassUtils.getTrackingCompassIndex(getEntity().getInventory());
             }
             if(slot==-1){
                 slot = inventory.firstEmpty();
             }
-            Debugger.send("Using slot " + slot);
         }
         if(isLodestoneTracking()){
-            Debugger.send("replacing with lodestone!");
             inventory.setItem(slot, lodestoneCompass);
             this.compass = inventory.getItem(slot);
         } else {
@@ -90,8 +88,10 @@ public class Hunter extends EveryhuntEntity{
 
     public void updateCompassLodedStatus(){
         if(lodestoneTracking){
+            Debugger.send("updating loded status, lodestone tracking");
             setCompass(lodestoneCompass,true,-1,true);
         } else {
+            Debugger.send("updating loded status, not lodestone tracking");
             setCompass(TrackingCompassUtils.trackingCompass(this),true,-1,true);
         }
     }
@@ -195,9 +195,6 @@ public class Hunter extends EveryhuntEntity{
     }
 
     public void setTarget(Target target){
-        if(!GameCfg.huntersCanChangeTarget){
-            getEntity().sendMessage("You aren't allowed to change your target!");
-        }
         if(this.target!=null){
             this.target.removeHunter(this);
         }
@@ -209,15 +206,29 @@ public class Hunter extends EveryhuntEntity{
         }
     }
 
+    public void track(Target target){
+        if(!GameCfg.huntersCanChangeTarget){ // this is a little goofy
+            getEntity().sendMessage("You aren't allowed to change your target!");
+        } else {
+            setTarget(target);
+            if(target==null){
+                getEntity().sendMessage("Tracker reset!");
+            } else {
+                getEntity().sendMessage("Now tracking " + getTargetEntity().getName() + ".");
+            }
+            updateCompassMeta();
+        }
+    }
+
+    public Target getTarget(){
+        return this.target;
+    }
+
     public Entity getTargetEntity(){
         if(target==null){
             return null;
         }
         return target.getEntity();
-    }
-
-    public Target getTarget(){
-        return this.target;
     }
 
     public void updateCompassMeta(){

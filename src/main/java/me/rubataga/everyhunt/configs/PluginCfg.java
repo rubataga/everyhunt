@@ -1,7 +1,8 @@
-package me.rubataga.everyhunt.config;
+package me.rubataga.everyhunt.configs;
 
 import me.rubataga.everyhunt.Everyhunt;
 import me.rubataga.everyhunt.utils.Debugger;
+import me.rubataga.everyhunt.utils.EmbeddedYamlEditor;
 
 import java.util.List;
 

@@ -1,7 +1,9 @@
 package me.rubataga.everyhunt.roles;
 
-import me.rubataga.everyhunt.config.GameCfg;
-import me.rubataga.everyhunt.services.TargetManager;
+import me.rubataga.everyhunt.configs.GameCfg;
+import me.rubataga.everyhunt.exceptions.EntityHasRoleException;
+import me.rubataga.everyhunt.managers.TrackingManager;
+import me.rubataga.everyhunt.services.TrackingService;
 import me.rubataga.everyhunt.utils.Debugger;
 import me.rubataga.everyhunt.utils.LocationUtils;
 import org.bukkit.Location;
@@ -11,26 +13,31 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
-public class Target extends EveryhuntEntity {
+public class Target extends EveryhuntRole {
 
     private final List<Hunter> hunters = new LinkedList<>();
     private final Map<World,Location> lastLocations = new HashMap<>();
     private World deathWorld = null;
-    private boolean isRunner;
 
     public Target(Entity target){
         super(target);
         if(target instanceof Player && GameCfg.autoAddRunners){
-            TargetManager.addRunner(this);
-            this.isRunner = true;
+            Player player = (Player) target;
+            try{
+                TrackingService.addRunner(player);
+            } catch (EntityHasRoleException ignore){
+            }
         }
     }
 
     public Target(Entity target, boolean addRunner){
         super(target);
-        if(target instanceof Player && GameCfg.autoAddRunners && addRunner){
-            TargetManager.addRunner(this);
-            this.isRunner = true;
+        if(target instanceof Player && addRunner){
+            Player player = (Player) target;
+            try{
+                TrackingService.addRunner(player);
+            } catch (EntityHasRoleException ignore){
+            }
         }
     }
 
@@ -41,7 +48,7 @@ public class Target extends EveryhuntEntity {
     public void removeHunter(Hunter hunter) {
         hunters.remove(hunter);
         if(hunters.size()==0){
-            TargetManager.getTargets().remove(getEntity());
+            TrackingManager.getTargets().remove(getEntity());
         }
     }
 
@@ -64,8 +71,9 @@ public class Target extends EveryhuntEntity {
     public Location getLastLocationWorld(World world){
         if(lastLocations.containsKey(world)){
             return lastLocations.getOrDefault(world,null);
+        } else {
+            return null;
         }
-        return null;
     }
 
     public Map<World,Location> getLastLocations(){

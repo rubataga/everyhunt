@@ -1,12 +1,12 @@
 package me.rubataga.everyhunt.listeners;
 
-import me.rubataga.everyhunt.config.GameCfg;
-import me.rubataga.everyhunt.config.Rules;
+import me.rubataga.everyhunt.configs.GameCfg;
+import me.rubataga.everyhunt.services.TrackingService;
+import me.rubataga.everyhunt.utils.Rules;
 import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
-import me.rubataga.everyhunt.services.TargetManager;
-import me.rubataga.everyhunt.utils.Debugger;
+import me.rubataga.everyhunt.managers.TrackingManager;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -36,7 +36,6 @@ public class CompassListener implements Listener {
         illegalTrackingCompassActions.add(InventoryAction.PLACE_ONE);
         illegalTrackingCompassActions.add(InventoryAction.PLACE_SOME);
         illegalTrackingCompassActions.add(InventoryAction.PLACE_ALL);
-        illegalTrackingCompassActions.add(InventoryAction.MOVE_TO_OTHER_INVENTORY);
     }
 
     /**
@@ -45,18 +44,18 @@ public class CompassListener implements Listener {
      * @param e {@link PlayerInteractEvent}
      */
     @EventHandler
-    public void hunterUseTrackingCompass(PlayerInteractEvent e){
+    public void onHunterUseTrackingCompass(PlayerInteractEvent e){
         Action action = e.getAction();
         if(action==Action.LEFT_CLICK_AIR || action==Action.LEFT_CLICK_BLOCK || action==Action.PHYSICAL){
             return;
         }
         Player player = e.getPlayer();
         if(e.getHand().equals(EquipmentSlot.OFF_HAND) || //if listening for OFF_HAND
-                !TargetManager.hasRole(player, RoleEnum.HUNTER) || // if the event player is not a hunter
+                !TrackingManager.hasRole(player, RoleEnum.HUNTER) || // if the event player is not a hunter
                 !(TrackingCompassUtils.isTrackingCompass(e.getItem()))){// if the event player is not holding a Tracking Compass
             return;
         }
-        Hunter hunter = TargetManager.getHunter(player);
+        Hunter hunter = TrackingManager.getHunter(player);
         if(player.isSneaking()){
             if(GameCfg.guiEnabled){
                 hunter.getGUI().show();
@@ -71,26 +70,31 @@ public class CompassListener implements Listener {
         // if hunter is tracking dead runner, queue hunter to track runner when they revive
         if(hunter.isTrackingDeath()){
             if(target!=null) {
-                if (TargetManager.getRunners().containsKey(target)){
+                if (TrackingManager.getRunnerList().contains(target)){
                     player.sendMessage("Tracking " + target.getEntity().getName() + "'s death location until they revive.");
                     return;
                 }
             }
-            hunter.setTrackingDeath(false);
-            hunter.setTarget(null);
-            player.sendMessage("Tracker reset.");
-            hunter.updateCompassMeta();
-            return;
+            if(GameCfg.rightClickResetsDeadCompass){
+                hunter.setTrackingDeath(false);
+                hunter.track(null);
+                return;
+            }
         }
         if(!GameCfg.rightClickCyclesRunners){
             return;
         }
-        if(TargetManager.getRunners().size()==0 || // if there are no runners
-                !(target.getEntity() instanceof Player)) { // if target isn't a player
+        if(TrackingManager.getRunners().size()==0) { // if no runners
             return;
         }
+        if(target!=null){
+            // if not tracking player
+            if(!(target.getEntity() instanceof Player)){
+                return;
+            }
+        }
         int runnerIndex = 0;
-        List<Target> runnerList = TargetManager.getRunnerList();
+        List<Target> runnerList = TrackingManager.getRunnerList();
         // if there's only one runner
         if(runnerList.size()==1){
             // if the single runner is also the hunter
@@ -99,9 +103,12 @@ public class CompassListener implements Listener {
             }
             // if there are multiple runners, cycle to and select the next runner
         } else {
+            if(target==null){
+                target = TrackingManager.getRunnerList().get(0);
+            }
             Entity targetEntity = target.getEntity();
-            if(TargetManager.hasRole(targetEntity,RoleEnum.RUNNER)){
-                runnerIndex = runnerList.indexOf(TargetManager.getRunner(targetEntity)) + 1; // cycle to the next runner in the ArrayList
+            if(TrackingManager.hasRole(targetEntity,RoleEnum.RUNNER)){
+                runnerIndex = runnerList.indexOf(TrackingManager.getRunner(targetEntity)) + 1; // cycle to the next runner in the ArrayList
             }
             while(runnerList.get(runnerIndex).getEntity()==player){
                 runnerIndex++;
@@ -111,9 +118,7 @@ public class CompassListener implements Listener {
             }
         }
         Target runner = runnerList.get(runnerIndex);
-        hunter.setTarget(runner);
-        player.sendMessage("Now tracking " + runner.getEntity().getName() + ".");
-        hunter.updateCompassMeta();
+        hunter.track(runner);
     }
 
     /**
@@ -134,17 +139,16 @@ public class CompassListener implements Listener {
                 !(entity instanceof LivingEntity)){
             return;
         }
-        Debugger.send(entity.getType().getKey().getKey());
-        if(Rules.isBlacklisted(entity)){
+        Hunter hunter = TrackingManager.getHunter(player);
+        if(hunter==null){
             return;
         }
         e.setCancelled(true);
-        if(!TargetManager.hasRole(player,RoleEnum.HUNTER)){
+        if(!TrackingManager.hasRole(player,RoleEnum.HUNTER)){
             player.sendMessage("You are not a hunter!");
             return;
         }
         // set the player's target to the clicked entity
-        Hunter hunter = TargetManager.getHunter(player);
         if(player.isSneaking()){
             return;
         }
@@ -156,17 +160,17 @@ public class CompassListener implements Listener {
         if(hunter.getTargetEntity()==entity){
             return;
         }
+        if(Rules.isBlacklisted(entity)){
+            player.sendMessage(GameCfg.blacklistMessage);
+            return;
+        }
         Target target;
         // if clicked entity is a target, set target to the clicked entity
-        if(TargetManager.hasRole(entity,RoleEnum.TARGET)){
-            target = TargetManager.getTargets().get(entity);
-        } else {
-            target = new Target(entity);
-            TargetManager.addTarget(target);
+        target = TrackingManager.getTarget(entity);
+        if(target==null){
+            target = TrackingService.addTarget(entity);
         }
-        hunter.setTarget(target);
-        hunter.updateCompassMeta();
-        player.sendMessage("Now tracking " + entity.getName() + ".");
+        hunter.track(target);
     }
 
     @EventHandler
@@ -177,13 +181,13 @@ public class CompassListener implements Listener {
             return;
         }
         Entity entity = e.getEntity();
-        // no one should normally pick up a tracking compass, so cancel
+        // no one should ever pick up a tracking compass, so cancel
         e.setCancelled(true);
         // if not a hunter, return
-        if(!TargetManager.hasRole(entity, RoleEnum.HUNTER)){
+        if(!TrackingManager.hasRole(entity, RoleEnum.HUNTER)){
             return;
         }
-        Hunter hunter = TargetManager.getHunter(entity);
+        Hunter hunter = TrackingManager.getHunter(entity);
         // only hunters with no tracking compass in their inventory can pick one up
         if(!TrackingCompassUtils.hasTrackingCompass(hunter)) {
             item.remove();
@@ -196,8 +200,8 @@ public class CompassListener implements Listener {
     @EventHandler
     public void onRespawnSetBed(PlayerBedLeaveEvent e){
         Player player = e.getPlayer();
-        if(TargetManager.hasRole(player,RoleEnum.HUNTER)){
-            Hunter hunter = TargetManager.getHunter(player);
+        if(TrackingManager.hasRole(player,RoleEnum.HUNTER)){
+            Hunter hunter = TrackingManager.getHunter(player);
             if(hunter.getTarget()==null){
                 hunter.updateCompassMeta();
             }
@@ -219,7 +223,7 @@ public class CompassListener implements Listener {
         Player player = (Player) e.getWhoClicked();
         if(TrackingCompassUtils.isTrackingCompass(currentItem)){
             if (e.isRightClick()){// && compassPickupActions.contains(action)) {
-                Hunter hunter = TargetManager.getHunter(player);
+                Hunter hunter = TrackingManager.getHunter(player);
                 if (hunter != null) {
                     if(GameCfg.guiEnabled){
                         hunter.getGUI().show();
@@ -230,21 +234,29 @@ public class CompassListener implements Listener {
         }
         // if cursor has tc, cancel if trying to put it in a player's inventory who already
         // has a tc, or cancel if trying to stack
-        if(TrackingCompassUtils.isTrackingCompass(cursorItem)) {
+        boolean cursorIsCompass = TrackingCompassUtils.isTrackingCompass(cursorItem);
+        boolean currentIsCompass = TrackingCompassUtils.isTrackingCompass(currentItem);
+        if(cursorIsCompass || currentIsCompass) {
             Inventory inventory = e.getClickedInventory();
             if(inventory==null){
                 return;
             }
-            if(inventory instanceof PlayerInventory){
-                if(TrackingCompassUtils.hasTrackingCompass(player)) {
-                    if(illegalTrackingCompassActions.contains(action)) {
-                        e.setCancelled(true);
+            if(TrackingCompassUtils.hasTrackingCompass(player)){
+                if(inventory instanceof PlayerInventory){
+                    if(cursorIsCompass){
+                        if(illegalTrackingCompassActions.contains(action)) {
+                            e.setCancelled(true);
+                        }
+                    }
+                } else {
+                    if(currentIsCompass){
+                        if(action==InventoryAction.MOVE_TO_OTHER_INVENTORY) {
+                            e.setCancelled(true);
+                        }
                     }
                 }
             }
-            if(TrackingCompassUtils.isTrackingCompass(currentItem)){
-                e.setCancelled(true);
-            }
+
         }
     }
 }

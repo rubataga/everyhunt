@@ -1,6 +1,7 @@
 package me.rubataga.everyhunt.commands;
 
-import me.rubataga.everyhunt.services.CompassService;
+import me.rubataga.everyhunt.roles.Hunter;
+import me.rubataga.everyhunt.services.HunterService;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
@@ -13,11 +14,11 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Class containing commands relating to {@link TrackingCompassUtils}
+ * Class containing commands for {@link Hunter}s
  */
-public class TrackingCompassCommands {
+public class HunterCommands {
 
-    private TrackingCompassCommands() {}
+    private HunterCommands() {}
 
     /**
      * Command to give a player a {@link TrackingCompassUtils#trackingCompass()}
@@ -29,7 +30,7 @@ public class TrackingCompassCommands {
                 .withArguments(new PlayerArgument("player"))
                 .executes((sender, args) -> {
                     Collection<Entity> player = Collections.singletonList((Player) args[0]);
-                    CompassService.giveCompass(sender,player);
+                    HunterService.giveCompassCommand(sender,player);
                 });
     }
 
@@ -42,7 +43,7 @@ public class TrackingCompassCommands {
         return new CommandAPICommand("compass")
                 .executesPlayer((sender, args) -> {
                     Collection<Entity> player = Collections.singletonList(sender);
-                    CompassService.giveCompass(sender,player);
+                    HunterService.giveCompassCommand(sender,player);
                 });
     }
 
@@ -56,7 +57,7 @@ public class TrackingCompassCommands {
                 .withArguments(new PlayerArgument("runner"))
                 .executesPlayer((sender, args) -> {
                     Collection<Entity> entityList = Collections.singletonList((Player)args[0]);
-                    CompassService.track(sender,entityList);
+                    HunterService.track(sender,entityList);
                 });
     }
 
@@ -71,7 +72,7 @@ public class TrackingCompassCommands {
                 .withArguments(new EntitySelectorArgument("entity", EntitySelectorArgument.EntitySelector.MANY_ENTITIES))
                 .executesPlayer((sender,args) -> {
                     Collection<Entity> entityList = (Collection<Entity>)args[0];
-                    CompassService.track(sender,entityList);
+                    HunterService.track(sender,entityList);
                 });
     }
 
@@ -85,14 +86,14 @@ public class TrackingCompassCommands {
         return new CommandAPICommand("reset")
                 .withAliases("rs")
                 .executesPlayer((sender, args) -> {
-                    CompassService.reset(sender);
+                    HunterService.reset(sender);
                 });
     }
 
     public static CommandAPICommand gui(){
         return new CommandAPICommand("gui")
                 .executesPlayer((sender, args) -> {
-                    CompassService.gui(sender);
+                    HunterService.gui(sender);
                 });
     }
 }

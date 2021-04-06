@@ -20,21 +20,33 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 /**
  * Listener for events relating to {@link TrackingCompassUtils}
  */
-public class PortalListener implements Listener {
+public class TeleportListener implements Listener {
 
     @EventHandler
     public void onEntityTeleport(EntityTeleportEvent e){
-        teleportHandler(e.getEntity(),e.getFrom(),e.getTo());
+        Location to = e.getTo();
+        if(to==null){
+            to = e.getFrom();
+        }
+        teleportHandler(e.getEntity(),e.getFrom(),to);
     }
 
     @EventHandler
     public void onEntityPortal(EntityPortalEvent e){
-        teleportHandler(e.getEntity(), e.getFrom(),e.getTo());
+        Location to = e.getTo();
+        if(to==null){
+            to = e.getFrom();
+        }
+        teleportHandler(e.getEntity(), e.getFrom(),to);
     }
 
     @EventHandler
     public void onPlayerTeleport(PlayerTeleportEvent e){
-        teleportHandler(e.getPlayer(),e.getFrom(),e.getTo());
+        Location to = e.getTo();
+        if(to==null){
+            to = e.getFrom();
+        }
+        teleportHandler(e.getPlayer(),e.getFrom(),to);
     }
 
     private void teleportHandler(Entity entity, Location from, Location to){
@@ -66,16 +78,18 @@ public class PortalListener implements Listener {
             Debugger.send("hunter lodestone tracking? " + hunter.isLodestoneTracking());
             Debugger.send("hunter tracking portal? " + hunter.isTrackingPortal());
             // if target has a lastLocation in the toWorld, use it
-            Location targetLast;
-            if(target==null){
-                targetLast = to;
-            } else {
+            Location targetLast = null;
+            if(target!=null){
                 targetLast = target.getLastLocationWorld(toWorld);
+            }
+            if (target==null || targetLast==null){
+                targetLast = to;
             }
             if(toWorld!=fromWorld) {
                 hunter.setLastTracked(targetLast);
             }
             if(initialLodestoneTrackingStatus!=hunter.isLodestoneTracking()){
+                Debugger.send("updating compass status!");
                 hunter.updateCompassLodedStatus();
             }
             hunter.updateCompassMeta();

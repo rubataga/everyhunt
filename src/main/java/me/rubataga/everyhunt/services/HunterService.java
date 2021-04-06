@@ -1,6 +1,9 @@
 package me.rubataga.everyhunt.services;
 
-import me.rubataga.everyhunt.config.Rules;
+import me.rubataga.everyhunt.exceptions.PlayerHasTrackingCompassException;
+import me.rubataga.everyhunt.exceptions.EntityHasRoleException;
+import me.rubataga.everyhunt.utils.Rules;
+import me.rubataga.everyhunt.managers.TrackingManager;
 import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
@@ -16,37 +19,48 @@ import org.bukkit.entity.Player;
 
 import java.util.Collection;
 
-public class CompassService {
+public class HunterService {
 
-    public static void giveCompass(CommandSender sender, Collection<Entity> hunters){
+    public static void giveCompassCommand(CommandSender sender, Collection<Entity> hunters) {
         CommandSenderMessenger csm = new CommandSenderMessenger(sender);
         for(Entity entity : hunters){
             Player player = (Player) entity;
-            //boolean senderIsPlayer = sender == player;
-            if(!TargetManager.hasRole(player, RoleEnum.HUNTER)){
-                csm.povMsgSenderOnly(player," not a hunter!");
-            } else {
-                Hunter hunter = TargetManager.getHunter(player);
-                // if hunter has a tracking compass in their inventory
-                if(TrackingCompassUtils.assignTrackingCompass(hunter)){
-                    csm.setYouString("You already have");
-                    csm.setOtherString(" already has");
-                    csm.povMsg(player," a Tracking Compass!");
-                } else {
-                    csm.setYouString("You were");
-                    csm.setOtherString(" was");
-                    csm.povMsg(player," given a Tracking Compass!",sender!=player,false);
-                    hunter.updateCompassMeta();
-                }
+            try{
+                giveCompass(player);
+                csm.setYouString("You were");
+                csm.setOtherString(" was");
+                csm.povMessage(player," given a Tracking Compass!",sender!=player,false);
+            } catch (EntityHasRoleException e){
+                csm.povMessageSenderOnly(player," not a hunter!");
+            } catch (PlayerHasTrackingCompassException e){
+                csm.setYouString("You already have");
+                csm.setOtherString(" already has");
+                csm.povMessage(player," a Tracking Compass!");
             }
         }
     }
 
+    public static void giveCompass(Player player) throws EntityHasRoleException, PlayerHasTrackingCompassException {
+        //boolean senderIsPlayer = sender == player;
+        Hunter hunter = TrackingManager.getHunter(player);
+        if(hunter==null) {
+            throw new EntityHasRoleException(player, RoleEnum.HUNTER, false);
+        }
+        hunter = TrackingManager.getHunter(player);
+            // if hunter has a tracking compass in their inventory
+        if(TrackingCompassUtils.assignTrackingCompass(hunter)){
+            throw new PlayerHasTrackingCompassException(player);
+        } else {
+            hunter.updateCompassMeta();
+        }
+    }
+
+    // split
     public static void track(CommandSender sender, Collection<Entity> targetsInit){
         Entity targetEntity = null;
         Target target;
         Player player = (Player) sender;
-        Hunter hunter = TargetManager.getHunter(player);
+        Hunter hunter = TrackingManager.getHunter(player);
         if(hunter==null){
             player.sendMessage("You are not a hunter!");
             return;
@@ -56,7 +70,7 @@ public class CompassService {
         if(targetsInit.size()>0){
             if(targetsInit.size()==1){
                targetEntity = targetsInit.toArray(new Entity[1])[0];
-                target = TargetManager.getTarget(targetEntity);
+                target = TrackingManager.getTarget(targetEntity);
                 if(target!=null){
                    World targetWorld;
                    if(targetEntity.isDead()){
@@ -71,7 +85,7 @@ public class CompassService {
                            hunter.setLodestoneTracking();
                            player.sendMessage("Now tracking " + targetEntity.getName() + "'s portal.");
                        } else {
-                           player.sendMessage("Sorry, " + targetEntity.getName() + " has    not been in this world yet.");
+                           player.sendMessage(targetEntity.getName() + " has not been in this world yet.");
                            return;
                        }
                    } else {
@@ -83,11 +97,10 @@ public class CompassService {
                    }
 
                } else if (targetEntity.isDead() || targetEntity.getWorld()!=player.getWorld()){
-                   player.sendMessage("Sorry, you are not allowed to track " + targetEntity.getName());
+                   player.sendMessage("You are not allowed to track " + targetEntity.getName());
                    return;
                } else {
-                   target = new Target(targetEntity);
-                   TargetManager.addTarget(target);
+                   target = TrackingService.addTarget(targetEntity);
                    player.sendMessage("Now tracking " + targetEntity.getName());
                }
                hunter.setTarget(target);
@@ -99,7 +112,7 @@ public class CompassService {
             //find closest target
             for(Entity entity : targetsInit){
                 //if entity is a player and the player isn't a runner, continue
-                if(entity instanceof Player && !TargetManager.getRunners().containsKey(entity)
+                if(entity instanceof Player && !TrackingManager.getRunners().containsKey(entity)
                         || !(entity instanceof LivingEntity)
                         || player.getWorld() != entity.getWorld()
                         || Rules.isBlacklisted(entity)){
@@ -113,11 +126,7 @@ public class CompassService {
             }
         }
         if(targetEntity!=null){
-            target = TargetManager.getTargets().get(targetEntity);
-            if(target==null){
-                target = new Target(targetEntity);
-                TargetManager.addTarget(target);
-            }
+            target = TrackingService.addTarget(targetEntity);
             hunter.setTarget(target);
             player.sendMessage("Now tracking " + targetEntity.getName());
             hunter.updateCompassMeta();
@@ -130,22 +139,22 @@ public class CompassService {
         CommandSenderMessenger csm = new CommandSenderMessenger(sender);
         Player player = (Player) sender;
         Hunter hunter;
-        if(!TargetManager.hasRole(player,RoleEnum.HUNTER)){
-            csm.msg("You are not a hunter!");
+        if(!TrackingManager.hasRole(player,RoleEnum.HUNTER)){
+            csm.message("You are not a hunter!");
             return;
         }
-        hunter = TargetManager.getHunter(player);
+        hunter = TrackingManager.getHunter(player);
         hunter.setTarget(null);
         hunter.setLastTracked(null);
         hunter.setTrackingDeath(false);
         hunter.setLodestoneTracking();
         hunter.setTrackingPortal();
         hunter.updateCompassMeta();
-        csm.msg("Compass reset!");
+        csm.message("Compass reset!");
     }
 
     public static void gui(CommandSender sender){
-        Hunter hunter = TargetManager.getHunter((Entity)sender);
+        Hunter hunter = TrackingManager.getHunter((Entity)sender);
         if(hunter!=null){
             hunter.getGUI().show();
         } else {

@@ -1,11 +1,12 @@
-package me.rubataga.everyhunt.services;
+package me.rubataga.everyhunt.managers;
 
-import me.rubataga.everyhunt.config.GameCfg;
+import me.rubataga.everyhunt.configs.GameCfg;
 import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
 
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 import java.util.*;
 
@@ -38,37 +39,30 @@ public class TrackingManager {
         return roles;
     }
 
-    public static void addHunter(Hunter hunter){
-        hunters.put(hunter.getEntity(), hunter);
+    public static void addHunter(Player playerEntity, Hunter hunter){
+        hunters.put(playerEntity, hunter);
     }
 
     public static void removeHunter(Entity hunter){
         hunters.remove(hunter);
     }
 
-    public static void addTarget(Target target){
-        Entity targetEntity = target.getEntity();
+    public static void addTarget(Entity targetEntity, Target target){
         targets.put(targetEntity, target);
-        if(GameCfg.autoAddRunners){
-            if(runnerList.contains(target)){
-                runners.put(targetEntity,target);
-                runnerList.add(target);
-            }
-        }
     }
 
     public static void removeTarget(Entity target){
-        if(GameCfg.autoRemoveRunners){
-            if(runners.containsKey(target)){
-                runners.remove(target);
-                runnerList.remove(getTarget(target));
-            }
-        }
+//        if(GameCfg.autoRemoveRunners){
+//            if(runners.containsKey(target)){
+//                runners.remove(target);
+//                runnerList.remove(getTarget(target));
+//            }
+//        }
         targets.remove(target);
     }
 
-    public static void addRunner(Target runner){
-        runners.put(runner.getEntity(), runner);
+    public static void addRunner(Entity runnerEntity, Target runner){
+        runners.put(runnerEntity, runner);
         runnerList.add(runner);
     }
 
@@ -111,8 +105,6 @@ public class TrackingManager {
         return runnerList;
     }
 
-    public static Target getRunnerIndex(int i){
-        return runnerList.get(i);
-    }
+    public static Map<RoleEnum,Map<Entity,?>> getRoleMaps() { return roleMaps; }
 
 }

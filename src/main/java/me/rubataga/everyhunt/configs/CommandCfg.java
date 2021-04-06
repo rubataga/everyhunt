@@ -1,8 +1,8 @@
-package me.rubataga.everyhunt.config;
+package me.rubataga.everyhunt.configs;
 
 import dev.jorel.commandapi.CommandAPICommand;
 import me.rubataga.everyhunt.commands.AdminCommands;
-import me.rubataga.everyhunt.commands.GameManagerCommands;
+import me.rubataga.everyhunt.commands.LobbyCommands;
 import me.rubataga.everyhunt.commands.TrackingCommands;
 import me.rubataga.everyhunt.commands.HunterCommands;
 import me.rubataga.everyhunt.utils.Debugger;
@@ -24,12 +24,12 @@ public class CommandCfg {
     private static final CommandAPICommand CONFIG_GUI = AdminCommands.configGui();
     private static final CommandAPICommand DUMMY = AdminCommands.dummy();
 
-    private static final CommandAPICommand NEW_GAME = GameManagerCommands.newGame();
-    private static final CommandAPICommand START_GAME = GameManagerCommands.startGame();
-    private static final CommandAPICommand STOP_GAME = GameManagerCommands.stopGame();
-    private static final CommandAPICommand JOIN_PLAYER = GameManagerCommands.joinPlayer();
-    private static final CommandAPICommand JOIN_PLAYER_MULTIPLE = GameManagerCommands.joinPlayerMultiple();
-    private static final CommandAPICommand JOIN_SELF = GameManagerCommands.joinSelf();
+    private static final CommandAPICommand NEW_GAME = LobbyCommands.newGame();
+    private static final CommandAPICommand START_GAME = LobbyCommands.startGame();
+    private static final CommandAPICommand STOP_GAME = LobbyCommands.stopGame();
+    private static final CommandAPICommand JOIN_PLAYER = LobbyCommands.joinPlayer();
+    private static final CommandAPICommand JOIN_PLAYER_MULTIPLE = LobbyCommands.joinPlayerMultiple();
+    private static final CommandAPICommand JOIN_SELF = LobbyCommands.joinSelf();
 
     private static final CommandAPICommand ADD_RUNNER = TrackingCommands.addRunner();
     private static final CommandAPICommand ADD_RUNNER_SELF = TrackingCommands.addRunnerSelf();
@@ -71,7 +71,7 @@ public class CommandCfg {
         REQUIRED_COMMANDS.put(ADD_HUNTER_MULTIPLE,"addhunter");
         REQUIRED_COMMANDS.put(REMOVE_PLAYER,"remove");
         REQUIRED_COMMANDS.put(REMOVE_PLAYER_MULTIPLE,"remove");
-        REQUIRED_COMMANDS.put(REMOVE_ENTITY,"remove");
+//        REQUIRED_COMMANDS.put(REMOVE_ENTITY,"remove");
         REQUIRED_COMMANDS.put(REMOVE_ENTITY_MULTIPLE,"remove");
         REQUIRED_COMMANDS.put(COMPASS,"compass");
 

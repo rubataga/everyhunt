@@ -1,8 +1,7 @@
 package me.rubataga.everyhunt.commands;
 
-import me.rubataga.everyhunt.GameEngine;
-import me.rubataga.everyhunt.services.TargetService;
-import me.rubataga.everyhunt.services.TargetManager;
+import me.rubataga.everyhunt.services.TrackingService;
+import me.rubataga.everyhunt.managers.TrackingManager;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.PlayerArgument;
@@ -14,11 +13,11 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Class containing commands relating to {@link TargetManager}
+ * Class containing commands relating to {@link TrackingManager}
  */
-public class TargetManagerCommands {
+public class TrackingCommands {
 
-    private TargetManagerCommands() {
+    private TrackingCommands() {
     }
 
     /**
@@ -31,7 +30,7 @@ public class TargetManagerCommands {
                 .withArguments(new PlayerArgument("player"))
                 .executes((sender, args) -> {
                     Collection<Entity> player = Collections.singletonList((Player) args[0]);
-                    TargetService.addRunner(sender, player);
+                    TrackingService.addRunnerCommand(sender, player);
                 });
     }
 
@@ -44,7 +43,7 @@ public class TargetManagerCommands {
         return new CommandAPICommand("addrunner")
                 .executesPlayer((sender, args) -> {
                     Collection<Entity> player = Collections.singletonList(sender);
-                    TargetService.addRunner(sender, player);
+                    TrackingService.addRunnerCommand(sender, player);
                 });
     }
 
@@ -58,7 +57,7 @@ public class TargetManagerCommands {
         return new CommandAPICommand("addrunner")
                 .withArguments(new EntitySelectorArgument("players", EntitySelectorArgument.EntitySelector.MANY_PLAYERS))
                 .executes((sender, args) -> {
-                    TargetService.addRunner(sender, (Collection<Entity>) args[0]);
+                    TrackingService.addRunnerCommand(sender, (Collection<Entity>) args[0]);
                 });
     }
 
@@ -71,8 +70,8 @@ public class TargetManagerCommands {
         return new CommandAPICommand("addhunter")
                 .withArguments(new PlayerArgument("player"))
                 .executes((sender, args) -> {
-                    Collection<Entity> player = Collections.singletonList((Player) args[0]);
-                    TargetService.addHunter(sender, player);
+                    Collection<Player> player = Collections.singletonList((Player) args[0]);
+                    TrackingService.addHunterCommand(sender, player);
                 });
     }
 
@@ -87,7 +86,7 @@ public class TargetManagerCommands {
         return new CommandAPICommand("addhunter")
                 .withArguments(new EntitySelectorArgument("players", EntitySelectorArgument.EntitySelector.MANY_PLAYERS))
                 .executes((sender, args) -> {
-                    TargetService.addRunner(sender, (Collection<Entity>) args[0]);
+                    TrackingService.addHunterCommand(sender, (Collection<Player>) args[0]);
                 });
     }
 
@@ -99,8 +98,8 @@ public class TargetManagerCommands {
     public static CommandAPICommand addHunterSelf() {
         return new CommandAPICommand("addhunter")
                 .executesPlayer((sender, args) -> {
-                    Collection<Entity> players = Collections.singletonList(sender);
-                    TargetService.addHunter(sender, players);
+                    Collection<Player> players = Collections.singletonList(sender);
+                    TrackingService.addHunterCommand(sender, players);
                 });
     }
 
@@ -114,7 +113,7 @@ public class TargetManagerCommands {
                 .withArguments(new PlayerArgument("player"))
                 .executes((sender, args) -> {
                     Collection<Entity> player = Collections.singletonList((Player) args[0]);
-                    TargetService.removeEntity(sender, player);
+                    TrackingService.removeEntityCommand(sender, player);
                 });
     }
 
@@ -125,7 +124,7 @@ public class TargetManagerCommands {
                 .withArguments(new EntitySelectorArgument("entity", EntitySelectorArgument.EntitySelector.MANY_PLAYERS))
                 .executes((sender, args) -> {
                     Collection<Entity> players = (Collection<Entity>) args[0];
-                    TargetService.removeEntity(sender, players);
+                    TrackingService.removeEntityCommand(sender, players);
                 });
     }
 
@@ -134,12 +133,11 @@ public class TargetManagerCommands {
      *
      * @return CommandAPICommand
      */
-    @SuppressWarnings("unchecked")
     public static CommandAPICommand removeEntity() {
         return new CommandAPICommand("remove")
                 .withArguments(new EntitySelectorArgument("entity"))
                 .executes((sender, args) -> {
-                    TargetService.removeEntity(sender, Collections.singletonList((Entity) args[0]));
+                    TrackingService.removeEntityCommand(sender, Collections.singletonList((Entity) args[0]));
                 });
     }
 
@@ -149,7 +147,7 @@ public class TargetManagerCommands {
                 .withArguments(new EntitySelectorArgument("entity", EntitySelectorArgument.EntitySelector.MANY_ENTITIES))
                 .executes((sender, args) -> {
                     Collection<Entity> entities = (Collection<Entity>) args[0];
-                    TargetService.removeEntity(sender, entities);
+                    TrackingService.removeEntityCommand(sender, entities);
                 });
     }
 
@@ -162,7 +160,7 @@ public class TargetManagerCommands {
         return new CommandAPICommand("remove")
                 .executesPlayer((sender, args) -> {
                     Collection<Entity> player = Collections.singletonList(sender);
-                    TargetService.removeEntity(sender, player);
+                    TrackingService.removeEntityCommand(sender, player);
                 });
     }
 
@@ -174,7 +172,7 @@ public class TargetManagerCommands {
     public static CommandAPICommand teams() {
         return new CommandAPICommand("teams")
                 .executes((sender, args) -> {
-                    TargetService.teams(sender);
+                    TrackingService.teams(sender);
                 });
     }
 

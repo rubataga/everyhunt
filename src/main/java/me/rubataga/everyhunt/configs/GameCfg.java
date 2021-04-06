@@ -1,19 +1,20 @@
-package me.rubataga.everyhunt.config;
+package me.rubataga.everyhunt.configs;
 
 import me.rubataga.everyhunt.Everyhunt;
 import me.rubataga.everyhunt.guis.ConfigGui;
 import me.rubataga.everyhunt.utils.Debugger;
-import org.bukkit.entity.Entity;
+import me.rubataga.everyhunt.utils.EmbeddedYamlEditor;
 
 import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
-public class GameCfg extends AbstractCfg{
+public class GameCfg{
 
     private static final Everyhunt EVERYHUNT = Everyhunt.getInstance();
     private static final String EMBEDDED_GAMEMODE_NAME = "base.yml";
+    private static final Class<GameCfg> GAME_CFG_CLASS = GameCfg.class;
 
     private static ConfigGui gui;
     private static EmbeddedYamlEditor editor;
@@ -62,21 +63,27 @@ public class GameCfg extends AbstractCfg{
     }
 
     public static Object getValue(String key) {
-        return getValue(key,GameCfg.class);
+        try {
+            return GAME_CFG_CLASS.getField(key).get(GAME_CFG_CLASS);
+        } catch (NoSuchFieldException | IllegalAccessException ignore) {
+        }
+        return null;
     }
 
     public static String getFormattedValue(String key){
-        return getFormattedValue(key,GameCfg.class);
+        return String.format("%s: %s",key,getValue(key));
     }
 
     public static void load(String fileName) throws FileNotFoundException {
         editor.load(fileName);
+        for(String key : getKeyFields().keySet()){
+            Debugger.send(getFormattedValue(key));
+        }
     }
 
     public static Map<String,Field> getKeyFields(){
         return editor.getKeyFields();
     }
-
 
     public static ConfigGui getGui(){
         return gui;

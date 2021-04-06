@@ -1,17 +1,48 @@
 package me.rubataga.everyhunt.roles;
 
+import me.rubataga.everyhunt.managers.TrackingManager;
 import org.bukkit.entity.Entity;
 
-public abstract class EveryhuntEntity {
+import java.util.ArrayList;
+import java.util.List;
+
+public abstract class EveryhuntRole {
 
     private final Entity entity;
 
-    public EveryhuntEntity(Entity entity){
+    public EveryhuntRole(Entity entity){
         this.entity = entity;
     }
 
     public Entity getEntity() {
         return entity;
     }
+
+//    public boolean hasRole(RoleEnum role) {
+//        return TrackingManager.getRoleMaps().get(role).containsKey(entity);
+//    }
+//
+//    public List<RoleEnum> getRoles(){
+//        List<RoleEnum> roles = new ArrayList<>();
+//        for(RoleEnum role : TrackingManager.getRoleMaps().keySet()){
+//            if(hasRole(role)){
+//                roles.add(role);
+//            }
+//        }
+//        return roles;
+//    }
+//
+//    public EveryhuntRole getRoleObject(RoleEnum role){
+//        return (EveryhuntRole) TrackingManager.getRoleMaps().get(role).getOrDefault(entity,null);
+//    }
+//
+//    public List<EveryhuntRole> getEveryhuntRoles(){
+//        List<EveryhuntRole> roles = new ArrayList<>();
+//        for(RoleEnum role : getRoles()){
+//            roles.add(getRoleObject(role));
+//        }
+//        return roles;
+//    }
+
 
 }
