@@ -69,7 +69,7 @@ public class DeathListener implements Listener {
     private static void anypercentWon(Target target){
         StringBuilder victoryTextBuilder = new StringBuilder("The Runners win!");
         if (target!=null){
-            victoryTextBuilder.insert(0,target.getEntity().getName()).append(" has killed the Ender Dragon! ");
+            victoryTextBuilder.insert(0,target).append(" has killed the Ender Dragon! ");
         }
         String victoryText = victoryTextBuilder.toString();
         for(Entity hunter : TrackingManager.getHunters().keySet()){

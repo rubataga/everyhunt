@@ -11,6 +11,7 @@ import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -67,18 +68,20 @@ public class HunterGui extends InventoryGui {
                         return true;
             });
             if(HUNTER.getTarget()!=null){
+                Entity targetEntity = HUNTER.getTargetEntity();
                 String alive = ChatColor.GREEN + "Alive!";
-                if(HUNTER.getTargetEntity().isDead()){
+                if(targetEntity.isDead()){
                     alive = ChatColor.RED + "Dead!";
                 }
                 String environment = "Overworld";
-                if(HUNTER.getTargetEntity().getWorld().getEnvironment()==World.Environment.NETHER){
+                World.Environment targetEnvironment = targetEntity.getWorld().getEnvironment();
+                if(targetEnvironment==World.Environment.NETHER){
                     environment = "The Nether";
-                } else if (HUNTER.getTargetEntity().getWorld().getEnvironment()==World.Environment.THE_END){
+                } else if (targetEnvironment==World.Environment.THE_END){
                     environment = "The End";
                 }
                 compass.setText(
-                        HUNTER.getTargetEntity().getName(),
+                        targetEntity.getName(),
                         environment,
                         alive
                 );
@@ -94,35 +97,53 @@ public class HunterGui extends InventoryGui {
         });
     }
 
-    private GuiStateElement guiLockElement(){
-        GuiStateElement lock = new GuiStateElement('l',
-                new GuiStateElement.State(
-                        change -> {
-                            HUNTER.setLockedOnTarget(true);
-                            PLAYER.sendMessage("Your compass is locked");
-                        },
-                        "compassLocked",
-                        new ItemStack(Material.BEDROCK),
-                        "Compass is " + ChatColor.RED + "LOCKED",
-                        "Click here to unlock your compass"
-                ),
-                new GuiStateElement.State(
-                        change -> {
-                            HUNTER.setLockedOnTarget(false);
-                            PLAYER.sendMessage("Your compass is unlocked");
-                        },
-                        "compassUnlocked",
-                        new ItemStack(Material.DIRT),
-                        "Compass is " + ChatColor.GREEN + "UNLOCKED",
-                        "Click here to lock your compass"
-                )
-        );
-        if(HUNTER.isLockedOnTarget()){
-            lock.setState("compassLocked");
+    private DynamicGuiElement guiLockElement(){
+        return new DynamicGuiElement('l', (viewer) -> {
+            GuiStateElement lock;
+            if(GameCfg.huntersCanChangeTarget){
+                lock = new GuiStateElement('l',compassLocked(),compassUnlocked());
+            } else {
+                lock = new GuiStateElement('l',compassLocked());
+            }
+            if(HUNTER.isLockedOnTarget()){
+                lock.setState("compassLocked");
+            } else {
+                lock.setState("compassUnlocked");
+            }
+            return lock;
+        });
+    }
+
+    private GuiStateElement.State compassLocked(){
+        String finalLine;
+        if(GameCfg.huntersCanChangeTarget){
+            finalLine = "Click here to unlock your compass";
         } else {
-            lock.setState("compassUnlocked");
+            finalLine = "You cannot change your target!";
         }
-        return lock;
+        return new GuiStateElement.State(
+                change -> {
+                    HUNTER.setLockedOnTarget(true);
+                    PLAYER.sendMessage("Your compass is locked");
+                },
+                "compassLocked",
+                new ItemStack(Material.BEDROCK),
+                "Compass is " + ChatColor.RED + "LOCKED",
+                finalLine
+        );
+    }
+
+    private GuiStateElement.State compassUnlocked(){
+        return new GuiStateElement.State(
+                change -> {
+                    HUNTER.setLockedOnTarget(false);
+                    PLAYER.sendMessage("Your compass is unlocked");
+                },
+                "compassUnlocked",
+                new ItemStack(Material.GRASS_BLOCK),
+                "Compass is " + ChatColor.GREEN + "UNLOCKED",
+                "Click here to lock your compass"
+        );
     }
 
     private StaticGuiElement guiTargetElement(){

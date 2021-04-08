@@ -1,6 +1,5 @@
 package me.rubataga.everyhunt.managers;
 
-import me.rubataga.everyhunt.configs.GameCfg;
 import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
@@ -23,6 +22,21 @@ public class TrackingManager {
         roleMaps.put(RoleEnum.HUNTER,hunters);
         roleMaps.put(RoleEnum.TARGET,targets);
         roleMaps.put(RoleEnum.RUNNER,runners);
+    }
+
+    public static List<Collection<?>> getCollections(){
+        List<Collection<?>> mapList = new LinkedList<>();
+        mapList.add((Collection<?>) hunters);
+        mapList.add((Collection<?>) targets);
+        mapList.add((Collection<?>) runners);
+        mapList.add(runnerList);
+        return mapList;
+    }
+
+    public static void clearCollections(){
+        for(Collection<?> trackingManagerCollection : getCollections()){
+            trackingManagerCollection.clear();
+        }
     }
 
     public static boolean hasRole(Entity entity, RoleEnum role) {
@@ -52,12 +66,6 @@ public class TrackingManager {
     }
 
     public static void removeTarget(Entity target){
-//        if(GameCfg.autoRemoveRunners){
-//            if(runners.containsKey(target)){
-//                runners.remove(target);
-//                runnerList.remove(getTarget(target));
-//            }
-//        }
         targets.remove(target);
     }
 
@@ -69,12 +77,6 @@ public class TrackingManager {
     public static void removeRunner(Entity runner){
         runners.remove(runner);
         runnerList.remove(runners.get(runner));
-    }
-
-    public static void removeAll(Entity entity){
-        removeHunter(entity);
-        removeRunner(entity);
-        removeTarget(entity);
     }
 
     public static Map<Entity, Hunter> getHunters() {
@@ -104,7 +106,5 @@ public class TrackingManager {
     public static List<Target> getRunnerList() {
         return runnerList;
     }
-
-    public static Map<RoleEnum,Map<Entity,?>> getRoleMaps() { return roleMaps; }
 
 }

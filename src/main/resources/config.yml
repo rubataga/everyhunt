@@ -1,7 +1,7 @@
 debugMode: true
 debugTag: "§d{DEBUG} "
 
-defaultGamemode: "base.yml"
+defaultGamemode: "pog.yml"
 
 commandPrefix: "eh"
 disabledCommands: []

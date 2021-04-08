@@ -54,8 +54,8 @@ public class TeleportListener implements Listener {
         World fromWorld = from.getWorld();
         if(TrackingManager.hasRole(entity,RoleEnum.TARGET)) {
             Target target = TrackingManager.getTarget(entity);
-            target.updateWorldLocation(toWorld, to);
-            target.updateWorldLocation(fromWorld, from);
+            target.updateLastWorldLocation(toWorld, to);
+            target.updateLastWorldLocation(fromWorld, from);
             target.updateLastLocation();
             if(toWorld!=fromWorld){
                 for(Hunter hunter : target.getHunters()){
@@ -63,7 +63,7 @@ public class TeleportListener implements Listener {
                     World world = player.getWorld();
                     hunter.setLodestoneTracking(from);
                     hunter.setTrackingPortal(player.getLocation(),to);
-                    hunter.setLastTracked(target.getLastLocationWorld(world));
+                    hunter.setLastTracked(target.getLastWorldLocation(world));
                     hunter.updateCompassMeta();
                 }
             }
@@ -80,7 +80,7 @@ public class TeleportListener implements Listener {
             // if target has a lastLocation in the toWorld, use it
             Location targetLast = null;
             if(target!=null){
-                targetLast = target.getLastLocationWorld(toWorld);
+                targetLast = target.getLastWorldLocation(toWorld);
             }
             if (target==null || targetLast==null){
                 targetLast = to;

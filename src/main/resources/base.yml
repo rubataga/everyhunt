@@ -25,6 +25,9 @@ guiEnabled: true
 ### PORTALS
 disablePortals: false
 
+### LOBBY
+
+
 ### ROLES
 assignRolesAtStart: false
 assignRoleAtMidjoin: "hunter"
@@ -32,8 +35,9 @@ playersCanChangeRole: true
 
 ### HUNTERS
 assignTargetAtStart: true
-huntersCanChangeTarget: false
+huntersCanChangeTarget: true
 huntersCanBeRunners: true
+huntersCanTrackDeadTargets: true
 
 ### RUNNERS
 nonRunnersCanBeTargeted: false

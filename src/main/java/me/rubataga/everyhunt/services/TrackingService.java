@@ -181,7 +181,7 @@ public class TrackingService {
             if(i>0){
                 s.append(", ");
             }
-            s.append(entities[i].getEntity().getName());
+            s.append(entities[i]);
         }
         s.append(".");
     }

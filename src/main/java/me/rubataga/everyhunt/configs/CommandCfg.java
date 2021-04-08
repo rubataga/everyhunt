@@ -102,6 +102,7 @@ public class CommandCfg {
      * Registers all of the plugin's commands
      */
     public static void register() {
+        Debugger.send("-------------- Registering Commands -------------- ");
         if(COMMAND_PREFIX!=null && !COMMAND_PREFIX.equals("")) {
             CommandAPICommand prefix = new CommandAPICommand(COMMAND_PREFIX);
             List<CommandAPICommand> enabledCommands = new ArrayList<>();

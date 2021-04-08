@@ -71,7 +71,7 @@ public class CompassListener implements Listener {
         if(hunter.isTrackingDeath()){
             if(target!=null) {
                 if (TrackingManager.getRunnerList().contains(target)){
-                    player.sendMessage("Tracking " + target.getEntity().getName() + "'s death location until they revive.");
+                    player.sendMessage("Tracking " + target + "'s death location until they revive.");
                     return;
                 }
             }

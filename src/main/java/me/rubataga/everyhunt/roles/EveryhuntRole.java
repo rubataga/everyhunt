@@ -18,6 +18,15 @@ public abstract class EveryhuntRole {
         return entity;
     }
 
+    public String getName() {
+        return entity.getName();
+    }
+
+    @Override
+    public String toString() {
+        return entity.getName();
+    }
+
 //    public boolean hasRole(RoleEnum role) {
 //        return TrackingManager.getRoleMaps().get(role).containsKey(entity);
 //    }

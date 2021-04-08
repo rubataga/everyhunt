@@ -27,20 +27,23 @@ public class EmbeddedYamlEditor {
     private String loadedResourceName = "";
 
     // settings
-    private final String valueFormat = "%s: %s";
+//    private final String valueFormat = "%s: %s";
 
-    public EmbeddedYamlEditor(Class<?> ownerClass, JavaPlugin plugin, String EMBEDDED_RESOURCE_NAME, String DEFAULT_RESOURCE_NAME) {
+    public EmbeddedYamlEditor(Class<?> ownerClass, JavaPlugin plugin, String embeddedResourceName, String defaultResourceName) {
+//        Debugger.send("Creating YamlEditor for " + ownerClass.getName());
         this.PLUGIN = plugin;
         this.OWNER_CLASS = ownerClass;
         for(Field f : ownerClass.getFields()){
             this.FIELDS.put(f.getName(),f);
         }
-        this.EMBEDDED_RESOURCE_NAME = EMBEDDED_RESOURCE_NAME;
+        this.EMBEDDED_RESOURCE_NAME = embeddedResourceName;
         this.EMBEDDED_VALUE_MAP = YAML.load(getEmbeddedResource());
         try{
-            load(DEFAULT_RESOURCE_NAME);
+            load(defaultResourceName);
+//            Debugger.send("Loaded default for " + ownerClass.getName() + "!");
         } catch (FileNotFoundException e){
             loadEmbed();
+//            Debugger.send("Couldn't find default for" + ownerClass.getSimpleName() + "! Loaded embedded.");
         }
     }
 
@@ -79,26 +82,39 @@ public class EmbeddedYamlEditor {
         if (loadedResourceName.equalsIgnoreCase(fileName)) {
             return;
         }
-        Map<String,Object> loadedValueMap = YAML.load(getInputStream(fileName));
+        InputStream fileStream = getInputStream(fileName);
+        Map<String,Object> loadedValueMap = YAML.load(fileStream);
+//        Debugger.send("this input stream: " + fileStream);
+//        Debugger.send("embedded input stream: " + getEmbeddedResource());
+//        Debugger.send("this stream = embedded stream: " + (fileStream==getEmbeddedResource()));
+//        Map<String,Object> loadedValueMap = YAML.load(getInputStream(fileName));
         setFieldsToValues(loadedValueMap);
         loadedResourceName = fileName;
     }
 
     public void loadEmbed() {
-        Map<String,Object> loadedValueMap = YAML.load(getEmbeddedResource());
-        setFieldsToValues(loadedValueMap);
+//        Debugger.send("loading embedded resource!");
+        setFieldsToValues(EMBEDDED_VALUE_MAP);
         loadedResourceName = EMBEDDED_RESOURCE_NAME;
 }
 
     public InputStream getEmbeddedResource() {
+//        Debugger.send("getting embedded resource!");
         return PLUGIN.getResource(EMBEDDED_RESOURCE_NAME);
     }
 
     public InputStream getInputStream(String fileName) throws FileNotFoundException {
         InputStream inputStream = null;
-        if (fileName.equalsIgnoreCase("$embedded") || fileName.equalsIgnoreCase(EMBEDDED_RESOURCE_NAME)) {
-            inputStream = getEmbeddedResource();
+        if(fileName.equalsIgnoreCase(EMBEDDED_RESOURCE_NAME)){
+            try {
+                inputStream = getInputStream("$embedded");
+            } catch (FileNotFoundException e){
+                inputStream = getEmbeddedResource();
+            }
         } else {
+            if(fileName.equals("$embedded")){
+                fileName = EMBEDDED_RESOURCE_NAME;
+            }
             File configFile = new File(PLUGIN.getDataFolder(), fileName);
             if (configFile.exists()) {
                 try {
@@ -110,11 +126,11 @@ public class EmbeddedYamlEditor {
                 throw new FileNotFoundException("Config file " + fileName + " not found!");
             }
         }
-        loadedResourceName = fileName;
         return inputStream;
     }
 
     private void setFieldsToValues(Map<String,Object> loadedValueMap) {
+        Debugger.send("-------------- Setting fields for " + OWNER_CLASS.getSimpleName() + "-------------- ");
         for(String key : FIELDS.keySet()){
             Field f = FIELDS.get(key);
             if(f!=null){
@@ -128,12 +144,12 @@ public class EmbeddedYamlEditor {
         }
     }
 
-    public void setFieldToValue(String key, Object value) throws IllegalAccessException {
-        Field f = FIELDS.get(key);
-        if(f!=null){
-            f.set(OWNER_CLASS,value);
-        }
-    }
+//    public void setFieldToValue(String key, Object value) throws IllegalAccessException {
+//        Field f = FIELDS.get(key);
+//        if(f!=null){
+//            f.set(OWNER_CLASS,value);
+//        }
+//    }
 
     private Object getSafeValueFromMap(String key, Field f, Map<String,Object> loadedValueMap){
         Object obj = loadedValueMap.get(key);
@@ -169,7 +185,7 @@ public class EmbeddedYamlEditor {
 //            }
 //            obj = EMBEDDED_VALUE_MAP.get(key);
         }
-        Debugger.send(f.getName() + ": " + obj);
+//        Debugger.send(f.getName() + ": " + obj);
         return obj;
     }
 
@@ -179,7 +195,7 @@ public class EmbeddedYamlEditor {
 //        return field.get(OWNER_CLASS);
 //    }
 
-//    public Object getaValue(String key) {
+//    public Object getAValue(String key) {
 //        Object value;
 //        if(FIELDS.containsKey(key)){
 //            Field f = FIELDS.get(key);

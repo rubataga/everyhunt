@@ -6,6 +6,7 @@ import me.rubataga.everyhunt.configs.PluginCfg;
 import dev.jorel.commandapi.CommandAPI;
 import me.rubataga.everyhunt.managers.GameManager;
 import me.rubataga.everyhunt.managers.LobbyManager;
+import me.rubataga.everyhunt.utils.Debugger;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -33,6 +34,8 @@ public final class Everyhunt extends JavaPlugin {
         CommandAPI.onEnable(this);
         pluginInstance = this;
         pluginManager = getServer().getPluginManager();
+
+        Debugger.enabled = getConfig().getBoolean("debugMode");
 
         PluginCfg.initialize();
         GameCfg.initialize();

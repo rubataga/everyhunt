@@ -3,6 +3,7 @@ package me.rubataga.everyhunt.commands;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import dev.jorel.commandapi.arguments.PlayerArgument;
+import me.rubataga.everyhunt.exceptions.GameStartException;
 import me.rubataga.everyhunt.managers.GameManager;
 import me.rubataga.everyhunt.managers.LobbyManager;
 import me.rubataga.everyhunt.services.LobbyService;
@@ -23,7 +24,11 @@ public class LobbyCommands {
     public static CommandAPICommand startGame() {
         return new CommandAPICommand("startgame")
                 .executes((sender, args) -> {
-                    GameManager.startGame();
+                    try {
+                        GameManager.startGame();
+                    } catch (GameStartException e){
+                        sender.sendMessage(e.getMessage());
+                    }
                     sender.sendMessage("Started game!");
                 });
     }

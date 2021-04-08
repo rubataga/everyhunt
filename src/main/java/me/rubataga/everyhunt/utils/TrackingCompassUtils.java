@@ -189,7 +189,7 @@ public class TrackingCompassUtils {
             }
         // if hunter has target
         } else {
-            displayName.append(" - ").append(hunter.getTargetEntity().getName());
+            displayName.append(" - ").append(hunter.getTarget());
             if (hunter.isTrackingDeath()) {
                 displayName.append("'s death location");
             }

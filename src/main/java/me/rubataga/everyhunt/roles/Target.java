@@ -16,7 +16,7 @@ import java.util.*;
 public class Target extends EveryhuntRole {
 
     private final List<Hunter> hunters = new LinkedList<>();
-    private final Map<World,Location> lastLocations = new HashMap<>();
+    private final Map<World,Location> lastWorldLocations = new HashMap<>();
     private World deathWorld = null;
 
     public Target(Entity target){
@@ -56,28 +56,28 @@ public class Target extends EveryhuntRole {
         return hunters;
     }
 
-    public void updateWorldLocation(World world, Location location){
-        lastLocations.put(world,location);
+    public void updateLastWorldLocation(World world, Location location){
+        lastWorldLocations.put(world,location);
     }
 
     public void updateLastLocation() {
         World world = getEntity().getWorld();
         Location currentLocation = getEntity().getLocation();
         Debugger.send("adding last location to world " + world + " : " + LocationUtils.formatBlockLocation(currentLocation));
-        lastLocations.put(world,currentLocation);
-        Debugger.send("all locations: " + lastLocations);
+        updateLastWorldLocation(world,currentLocation);
+        Debugger.send("all locations: " + lastWorldLocations);
     }
 
-    public Location getLastLocationWorld(World world){
-        if(lastLocations.containsKey(world)){
-            return lastLocations.getOrDefault(world,null);
+    public Location getLastWorldLocation(World world){
+        if(lastWorldLocations.containsKey(world)){
+            return lastWorldLocations.getOrDefault(world,null);
         } else {
             return null;
         }
     }
 
-    public Map<World,Location> getLastLocations(){
-        return lastLocations;
+    public Map<World,Location> getLastWorldLocations(){
+        return lastWorldLocations;
     }
 
     public void updateDeathWorld(){

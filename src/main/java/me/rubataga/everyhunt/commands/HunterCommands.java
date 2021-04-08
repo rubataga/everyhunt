@@ -57,7 +57,7 @@ public class HunterCommands {
                 .withArguments(new PlayerArgument("runner"))
                 .executesPlayer((sender, args) -> {
                     Collection<Entity> entityList = Collections.singletonList((Player)args[0]);
-                    HunterService.track(sender,entityList);
+                    HunterService.trackCommand(sender,entityList);
                 });
     }
 
@@ -72,7 +72,7 @@ public class HunterCommands {
                 .withArguments(new EntitySelectorArgument("entity", EntitySelectorArgument.EntitySelector.MANY_ENTITIES))
                 .executesPlayer((sender,args) -> {
                     Collection<Entity> entityList = (Collection<Entity>)args[0];
-                    HunterService.track(sender,entityList);
+                    HunterService.trackCommand(sender,entityList);
                 });
     }
 

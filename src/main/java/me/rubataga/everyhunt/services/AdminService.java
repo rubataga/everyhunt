@@ -49,9 +49,9 @@ public class AdminService {
                 Hunter hunter = TrackingManager.getHunter(entity);
                 sender.sendMessage("Compass is null?: " + (hunter.getCompass()==null));
                 if(hunter.getTarget()!=null){
-                    sender.sendMessage("Target: " + hunter.getTargetEntity().getName());
-                    if(hunter.getTarget().getLastLocations().containsKey(entity.getWorld())){
-                        sender.sendMessage("Target last location in world " + entity.getWorld() + ": " + LocationUtils.formatBlockLocation(hunter.getTarget().getLastLocationWorld(entity.getWorld())));
+                    sender.sendMessage("Target: " + hunter.getTarget());
+                    if(hunter.getTarget().getLastWorldLocations().containsKey(entity.getWorld())){
+                        sender.sendMessage("Target last location in world " + entity.getWorld() + ": " + LocationUtils.formatBlockLocation(hunter.getTarget().getLastWorldLocation(entity.getWorld())));
                     }
                 }
                 sender.sendMessage("Tracking death: " + hunter.isTrackingDeath());
@@ -72,8 +72,8 @@ public class AdminService {
             if(roles.contains(RoleEnum.TARGET)){
                 Target target = TrackingManager.getTarget(entity);
                 sender.sendMessage("Hunters in pursuit: " + target.getHunters());
-                for(World world : target.getLastLocations().keySet()){
-                    sender.sendMessage("Last location in world " + world.getName() + ": " + LocationUtils.formatBlockLocation(target.getLastLocationWorld(world)));
+                for(World world : target.getLastWorldLocations().keySet()){
+                    sender.sendMessage("Last location in world " + world.getName() + ": " + LocationUtils.formatBlockLocation(target.getLastWorldLocation(world)));
                 }
             }
         }

@@ -2,6 +2,10 @@ package me.rubataga.everyhunt.managers;
 
 import me.rubataga.everyhunt.Everyhunt;
 import me.rubataga.everyhunt.configs.GameCfg;
+import me.rubataga.everyhunt.events.GameStartEvent;
+import me.rubataga.everyhunt.events.GameStopEvent;
+import me.rubataga.everyhunt.exceptions.GameStartException;
+import me.rubataga.everyhunt.listeners.ServerTrafficListener;
 import me.rubataga.everyhunt.listeners.CompassListener;
 import me.rubataga.everyhunt.listeners.DeathListener;
 import me.rubataga.everyhunt.listeners.TeleportListener;
@@ -16,6 +20,8 @@ import java.io.FileNotFoundException;
 import java.util.List;
 
 public class GameManager {
+
+    private static final PluginManager PM = Bukkit.getPluginManager();
 
     public static boolean gameStarted;
     public static JavaPlugin plugin;
@@ -42,40 +48,40 @@ public class GameManager {
         }
         Debugger.send("Created new game with configuration: " + GameCfg.gameName);
         if(GameCfg.autoAddToGame){
-            pluginManager.registerEvents(new LobbyManager(),plugin);
+            pluginManager.registerEvents(new ServerTrafficListener(),plugin);
             lobbyPlayers.addAll(Bukkit.getOnlinePlayers());
         }
         if(GameCfg.autoStartOnLoad){
-            startGame();
+            try {
+                startGame();
+            } catch (GameStartException ignore) {}
         }
     }
 
-    public static void startGame(){
+    public static void startGame() throws GameStartException {
         if(gameStarted){
-            Debugger.send("Game already started!");
-            return;
+            throw new GameStartException("Game already started!");
         }
         if(lobbyPlayers.size()<GameCfg.minimumPlayers){
-            Debugger.send("Not enough players!");
-            return;
+            throw new GameStartException("Not enough players!");
         }
         LobbyManager.setRoles();
         pluginManager.registerEvents(new CompassListener(),plugin);
         pluginManager.registerEvents(new DeathListener(),plugin);
         pluginManager.registerEvents(new TeleportListener(),plugin);
-        if(!GameCfg.playersCanMidjoin && GameCfg.autoAddToGame){
-            HandlerList.unregisterAll(new LobbyManager());
+        if(GameCfg.playersCanMidjoin && GameCfg.autoAddToGame){
+            pluginManager.registerEvents(new ServerTrafficListener(), plugin);
         }
         gameStarted = true;
+        PM.callEvent(new GameStartEvent(GameCfg.gameName));
     }
 
     public static void stopGame(){
         HandlerList.unregisterAll(Everyhunt.getInstance());
-        for(Player player : LobbyManager.getLobbyPlayers()){
-            TrackingManager.removeAll(player);
-        }
+        TrackingManager.clearCollections();
         lobbyPlayers.clear();
         gameStarted=false;
+        PM.callEvent(new GameStopEvent());
     }
 
 }

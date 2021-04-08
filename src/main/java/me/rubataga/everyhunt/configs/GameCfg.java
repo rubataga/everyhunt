@@ -45,6 +45,7 @@ public class GameCfg{
     public static boolean assignTargetAtStart;
     public static boolean huntersCanChangeTarget;
     public static boolean huntersCanBeRunners;
+    public static boolean huntersCanTrackDeadTargets;
 
     public static boolean nonRunnersCanBeTargeted;
     public static boolean autoAddRunners;
@@ -56,7 +57,7 @@ public class GameCfg{
         if (defaultName == null) {
             defaultName = "base.yml";
         }
-        editor = new EmbeddedYamlEditor(GameCfg.class, EVERYHUNT, EMBEDDED_GAMEMODE_NAME, defaultName);
+        editor = new EmbeddedYamlEditor(GAME_CFG_CLASS, EVERYHUNT, EMBEDDED_GAMEMODE_NAME, defaultName);
         EVERYHUNT.saveDefaultConfig();
         ConfigGui.initialize();
         gui = new ConfigGui();

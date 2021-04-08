@@ -1,10 +1,13 @@
 package me.rubataga.everyhunt.roles;
 
 import me.rubataga.everyhunt.configs.GameCfg;
+import me.rubataga.everyhunt.events.HunterTrackTargetEvent;
 import me.rubataga.everyhunt.guis.HunterGui;
+import me.rubataga.everyhunt.services.HunterService;
 import me.rubataga.everyhunt.utils.Debugger;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -12,8 +15,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
+import org.bukkit.plugin.PluginManager;
 
 public class Hunter extends EveryhuntRole {
+
+    private static final PluginManager pm = Bukkit.getPluginManager();
 
     private Target target;
     private boolean lockedOnTarget;
@@ -31,6 +37,9 @@ public class Hunter extends EveryhuntRole {
         super(player);
         this.gui = new HunterGui(this);
         this.lodestoneCompass = TrackingCompassUtils.lodestoneTrackingCompass(this);
+        if(!GameCfg.huntersCanChangeTarget){
+            lockedOnTarget = true;
+        }
     }
 
     public ItemStack getCompass(){
@@ -189,7 +198,6 @@ public class Hunter extends EveryhuntRole {
         setTrackingPortal(getEntity().getLocation());
     }
 
-
     public boolean isLodestoneTracking(){
         return lodestoneTracking;
     }
@@ -201,23 +209,18 @@ public class Hunter extends EveryhuntRole {
         this.target = target;
         if(target!=null){
             target.addHunter(this);
-            this.trackingDeath = target.getEntity().isDead();
-            setLodestoneTracking();
+            setTrackingSettings();
         }
     }
 
+    public void setTrackingSettings(){
+        setTrackingDeath(target.getEntity().isDead());
+        setTrackingPortal();
+        setLodestoneTracking();
+    }
+
     public void track(Target target){
-        if(!GameCfg.huntersCanChangeTarget){ // this is a little goofy
-            getEntity().sendMessage("You aren't allowed to change your target!");
-        } else {
-            setTarget(target);
-            if(target==null){
-                getEntity().sendMessage("Tracker reset!");
-            } else {
-                getEntity().sendMessage("Now tracking " + getTargetEntity().getName() + ".");
-            }
-            updateCompassMeta();
-        }
+        HunterService.track(this,target);
     }
 
     public Target getTarget(){

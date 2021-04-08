@@ -1,5 +1,7 @@
 package me.rubataga.everyhunt.services;
 
+import me.rubataga.everyhunt.configs.GameCfg;
+import me.rubataga.everyhunt.events.HunterTrackTargetEvent;
 import me.rubataga.everyhunt.exceptions.PlayerHasTrackingCompassException;
 import me.rubataga.everyhunt.exceptions.EntityHasRoleException;
 import me.rubataga.everyhunt.utils.Rules;
@@ -10,16 +12,20 @@ import me.rubataga.everyhunt.roles.Target;
 import me.rubataga.everyhunt.utils.CommandSenderMessenger;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
 
 import java.util.Collection;
 
 public class HunterService {
+
+    private static final PluginManager PM = Bukkit.getPluginManager();
 
     public static void giveCompassCommand(CommandSender sender, Collection<Entity> hunters) {
         CommandSenderMessenger csm = new CommandSenderMessenger(sender);
@@ -55,70 +61,104 @@ public class HunterService {
         }
     }
 
+    public static void track(Hunter hunter, Target target){
+            hunter.setTarget(target);
+            if(target==null){
+                hunter.getEntity().sendMessage("Tracker reset!");
+            } else {
+                hunter.getEntity().sendMessage(getHunterTrackingMessage(hunter));
+            }
+            hunter.updateCompassMeta();
+            PM.callEvent(new HunterTrackTargetEvent(hunter,target));
+    }
+
+    public static String getHunterTrackingMessage(Hunter hunter){
+        StringBuilder sb = new StringBuilder("Now tracking " + hunter.getTarget());
+        if(hunter.isTrackingDeath()){
+            sb.append("'s death location");
+        }
+        if(hunter.isTrackingPortal()){
+            sb.append("'s portal");
+        }
+        sb.append(".");
+        return sb.toString();
+    }
+
+    private static void trackCommandForSingleTarget(Hunter hunter, Entity targetEntity){
+        Player hunterPlayer = hunter.getEntity();
+        Target target = TrackingManager.getTarget(targetEntity);
+        if(target!=null){
+            World targetWorld;
+            World hunterWorld = hunterPlayer.getWorld();
+            if(targetEntity.isDead()){
+                targetWorld = target.getDeathWorld();
+            } else {
+                targetWorld = targetEntity.getWorld();
+            }
+            // get the target's last location in the hunter's current world
+            Location targetLastHunterWorldLocation = target.getLastWorldLocation(hunterWorld);
+            // hunter and target are in different worlds.
+            if(targetWorld!=hunterWorld){
+                // if target has been in this world before, hunter will track their last world location (probably a portal)
+                if(targetLastHunterWorldLocation!=null){
+                    hunter.setLastTracked(targetLastHunterWorldLocation);
+                    hunter.setLodestoneTracking();
+                } else {
+                    hunterPlayer.sendMessage(targetEntity.getName() + " has not been in this world yet.");
+                    return;
+                }
+            } else {
+                if(targetEntity.isDead() && GameCfg.huntersCanTrackDeadTargets){
+                    hunter.setLastTracked(targetLastHunterWorldLocation);
+                    hunter.setTrackingDeath(true);
+                    hunterPlayer.sendMessage(getHunterTrackingMessage(hunter));
+                }
+            }
+        }
+        // the inputted targetEntity has no associated Target
+        else if (targetEntity.isDead() || targetEntity.getWorld()!=hunterPlayer.getWorld()){
+            hunterPlayer.sendMessage("You are not allowed to track " + targetEntity.getName());
+            return;
+        } else {
+            target = TrackingService.addTarget(targetEntity);
+        }
+        hunter.track(target);
+    }
+
     // split
-    public static void track(CommandSender sender, Collection<Entity> targetsInit){
+    public static void trackCommand(CommandSender sender, Collection<Entity> targetsInit){
         Entity targetEntity = null;
         Target target;
-        Player player = (Player) sender;
-        Hunter hunter = TrackingManager.getHunter(player);
+        Player hunterPlayer = (Player) sender;
+        Hunter hunter = TrackingManager.getHunter(hunterPlayer);
         if(hunter==null){
-            player.sendMessage("You are not a hunter!");
+            sender.sendMessage("You are not a hunter!");
             return;
         }
+        if(!GameCfg.huntersCanChangeTarget){
+            sender.sendMessage("You are not allowed to change your target!");
+        }
         //delete yourself from entityList
-        targetsInit.remove(player);
+        targetsInit.remove(hunterPlayer);
         if(targetsInit.size()>0){
             if(targetsInit.size()==1){
-               targetEntity = targetsInit.toArray(new Entity[1])[0];
-                target = TrackingManager.getTarget(targetEntity);
-                if(target!=null){
-                   World targetWorld;
-                   if(targetEntity.isDead()){
-                       targetWorld = target.getDeathWorld();
-                   } else {
-                       targetWorld = targetEntity.getWorld();
-                   }
-                   Location targetHunterWorldLocation = target.getLastLocationWorld(player.getWorld());
-                   if(targetWorld!=player.getWorld()){
-                       if(targetHunterWorldLocation!=null){
-                           hunter.setLastTracked(targetHunterWorldLocation);
-                           hunter.setLodestoneTracking();
-                           player.sendMessage("Now tracking " + targetEntity.getName() + "'s portal.");
-                       } else {
-                           player.sendMessage(targetEntity.getName() + " has not been in this world yet.");
-                           return;
-                       }
-                   } else {
-                       if(targetEntity.isDead()){
-                           hunter.setLastTracked(targetHunterWorldLocation);
-                           hunter.setTrackingDeath(true);
-                           player.sendMessage("Now tracking " + targetEntity.getName() + "'s death location.");
-                       }
-                   }
-
-               } else if (targetEntity.isDead() || targetEntity.getWorld()!=player.getWorld()){
-                   player.sendMessage("You are not allowed to track " + targetEntity.getName());
-                   return;
-               } else {
-                   target = TrackingService.addTarget(targetEntity);
-                   player.sendMessage("Now tracking " + targetEntity.getName());
-               }
-               hunter.setTarget(target);
-               hunter.updateCompassMeta();
-               return;
+                targetEntity = targetsInit.toArray(new Entity[1])[0];
+//                target = TrackingManager.getTarget(targetEntity);
+                trackCommandForSingleTarget(hunter,targetEntity);
+                return;
             }
-            player.sendMessage("Multiple targets found! Tracking closest target.");
+            hunterPlayer.sendMessage("Multiple targets found! Tracking closest target.");
             Double min = null;
             //find closest target
             for(Entity entity : targetsInit){
                 //if entity is a player and the player isn't a runner, continue
                 if(entity instanceof Player && !TrackingManager.getRunners().containsKey(entity)
                         || !(entity instanceof LivingEntity)
-                        || player.getWorld() != entity.getWorld()
+                        || hunterPlayer.getWorld() != entity.getWorld()
                         || Rules.isBlacklisted(entity)){
                     continue;
                 }
-                double dist = player.getLocation().distanceSquared(entity.getLocation());
+                double dist = hunterPlayer.getLocation().distanceSquared(entity.getLocation());
                 if(targetEntity==null || dist<min){
                     targetEntity = entity;
                     min = dist;
@@ -127,11 +167,9 @@ public class HunterService {
         }
         if(targetEntity!=null){
             target = TrackingService.addTarget(targetEntity);
-            hunter.setTarget(target);
-            player.sendMessage("Now tracking " + targetEntity.getName());
-            hunter.updateCompassMeta();
+            hunter.track(target);
         } else {
-            player.sendMessage("No targets found!");
+            hunterPlayer.sendMessage("No targets found!");
         }
     }
 
