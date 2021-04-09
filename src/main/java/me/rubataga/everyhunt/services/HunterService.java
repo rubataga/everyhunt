@@ -1,5 +1,6 @@
 package me.rubataga.everyhunt.services;
 
+import me.rubataga.everyhunt.Everyhunt;
 import me.rubataga.everyhunt.configs.GameCfg;
 import me.rubataga.everyhunt.events.HunterTrackTargetEvent;
 import me.rubataga.everyhunt.exceptions.PlayerHasTrackingCompassException;

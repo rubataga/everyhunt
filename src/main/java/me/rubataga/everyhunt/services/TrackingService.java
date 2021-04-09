@@ -17,7 +17,6 @@ import java.util.List;
 
 public class TrackingService {
 
-
     public static void addRunnerCommand(CommandSender sender, Collection<Entity> runnerEntities){
         CommandSenderMessenger senderCsm = new CommandSenderMessenger(sender);
         for(Entity entity : runnerEntities){

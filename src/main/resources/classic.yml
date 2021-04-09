@@ -1,21 +1,21 @@
 ### GAME
-gameName: "base"
-gameDescription: ["Base configuration for","Everyhunt"]
+gameName: "classic"
+gameDescription: ["A classic game of","Manhunt"]
 engine: "classic"
 
 ### STARTUP
 autoStartOnLoad: false
-minimumPlayers: 0
-minimumRunners: 0
+minimumPlayers: 2
+minimumRunners: 1
 playersCanMidjoin: true
 autoAddToGame: true
-clearInventory: false
+clearInventory: true
 
 ### SHUTDOWN
 removeCompasses: true
 
 ### TRACKING COMPASS
-useBlacklist: true
+useBlacklist: false
 blacklistMessage: "Tracking this entity is not allowed!"
 compassBlacklist: []
 compassWhitelist: ["player"]
@@ -32,17 +32,17 @@ disablePortals: false
 ### ROLES
 assignRolesAtStart: true
 assignRoleAtMidjoin: "hunter"
-playersCanChangeRole: true
+playersCanChangeRole: false
 
 ### HUNTERS
 assignTargetAtStart: true
 huntersCanChangeTarget: true
-huntersCanBeRunners: true
+huntersCanBeRunners: false
 huntersCanTrackDeadTargets: true
 huntersReviveAsSpectator: false
 
 ### RUNNERS
 nonRunnersCanBeTargeted: false
-autoAddRunners: false
+autoAddRunners: true
 autoRemoveRunners: true
 runnersReviveAsSpectator: true

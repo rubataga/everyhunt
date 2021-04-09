@@ -75,14 +75,15 @@ public class EmbeddedYamlEditor {
 //        valueFormat = s;
 //    }
 
-    public void load(String fileName) throws FileNotFoundException {
-        if(fileName==null){
+    public void load(String ... path) throws FileNotFoundException {
+        if(path==null){
             throw new FileNotFoundException("Filename cannot be null!");
         }
+        String fileName = path[path.length-1];
         if (loadedResourceName.equalsIgnoreCase(fileName)) {
             return;
         }
-        InputStream fileStream = getInputStream(fileName);
+        InputStream fileStream = getInputStream(path);
         Map<String,Object> loadedValueMap = YAML.load(fileStream);
 //        Debugger.send("this input stream: " + fileStream);
 //        Debugger.send("embedded input stream: " + getEmbeddedResource());
@@ -103,19 +104,25 @@ public class EmbeddedYamlEditor {
         return PLUGIN.getResource(EMBEDDED_RESOURCE_NAME);
     }
 
-    public InputStream getInputStream(String fileName) throws FileNotFoundException {
+    public InputStream getInputStream(String ... path) throws FileNotFoundException {
         InputStream inputStream = null;
-        if(fileName.equalsIgnoreCase(EMBEDDED_RESOURCE_NAME)){
+        String filename = path[path.length-1];
+        if(filename.equalsIgnoreCase(EMBEDDED_RESOURCE_NAME)){
             try {
                 inputStream = getInputStream("$embedded");
             } catch (FileNotFoundException e){
                 inputStream = getEmbeddedResource();
             }
         } else {
-            if(fileName.equals("$embedded")){
-                fileName = EMBEDDED_RESOURCE_NAME;
+            if(filename.equals("$embedded")){
+                path[path.length-1] = EMBEDDED_RESOURCE_NAME;
             }
-            File configFile = new File(PLUGIN.getDataFolder(), fileName);
+            File configFile = new File(PLUGIN.getDataFolder(), path[0]);
+            File outerFolder = configFile;
+            for(int i = 1; i<path.length; i++){
+                configFile = new File(outerFolder,path[i]);
+                outerFolder = configFile;
+            }
             if (configFile.exists()) {
                 try {
                     inputStream = configFile.toURI().toURL().openStream();
@@ -123,10 +130,18 @@ public class EmbeddedYamlEditor {
                 }
             }
             if (inputStream == null) {
-                throw new FileNotFoundException("Config file " + fileName + " not found!");
+                throw new FileNotFoundException("Config file " + formatPath(path) + " not found!");
             }
         }
         return inputStream;
+    }
+
+    private String formatPath(String ... path){
+        StringBuilder sb = new StringBuilder();
+        for(String string : path){
+            sb.append(string).append(File.separatorChar);
+        }
+        return sb.toString();
     }
 
     private void setFieldsToValues(Map<String,Object> loadedValueMap) {
