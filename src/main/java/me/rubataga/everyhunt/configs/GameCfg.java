@@ -1,12 +1,17 @@
 package me.rubataga.everyhunt.configs;
 
 import me.rubataga.everyhunt.Everyhunt;
+import me.rubataga.everyhunt.engines.AssassinEngine;
+import me.rubataga.everyhunt.engines.ClassicEngine;
+import me.rubataga.everyhunt.engines.Engine;
 import me.rubataga.everyhunt.guis.ConfigGui;
 import me.rubataga.everyhunt.utils.Debugger;
 import me.rubataga.everyhunt.utils.EmbeddedYamlEditor;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 
@@ -21,11 +26,14 @@ public class GameCfg{
 
     public static String gameName;
     public static List<String> gameDescription;
+    public static String engine;
+
     public static boolean autoStartOnLoad;
     public static int minimumPlayers;
     public static int minimumRunners;
     public static boolean playersCanMidjoin;
     public static boolean autoAddToGame;
+    public static boolean clearInventory;
 
     public static boolean useBlacklist;
     public static String blacklistMessage;
@@ -46,10 +54,12 @@ public class GameCfg{
     public static boolean huntersCanChangeTarget;
     public static boolean huntersCanBeRunners;
     public static boolean huntersCanTrackDeadTargets;
+    public static boolean huntersReviveAsSpectator;
 
     public static boolean nonRunnersCanBeTargeted;
     public static boolean autoAddRunners;
     public static boolean autoRemoveRunners;
+    public static boolean runnersReviveAsSpectator;
 
     // load the default gamemode from config.yml
     public static void initialize() {
@@ -76,10 +86,11 @@ public class GameCfg{
     }
 
     public static void load(String fileName) throws FileNotFoundException {
-        editor.load(fileName);
+        editor.load("configs",fileName);
         for(String key : getKeyFields().keySet()){
             Debugger.send(getFormattedValue(key));
         }
+        Everyhunt.setPluginEngine(getEngine());
     }
 
     public static Map<String,Field> getKeyFields(){
@@ -88,6 +99,15 @@ public class GameCfg{
 
     public static ConfigGui getGui(){
         return gui;
+    }
+
+    public static Engine getEngine() {
+        if(engine.equalsIgnoreCase("classic")){
+            return new ClassicEngine();
+        } else if(engine.equalsIgnoreCase("assassin")){
+            return new AssassinEngine();
+        }
+        return new ClassicEngine();
     }
 
 }

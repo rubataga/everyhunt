@@ -1,30 +1,27 @@
 package me.rubataga.everyhunt.listeners;
 
+import me.rubataga.everyhunt.Everyhunt;
+import me.rubataga.everyhunt.events.RunnerDeathByHunterEvent;
+import me.rubataga.everyhunt.events.RunnerDeathEvent;
 import me.rubataga.everyhunt.roles.Hunter;
 import me.rubataga.everyhunt.roles.RoleEnum;
 import me.rubataga.everyhunt.roles.Target;
 import me.rubataga.everyhunt.managers.TrackingManager;
 import me.rubataga.everyhunt.utils.Debugger;
 import me.rubataga.everyhunt.utils.TrackingCompassUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EnderDragonChangePhaseEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerRespawnEvent;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.bukkit.plugin.PluginManager;
 
 public class DeathListener implements Listener {
 
-    private final Map<Entity,Target> dragonHunterMap = new HashMap<>();
+    private static final PluginManager PM = Bukkit.getPluginManager();
 
     /**
      * EventHandler for a target dying
@@ -41,52 +38,56 @@ public class DeathListener implements Listener {
         targetDeathHandler(e.getEntity());
     }
 
-    private void targetDeathHandler(Entity entity){
-        if(TrackingManager.hasRole(entity,RoleEnum.TARGET)) {
-            Target target = TrackingManager.getTarget(entity);
-            target.updateLastLocation();
-            target.updateDeathWorld();
-            for (Hunter hunter : target.getHunters()) {
-                hunter.getEntity().sendMessage(entity.getName() + " has died. Now tracking " + entity.getName() + "'s death location.");
-                hunter.setTrackingDeath(true);
-                if(!hunter.isTrackingPortal()){
-                    hunter.setLastTracked(entity.getLocation());
+    @EventHandler
+    public void onTargetDamage(EntityDamageByEntityEvent e){
+        Entity targetEntity = e.getEntity();
+        Target runnerTarget = TrackingManager.getTarget(targetEntity);
+        if(runnerTarget!=null) {
+            if(targetEntity.isDead()){
+                Entity damagerEntity = e.getDamager();
+                Hunter damagerHunter = TrackingManager.getHunter(damagerEntity);
+                if(damagerHunter!=null){
+                    PM.callEvent(new RunnerDeathByHunterEvent(runnerTarget,damagerHunter));
+                } else {
+                    PM.callEvent(new RunnerDeathEvent(runnerTarget));
                 }
-                hunter.updateCompassMeta();
             }
         }
     }
 
-    @EventHandler
-    public void onEnderDragonDeath(EnderDragonChangePhaseEvent e){
-        Entity dragon = e.getEntity();
-        if(e.getNewPhase()==EnderDragon.Phase.DYING){
-            anypercentWon(dragonHunterMap.getOrDefault(dragon, null));
-        }
-        targetDeathHandler(dragon);
-    }
-
-    private static void anypercentWon(Target target){
-        StringBuilder victoryTextBuilder = new StringBuilder("The Runners win!");
-        if (target!=null){
-            victoryTextBuilder.insert(0,target).append(" has killed the Ender Dragon! ");
-        }
-        String victoryText = victoryTextBuilder.toString();
-        for(Entity hunter : TrackingManager.getHunters().keySet()){
-            hunter.sendMessage(victoryText);
+    private void targetDeathHandler(Entity targetEntity){
+        Target target = TrackingManager.getTarget(targetEntity);
+        if(target!=null) {
+            target.updateLastLocation();
+            target.updateDeathWorld();
+            for (Hunter hunter : target.getHunters()) {
+                hunter.getEntity().sendMessage(targetEntity.getName() + " has died. Now tracking " + targetEntity.getName() + "'s death location.");
+                hunter.setTrackingDeath(true);
+                if(!hunter.isTrackingPortal()){
+                    hunter.setLastTracked(targetEntity.getLocation());
+                }
+                hunter.updateCompassMeta();
+            }
+            EntityDamageEvent damageEvent = targetEntity.getLastDamageCause();
+            targetDeathEventCaller(damageEvent,target);
         }
     }
 
-    @EventHandler
-    public void onTargetKillEnderDragon(EntityDamageByEntityEvent e){
-        Entity damager = e.getDamager();
-        Entity dragon = e.getEntity();
-        if(!TrackingManager.hasRole(damager,RoleEnum.TARGET) || dragon.getType()!= EntityType.ENDER_DRAGON){
-            return;
+    private void targetDeathEventCaller(EntityDamageEvent e, Target target){
+        Debugger.send("A target has died!");
+        Entity targetEntity = target.getEntity();
+        if(e instanceof EntityDamageByEntityEvent) {
+            EntityDamageByEntityEvent damageByEntityEvent = (EntityDamageByEntityEvent) e;
+            if (TrackingManager.hasRole(targetEntity, RoleEnum.RUNNER)) {
+                Entity damagerEntity = damageByEntityEvent.getDamager();
+                Hunter damagerHunter = TrackingManager.getHunter(damagerEntity);
+                if (damagerHunter != null) {
+                    PM.callEvent(new RunnerDeathByHunterEvent(target, damagerHunter));
+                    return;
+                }
+            }
         }
-        if(dragon.isDead()){
-            dragonHunterMap.put(dragon, TrackingManager.getTarget(damager));
-        }
+        PM.callEvent(new RunnerDeathEvent(target));
     }
 
     /**
@@ -107,7 +108,6 @@ public class DeathListener implements Listener {
             hunter.setTrackingPortal();
             TrackingCompassUtils.assignTrackingCompass(hunter);
             if(hunter.isTrackingPortal() || hunter.isTrackingDeath()){
-                Debugger.send("compass target 1");
                 hunter.getEntity().setCompassTarget(hunter.getLastTracked());
             }
             hunter.updateCompassMeta();

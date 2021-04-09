@@ -18,6 +18,7 @@ public class LobbyCommands {
         return new CommandAPICommand("newgame")
                 .executes((sender, args) -> {
                     GameManager.newGame();
+                    sender.sendMessage("Started new game!");
                 });
     }
 
@@ -26,18 +27,22 @@ public class LobbyCommands {
                 .executes((sender, args) -> {
                     try {
                         GameManager.startGame();
+                        sender.sendMessage("Started game!");
                     } catch (GameStartException e){
                         sender.sendMessage(e.getMessage());
                     }
-                    sender.sendMessage("Started game!");
                 });
     }
 
     public static CommandAPICommand stopGame() {
         return new CommandAPICommand("stopgame")
                 .executes((sender, args) -> {
-                    GameManager.stopGame();
-                    sender.sendMessage("Stopped game!");
+                    try {
+                        GameManager.stopGame();
+                        sender.sendMessage("Stopped game!");
+                    } catch (GameStartException e){
+                        sender.sendMessage(e.getMessage());
+                    }
                 });
     }
 

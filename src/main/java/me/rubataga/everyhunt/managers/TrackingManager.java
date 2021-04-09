@@ -24,19 +24,21 @@ public class TrackingManager {
         roleMaps.put(RoleEnum.RUNNER,runners);
     }
 
-    public static List<Collection<?>> getCollections(){
-        List<Collection<?>> mapList = new LinkedList<>();
-        mapList.add((Collection<?>) hunters);
-        mapList.add((Collection<?>) targets);
-        mapList.add((Collection<?>) runners);
-        mapList.add(runnerList);
-        return mapList;
-    }
+//    public static List<Collection<?>> getCollections(){
+//
+//        List<Collection<?>> mapList = new LinkedList<>();
+//        mapList.add((Map<?>) hunters);
+//        mapList.add((Set<?>) targets);
+//        mapList.add((Set<?>) runners);
+//        mapList.add(runnerList);
+//        return mapList;
+//    }
 
     public static void clearCollections(){
-        for(Collection<?> trackingManagerCollection : getCollections()){
-            trackingManagerCollection.clear();
-        }
+        hunters.clear();
+        targets.clear();
+        runners.clear();
+        runnerList.clear();
     }
 
     public static boolean hasRole(Entity entity, RoleEnum role) {
