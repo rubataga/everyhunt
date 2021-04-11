@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -29,7 +30,7 @@ public class EmbeddedYamlEditor {
     // settings
 //    private final String valueFormat = "%s: %s";
 
-    public EmbeddedYamlEditor(Class<?> ownerClass, JavaPlugin plugin, String embeddedResourceName, String defaultResourceName) {
+    public EmbeddedYamlEditor(Class<?> ownerClass, JavaPlugin plugin, String embeddedResourceName, String ... defaultResourcePath) {
 //        Debugger.send("Creating YamlEditor for " + ownerClass.getName());
         this.PLUGIN = plugin;
         this.OWNER_CLASS = ownerClass;
@@ -39,7 +40,7 @@ public class EmbeddedYamlEditor {
         this.EMBEDDED_RESOURCE_NAME = embeddedResourceName;
         this.EMBEDDED_VALUE_MAP = YAML.load(getEmbeddedResource());
         try{
-            load(defaultResourceName);
+            load(defaultResourcePath);
 //            Debugger.send("Loaded default for " + ownerClass.getName() + "!");
         } catch (FileNotFoundException e){
             loadEmbed();
@@ -80,6 +81,9 @@ public class EmbeddedYamlEditor {
             throw new FileNotFoundException("Filename cannot be null!");
         }
         String fileName = path[path.length-1];
+        Debugger.send("filename: " + fileName);
+        Debugger.send("path:" + path);
+        Debugger.send("path:" + formatPath(path));
         if (loadedResourceName.equalsIgnoreCase(fileName)) {
             return;
         }
@@ -105,6 +109,7 @@ public class EmbeddedYamlEditor {
     }
 
     public InputStream getInputStream(String ... path) throws FileNotFoundException {
+        Debugger.send("getInputStream path: " + Arrays.toString(path));
         InputStream inputStream = null;
         String filename = path[path.length-1];
         if(filename.equalsIgnoreCase(EMBEDDED_RESOURCE_NAME)){
@@ -123,6 +128,8 @@ public class EmbeddedYamlEditor {
                 configFile = new File(outerFolder,path[i]);
                 outerFolder = configFile;
             }
+            Debugger.send("Final name: " + configFile.getName());
+            Debugger.send("Final path: " + configFile.getPath());
             if (configFile.exists()) {
                 try {
                     inputStream = configFile.toURI().toURL().openStream();

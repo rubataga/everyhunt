@@ -67,7 +67,7 @@ public class GameCfg{
         if (defaultName == null) {
             defaultName = "base.yml";
         }
-        editor = new EmbeddedYamlEditor(GAME_CFG_CLASS, EVERYHUNT, EMBEDDED_GAMEMODE_NAME, defaultName);
+        editor = new EmbeddedYamlEditor(GAME_CFG_CLASS, EVERYHUNT, EMBEDDED_GAMEMODE_NAME, "configs", defaultName);
         EVERYHUNT.saveDefaultConfig();
         ConfigGui.initialize();
         gui = new ConfigGui();

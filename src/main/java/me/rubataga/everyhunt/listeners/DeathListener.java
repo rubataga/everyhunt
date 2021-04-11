@@ -41,7 +41,7 @@ public class DeathListener implements Listener {
     @EventHandler
     public void onTargetDamage(EntityDamageByEntityEvent e){
         Entity targetEntity = e.getEntity();
-        Target runnerTarget = TrackingManager.getTarget(targetEntity);
+        Target runnerTarget = TrackingManager.getRunner(targetEntity);
         if(runnerTarget!=null) {
             if(targetEntity.isDead()){
                 Entity damagerEntity = e.getDamager();

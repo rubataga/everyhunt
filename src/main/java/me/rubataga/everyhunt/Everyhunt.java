@@ -36,6 +36,7 @@ public final class Everyhunt extends JavaPlugin {
     public void onEnable() {
         CommandAPI.onEnable(this);
         pluginInstance = this;
+
         File configDirectory = new File(this.getDataFolder(), "configs");
         configDirectory.mkdir();
 
